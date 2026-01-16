@@ -13,7 +13,9 @@ export const Header: Component<HeaderProps> = (props) => {
       <div class="container mx-auto px-4 py-3 flex items-center justify-between">
         <div class="flex items-center gap-3">
           <h1 class="text-2xl font-keifont">とくたん！</h1>
-          <span class="text-sm text-muted-foreground">卒業要件チェッカー</span>
+          <span class="text-sm text-muted-foreground font-semibold">
+            筑波大学&nbsp;卒業要件チェッカー
+          </span>
         </div>
 
         <div class="flex items-center gap-2">
