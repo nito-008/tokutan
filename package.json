@@ -7,7 +7,8 @@
     "start": "vinxi start",
     "format": "biome format --write ./src",
     "lint": "biome lint ./src",
-    "check": "biome check --write ./src"
+    "check": "biome check --write ./src",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@kobalte/core": "^0.13.11",
