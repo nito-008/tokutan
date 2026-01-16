@@ -1,7 +1,8 @@
 import { ensureDefaultProfile, getActiveProfile } from './db/profiles';
-import { getDefaultRequirements, saveRequirements, hasRequirements } from './db/requirements';
+import { getDefaultRequirements, saveRequirements, hasRequirements, getRequirements } from './db/requirements';
 import { getEnrollment } from './db/enrollment';
 import { defaultRequirements } from '~/data/default-requirements';
+import { mockRequirements } from '~/data/mock-requirements';
 import type { UserProfile, GraduationRequirements, EnrollmentData } from './types';
 
 export interface AppState {
@@ -18,12 +19,24 @@ export async function initializeApp(): Promise<AppState> {
   // デフォルト要件がなければ追加
   if (!(await hasRequirements())) {
     await saveRequirements(defaultRequirements);
+
+    // モック要件も追加
+    for (const req of mockRequirements) {
+      await saveRequirements(req);
+    }
+  } else {
+    // 既に要件が存在する場合でも、モック要件が存在しない場合は追加
+    for (const req of mockRequirements) {
+      const exists = await getRequirements(req.id);
+      if (!exists) {
+        await saveRequirements(req);
+      }
+    }
   }
 
   // 要件を取得（プロファイルに紐づくものがあればそれを、なければデフォルト）
   let requirements: GraduationRequirements | null = null;
   if (profile.selectedRequirementsId) {
-    const { getRequirements } = await import('./db/requirements');
     requirements = await getRequirements(profile.selectedRequirementsId) || null;
   }
   if (!requirements) {

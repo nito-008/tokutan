@@ -76,6 +76,17 @@ export async function deleteProfile(id: string): Promise<void> {
   }
 }
 
+// 選択中の卒業要件を更新
+export async function updateSelectedRequirements(
+  profileId: string,
+  requirementsId: string
+): Promise<void> {
+  await db.profiles.update(profileId, {
+    selectedRequirementsId: requirementsId,
+    updatedAt: new Date().toISOString()
+  });
+}
+
 // デフォルトプロファイルを作成（初回起動時）
 export async function ensureDefaultProfile(): Promise<UserProfile> {
   const profiles = await getAllProfiles();

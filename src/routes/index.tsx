@@ -2,12 +2,14 @@ import { Component, createSignal, onMount, Show, createEffect } from 'solid-js';
 import { Header } from '~/components/layout/Header';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { GraduationChecker } from '~/components/graduation/GraduationChecker';
+import { RequirementsSelector } from '~/components/graduation/RequirementsSelector';
 import { CourseManager } from '~/components/course/CourseManager';
 import { ExportDialog } from '~/components/dialogs/ExportDialog';
 import { ImportDialog } from '~/components/dialogs/ImportDialog';
 import { initializeApp, type AppState } from '~/lib/init';
 import type { EnrollmentData } from '~/lib/types';
 import { getEnrollment } from '~/lib/db/enrollment';
+import { getRequirements } from '~/lib/db/requirements';
 
 const Home: Component = () => {
   const [activeTab, setActiveTab] = createSignal<string>('graduation');
@@ -32,6 +34,16 @@ const Home: Component = () => {
     const current = appState();
     if (current) {
       setAppState({ ...current, enrollment });
+    }
+  };
+
+  const handleRequirementsChange = async (requirementsId: string) => {
+    const current = appState();
+    if (current) {
+      const newRequirements = await getRequirements(requirementsId);
+      if (newRequirements) {
+        setAppState({ ...current, requirements: newRequirements });
+      }
     }
   };
 
@@ -67,6 +79,12 @@ const Home: Component = () => {
           </div>
         }>
           <Show when={appState()}>
+            <RequirementsSelector
+              profileId={appState()!.profile.id}
+              selectedRequirementsId={appState()!.profile.selectedRequirementsId}
+              onRequirementsChange={handleRequirementsChange}
+            />
+
             <Tabs value={activeTab()} onChange={setActiveTab} class="w-full">
               <TabsList class="grid w-full grid-cols-2 max-w-md mx-auto mb-6">
                 <TabsTrigger value="graduation">卒業要件チェック</TabsTrigger>
