@@ -19,7 +19,7 @@ export const RequirementsSummary: Component<RequirementsSummaryProps> = (props) 
           <CardTitle class="text-2xl flex items-center gap-2">
             <Show
               when={props.status.isGraduationEligible}
-              fallback={<span>卒業まで&nbsp;あと{remaining()}単位</span>}
+              fallback={<span>卒業まであと&nbsp;{remaining()}単位</span>}
             >
               <span class="text-green-500">✅</span>
               <span>卒業可能</span>
