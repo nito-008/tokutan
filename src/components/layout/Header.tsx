@@ -1,5 +1,5 @@
-import { Component, Show, createSignal } from 'solid-js';
-import { Button } from '~/components/ui/button';
+import { Component, Show, createSignal } from "solid-js";
+import { Button } from "~/components/ui/button";
 
 interface HeaderProps {
   onExport: () => void;
@@ -12,7 +12,7 @@ export const Header: Component<HeaderProps> = (props) => {
     <header class="border-b bg-background">
       <div class="container mx-auto px-4 py-3 flex items-center justify-between">
         <div class="flex items-center gap-3">
-          <h1 class="text-xl font-bold text-primary">tokutan</h1>
+          <h1 class="text-2xl font-keifont">とくたん！</h1>
           <span class="text-sm text-muted-foreground">卒業要件チェッカー</span>
         </div>
 
