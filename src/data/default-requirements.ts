@@ -1,0 +1,332 @@
+import type { GraduationRequirements } from '~/lib/types';
+
+export const defaultRequirements: GraduationRequirements = {
+  id: 'esys-2024',
+  name: '2024年入学 工学システム学類',
+  year: 2024,
+  department: '工学システム学類',
+  totalCredits: 125,
+  version: '1.0.0',
+  isDefault: true,
+  createdAt: new Date().toISOString(),
+  updatedAt: new Date().toISOString(),
+  categories: [
+    {
+      id: 'specialized',
+      name: '専門科目',
+      minCredits: 65,
+      subcategories: [
+        {
+          id: 'specialized-required',
+          name: '必修科目',
+          type: 'required',
+          minCredits: 25,
+          rules: [
+            {
+              id: 'prog-c',
+              type: 'specific',
+              courseIds: ['FG20204'],
+              description: 'プログラミング序論C',
+              required: true
+            },
+            {
+              id: 'prog-d',
+              type: 'specific',
+              courseIds: ['FG20214'],
+              description: 'プログラミング序論D',
+              required: true
+            },
+            {
+              id: 'exp-a',
+              type: 'specific',
+              courseIds: ['FG19103'],
+              description: '工学システム基礎実験A',
+              required: true
+            },
+            {
+              id: 'exp-b',
+              type: 'specific',
+              courseIds: ['FG19113'],
+              description: '工学システム基礎実験B',
+              required: true
+            },
+            {
+              id: 'eng-a',
+              type: 'specific',
+              courseIds: ['FG18112'],
+              description: '専門英語A',
+              required: true
+            },
+            {
+              id: 'eng-b',
+              type: 'specific',
+              courseIds: ['FG20222'],
+              description: '専門英語B',
+              required: true
+            },
+            {
+              id: 'fg17-24-25',
+              type: 'pattern',
+              courseIdPattern: '^FG(17|24|25)',
+              description: 'FG17, FG24, FG25で始まる授業科目',
+              minCredits: 16
+            }
+          ]
+        },
+        {
+          id: 'specialized-elective',
+          name: '選択科目',
+          type: 'elective',
+          minCredits: 40,
+          maxCredits: 49,
+          rules: [
+            {
+              id: 'fg-ff-gb',
+              type: 'pattern',
+              courseIdPattern: '^(FG|FF|GB)',
+              description: 'FG, FF, GBで始まる専門選択科目'
+            }
+          ]
+        }
+      ]
+    },
+    {
+      id: 'foundation',
+      name: '専門基礎科目',
+      minCredits: 31,
+      subcategories: [
+        {
+          id: 'foundation-required',
+          name: '必修科目',
+          type: 'required',
+          minCredits: 31,
+          rules: [
+            {
+              id: 'math-literacy',
+              type: 'specific',
+              courseIds: ['FA01141', 'FA01241'],
+              description: '数学リテラシー1, 2',
+              required: true
+            },
+            {
+              id: 'linear-algebra',
+              type: 'specific',
+              courseIds: ['FA01641', 'FA01741', 'FA01841'],
+              description: '線形代数1, 2, 3',
+              required: true
+            },
+            {
+              id: 'calculus',
+              type: 'specific',
+              courseIds: ['FA01341', 'FA01441', 'FA01541'],
+              description: '微積分1, 2, 3',
+              required: true
+            },
+            {
+              id: 'mechanics',
+              type: 'specific',
+              courseIds: ['FCB1201', 'FCB1241', 'FCB1291'],
+              description: '力学1, 2, 3',
+              required: true
+            },
+            {
+              id: 'em',
+              type: 'specific',
+              courseIds: ['FCB1321', 'FCB1361', 'FCB1381'],
+              description: '電磁気学1, 2, 3',
+              required: true
+            },
+            {
+              id: 'esys-intro',
+              type: 'specific',
+              courseIds: ['FG10651'],
+              description: '工学システム原論',
+              required: true
+            },
+            {
+              id: 'la-adv',
+              type: 'specific',
+              courseIds: ['FG10704', 'FG10724'],
+              description: '線形代数総論A, B',
+              required: true
+            },
+            {
+              id: 'analysis',
+              type: 'specific',
+              courseIds: ['FG10744'],
+              description: '解析学総論',
+              required: true
+            },
+            {
+              id: 'ode',
+              type: 'specific',
+              courseIds: ['FG10764'],
+              description: '常微分方程式',
+              required: true
+            },
+            {
+              id: 'mech-adv',
+              type: 'specific',
+              courseIds: ['FG10814'],
+              description: '力学総論',
+              required: true
+            },
+            {
+              id: 'em-adv',
+              type: 'specific',
+              courseIds: ['FG10834'],
+              description: '電磁気学総論',
+              required: true
+            },
+            {
+              id: 'material',
+              type: 'specific',
+              courseIds: ['FG10864'],
+              description: '材料力学基礎',
+              required: true
+            },
+            {
+              id: 'thermo',
+              type: 'specific',
+              courseIds: ['FG10911'],
+              description: '熱力学基礎',
+              required: true
+            },
+            {
+              id: 'fluid',
+              type: 'specific',
+              courseIds: ['FG10851'],
+              description: '流体力学基礎',
+              required: true
+            },
+            {
+              id: 'complex',
+              type: 'specific',
+              courseIds: ['FG10784'],
+              description: '複素解析',
+              required: true
+            },
+            {
+              id: 'prog-a',
+              type: 'specific',
+              courseIds: ['FG10874'],
+              description: 'プログラミング序論A',
+              required: true
+            },
+            {
+              id: 'prog-b',
+              type: 'specific',
+              courseIds: ['FG10904'],
+              description: 'プログラミング序論B',
+              required: true
+            }
+          ]
+        }
+      ]
+    },
+    {
+      id: 'common',
+      name: '共通科目',
+      minCredits: 13,
+      subcategories: [
+        {
+          id: 'common-fys',
+          name: '総合科目（FYS、学問への誘い）',
+          type: 'required',
+          minCredits: 2,
+          rules: [
+            {
+              id: 'fys',
+              type: 'specific',
+              courseIds: ['1116302'],
+              description: 'ファーストイヤーセミナー',
+              required: true
+            },
+            {
+              id: 'intro',
+              type: 'specific',
+              courseIds: ['1227491'],
+              description: '学問への誘い',
+              required: true
+            }
+          ]
+        },
+        {
+          id: 'common-bachelor',
+          name: '総合科目（学士基礎科目）',
+          type: 'elective',
+          minCredits: 1,
+          maxCredits: 3,
+          rules: []
+        },
+        {
+          id: 'common-pe',
+          name: '体育',
+          type: 'required',
+          minCredits: 3,
+          rules: [
+            {
+              id: 'pe',
+              type: 'pattern',
+              courseIdPattern: '^21[0-9]{5}',
+              description: '体育科目'
+            }
+          ]
+        },
+        {
+          id: 'common-english',
+          name: '第1外国語（英語）',
+          type: 'required',
+          minCredits: 4,
+          rules: [
+            {
+              id: 'english',
+              type: 'pattern',
+              courseIdPattern: '^31[A-Z]{2}',
+              description: '英語科目'
+            }
+          ]
+        },
+        {
+          id: 'common-second',
+          name: '第2外国語（初修外国語）',
+          type: 'elective',
+          minCredits: 0,
+          maxCredits: 4,
+          rules: [
+            {
+              id: 'second-lang',
+              type: 'pattern',
+              courseIdPattern: '^34[A-Z0-9]{2}',
+              description: '初修外国語'
+            }
+          ]
+        }
+      ]
+    },
+    {
+      id: 'basic',
+      name: '基礎科目',
+      minCredits: 6,
+      maxCredits: 15,
+      subcategories: [
+        {
+          id: 'basic-other',
+          name: '他学群又は他学類の授業科目',
+          type: 'elective',
+          minCredits: 6,
+          maxCredits: 15,
+          rules: [
+            {
+              id: 'other-dept',
+              type: 'pattern',
+              courseIdPattern: '^(GB|GC|GA|GE|BC)',
+              description: '他学類の科目'
+            }
+          ],
+          notes: '情報学群、他学類の科目'
+        }
+      ]
+    }
+  ]
+};

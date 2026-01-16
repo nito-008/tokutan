@@ -1,25 +1,112 @@
-import { A } from "@solidjs/router";
-import Counter from "~/components/Counter";
+import { Component, createSignal, onMount, Show, createEffect } from 'solid-js';
+import { Header } from '~/components/layout/Header';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
+import { GraduationChecker } from '~/components/graduation/GraduationChecker';
+import { CourseManager } from '~/components/course/CourseManager';
+import { ExportDialog } from '~/components/dialogs/ExportDialog';
+import { ImportDialog } from '~/components/dialogs/ImportDialog';
+import { initializeApp, type AppState } from '~/lib/init';
+import type { EnrollmentData } from '~/lib/types';
+import { getEnrollment } from '~/lib/db/enrollment';
 
-export default function Home() {
+const Home: Component = () => {
+  const [activeTab, setActiveTab] = createSignal<string>('graduation');
+  const [isLoading, setIsLoading] = createSignal(true);
+  const [appState, setAppState] = createSignal<AppState | null>(null);
+  const [showExportDialog, setShowExportDialog] = createSignal(false);
+  const [showImportDialog, setShowImportDialog] = createSignal(false);
+  const [showRequirementEditor, setShowRequirementEditor] = createSignal(false);
+
+  onMount(async () => {
+    try {
+      const state = await initializeApp();
+      setAppState(state);
+    } catch (error) {
+      console.error('Failed to initialize app:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  });
+
+  const handleEnrollmentUpdate = async (enrollment: EnrollmentData) => {
+    const current = appState();
+    if (current) {
+      setAppState({ ...current, enrollment });
+    }
+  };
+
+  const handleImportComplete = async () => {
+    // 再初期化
+    const state = await initializeApp();
+    setAppState(state);
+  };
+
+  const handleSyncTwins = () => {
+    // CSVアップローダーを表示するためにタブを切り替え
+    setActiveTab('graduation');
+  };
+
+  const handleEditRequirements = () => {
+    setShowRequirementEditor(true);
+  };
+
   return (
-    <main class="text-center mx-auto text-gray-700 p-4">
-      <h1 class="max-6-xs text-6xl text-sky-700 font-thin uppercase my-16">Hello world!</h1>
-      <Counter />
-      <p class="mt-8">
-        Visit{" "}
-        <a href="https://solidjs.com" target="_blank" class="text-sky-600 hover:underline">
-          solidjs.com
-        </a>{" "}
-        to learn how to build Solid apps.
-      </p>
-      <p class="my-4">
-        <span>Home</span>
-        {" - "}
-        <A href="/about" class="text-sky-600 hover:underline">
-          About Page
-        </A>{" "}
-      </p>
-    </main>
+    <div class="min-h-screen bg-background">
+      <Header
+        onExport={() => setShowExportDialog(true)}
+        onImport={() => setShowImportDialog(true)}
+      />
+
+      <main class="container mx-auto px-4 py-6">
+        <Show when={!isLoading()} fallback={
+          <div class="flex items-center justify-center py-12">
+            <div class="text-center">
+              <div class="text-4xl mb-4 animate-pulse">⏳</div>
+              <p class="text-muted-foreground">読み込み中...</p>
+            </div>
+          </div>
+        }>
+          <Show when={appState()}>
+            <Tabs value={activeTab()} onChange={setActiveTab} class="w-full">
+              <TabsList class="grid w-full grid-cols-2 max-w-md mx-auto mb-6">
+                <TabsTrigger value="graduation">卒業要件チェック</TabsTrigger>
+                <TabsTrigger value="course">履修管理</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="graduation">
+                <GraduationChecker
+                  requirements={appState()!.requirements}
+                  enrollment={appState()!.enrollment}
+                  onEnrollmentUpdate={handleEnrollmentUpdate}
+                  onEditRequirements={handleEditRequirements}
+                />
+              </TabsContent>
+
+              <TabsContent value="course">
+                <CourseManager
+                  profileId={appState()!.profile.id}
+                  enrollmentYear={appState()!.profile.enrollmentYear}
+                  enrollment={appState()!.enrollment}
+                  onSyncTwins={handleSyncTwins}
+                />
+              </TabsContent>
+            </Tabs>
+          </Show>
+        </Show>
+      </main>
+
+      <ExportDialog
+        open={showExportDialog()}
+        onClose={() => setShowExportDialog(false)}
+      />
+
+      <ImportDialog
+        open={showImportDialog()}
+        onClose={() => setShowImportDialog(false)}
+        onImportComplete={handleImportComplete}
+      />
+    </div>
   );
-}
+};
+
+export default Home;
