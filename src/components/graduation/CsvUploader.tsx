@@ -82,10 +82,11 @@ export const CsvUploader: Component<CsvUploaderProps> = (props) => {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div
+        <button
+          type="button"
           class={`
             border-2 border-dashed rounded-lg p-8 text-center cursor-pointer
-            transition-colors
+            transition-colors w-full
             ${isDragging() ? "border-primary bg-primary/5" : "border-muted-foreground/25 hover:border-primary/50"}
           `}
           onDrop={handleDrop}
@@ -114,7 +115,7 @@ export const CsvUploader: Component<CsvUploaderProps> = (props) => {
             <div class="text-4xl mb-4 animate-pulse">⏳</div>
             <p>読み込み中...</p>
           </Show>
-        </div>
+        </button>
 
         <Show when={error()}>
           <Alert variant="destructive" class="mt-4">

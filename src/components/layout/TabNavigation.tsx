@@ -1,11 +1,11 @@
-import type { Component } from "solid-js";
+import type { Component, JSX } from "solid-js";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 
 interface TabNavigationProps {
   activeTab: string;
   onTabChange: (tab: string) => void;
-  graduationContent: any;
-  courseContent: any;
+  graduationContent: JSX.Element;
+  courseContent: JSX.Element;
 }
 
 export const TabNavigation: Component<TabNavigationProps> = (props) => {

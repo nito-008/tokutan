@@ -49,7 +49,11 @@ const SubcategoryItem: Component<{ subcategory: SubcategoryStatus }> = (props) =
 
   return (
     <div class="border rounded-lg p-3">
-      <button class="flex items-center gap-3 w-full text-left" onClick={() => setIsOpen(!isOpen())}>
+      <button
+        type="button"
+        class="flex items-center gap-3 w-full text-left"
+        onClick={() => setIsOpen(!isOpen())}
+      >
         <StatusIcon isSatisfied={props.subcategory.isSatisfied} />
         <span class="font-medium text-sm">{props.subcategory.subcategoryName}</span>
         <span class="text-xs text-muted-foreground ml-auto">

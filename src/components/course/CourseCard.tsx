@@ -53,11 +53,11 @@ export const CourseCard: Component<CourseCardProps> = (props) => {
             {statusLabels[props.course.status]}
           </Badge>
           <Show when={props.course.actualGrade && props.course.actualGrade !== "-"}>
-            <Badge
-              class={`${gradeColors[props.course.actualGrade!] || "bg-gray-500"} text-white text-xs`}
-            >
-              {props.course.actualGrade}
-            </Badge>
+            {(grade) => (
+              <Badge class={`${gradeColors[grade()] || "bg-gray-500"} text-white text-xs`}>
+                {grade()}
+              </Badge>
+            )}
           </Show>
         </div>
       </div>

@@ -63,7 +63,10 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
       </Show>
 
       <Show when={!showUploader() && status() && props.requirements}>
-        <RequirementsSummary status={status()!} requirementsName={props.requirements?.name} />
+        <RequirementsSummary
+          status={status() as RequirementStatus}
+          requirementsName={props.requirements?.name ?? ""}
+        />
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <Card class="lg:col-span-1">

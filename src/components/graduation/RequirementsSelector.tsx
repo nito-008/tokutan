@@ -52,7 +52,7 @@ export const RequirementsSelector: Component<RequirementsSelectorProps> = (props
     <div>
       <Show when={!isLoading()} fallback={<div class="h-10 animate-pulse bg-muted rounded-md" />}>
         <div class="flex items-center gap-3">
-          <label class="text-sm font-medium text-foreground whitespace-nowrap">卒業要件:</label>
+          <span class="text-sm font-medium text-foreground whitespace-nowrap">卒業要件:</span>
           <Select
             value={selectedReq()}
             onChange={handleChange}

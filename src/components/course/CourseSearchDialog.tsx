@@ -99,8 +99,9 @@ export const CourseSearchDialog: Component<CourseSearchDialogProps> = (props) =>
               <div class="space-y-2">
                 <For each={results()}>
                   {(course) => (
-                    <div
-                      class="p-3 border rounded-lg hover:bg-muted cursor-pointer"
+                    <button
+                      type="button"
+                      class="p-3 border rounded-lg hover:bg-muted cursor-pointer w-full text-left"
                       onClick={() => handleSelectCourse(course)}
                     >
                       <div class="flex items-center justify-between">
@@ -110,7 +111,7 @@ export const CourseSearchDialog: Component<CourseSearchDialogProps> = (props) =>
                       <div class="text-xs text-muted-foreground mt-1">
                         {course.id} / {course.semester} {course.schedule}
                       </div>
-                    </div>
+                    </button>
                   )}
                 </For>
               </div>
