@@ -8,14 +8,44 @@ import type {
   SubcategoryStatus,
   UserCourseRecord,
 } from "../types";
+import type { Course } from "../types/course";
+
+// 全必修科目IDを収集するヘルパー関数
+function collectAllRequiredCourseIds(requirements: GraduationRequirements): Set<string> {
+  const requiredCourseIds = new Set<string>();
+
+  for (const category of requirements.categories) {
+    for (const subcategory of category.subcategories) {
+      for (const rule of subcategory.rules) {
+        if (rule.required && rule.type === "specific" && rule.courseIds) {
+          for (const courseId of rule.courseIds) {
+            requiredCourseIds.add(courseId);
+          }
+        }
+      }
+    }
+  }
+
+  return requiredCourseIds;
+}
 
 // 要件充足状況を計算
 export function calculateRequirementStatus(
   requirements: GraduationRequirements,
   courses: UserCourseRecord[],
+  kdbCourses: Course[] = [],
 ): RequirementStatus {
   // 各科目が使用済みかどうかを追跡（同じ科目を複数カテゴリでカウントしない）
   const usedCourseIds = new Set<string>();
+
+  // 全必修科目IDを収集
+  const excludedCourseIds = collectAllRequiredCourseIds(requirements);
+
+  // kdbキャッシュのMapを作成（科目番号→科目情報）
+  const kdbMap = new Map<string, Course>();
+  for (const course of kdbCourses) {
+    kdbMap.set(course.id, course);
+  }
 
   const categoryStatuses: CategoryStatus[] = requirements.categories.map((category) => {
     const subcategoryStatuses: SubcategoryStatus[] = category.subcategories.map((subcategory) => {
@@ -23,7 +53,7 @@ export function calculateRequirementStatus(
       const matchedCourses: MatchedCourse[] = [];
 
       for (const rule of subcategory.rules) {
-        const ruleMatches = matchCoursesToRule(courses, rule, usedCourseIds);
+        const ruleMatches = matchCoursesToRule(courses, rule, usedCourseIds, excludedCourseIds, kdbMap);
 
         const earnedCredits = ruleMatches
           .filter((m) => m.isPassed)
@@ -113,6 +143,8 @@ function matchCoursesToRule(
   courses: UserCourseRecord[],
   rule: RequirementRule,
   usedCourseIds: Set<string>,
+  excludedCourseIds: Set<string>,
+  kdbMap: Map<string, Course>,
 ): MatchedCourse[] {
   const matches: MatchedCourse[] = [];
 
@@ -130,7 +162,12 @@ function matchCoursesToRule(
       case "pattern":
         if (rule.courseIdPattern) {
           const regex = new RegExp(rule.courseIdPattern);
-          isMatch = regex.test(course.courseId);
+          // 必修科目として定義されているものは除外
+          if (excludedCourseIds.has(course.courseId)) {
+            isMatch = false;
+          } else {
+            isMatch = regex.test(course.courseId);
+          }
         }
         break;
 
@@ -148,6 +185,26 @@ function matchCoursesToRule(
         grade: course.grade,
         isPassed: course.isPassed,
         isInProgress: course.isInProgress,
+      });
+    }
+  }
+
+  // 必修科目ルールの場合、未履修科目も追加
+  if (rule.required && rule.type === "specific" && rule.courseIds) {
+    for (const courseId of rule.courseIds) {
+      // 既にマッチした科目はスキップ
+      if (matches.some((m) => m.courseId === courseId)) continue;
+
+      // kdbから科目情報を取得
+      const kdbCourse = kdbMap.get(courseId);
+      matches.push({
+        courseId,
+        courseName: kdbCourse?.name ?? courseId,
+        credits: kdbCourse?.credits ?? 2,
+        grade: "未履修",
+        isPassed: false,
+        isInProgress: false,
+        isUnregistered: true,
       });
     }
   }

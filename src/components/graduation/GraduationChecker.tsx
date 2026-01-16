@@ -1,8 +1,9 @@
-import { type Component, createEffect, createSignal, For, Show } from "solid-js";
+import { type Component, createEffect, createSignal, For, onCleanup, Show } from "solid-js";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { calculateRequirementStatus } from "~/lib/calculator/requirements";
 import { importTwinsData } from "~/lib/db/enrollment";
+import { getCachedKdb } from "~/lib/db/kdb";
 import { getActiveProfile } from "~/lib/db/profiles";
 import type { ValidationResult } from "~/lib/parsers/twins-csv";
 import type {
@@ -29,10 +30,29 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
 
   // 要件充足状況を計算
   createEffect(() => {
-    if (props.requirements && props.enrollment) {
-      const calculated = calculateRequirementStatus(props.requirements, props.enrollment.courses);
-      setStatus(calculated);
+    const requirements = props.requirements;
+    const enrollment = props.enrollment;
+
+    if (!requirements || !enrollment) {
+      return;
     }
+
+    let cancelled = false;
+    onCleanup(() => {
+      cancelled = true;
+    });
+
+    void (async () => {
+      const kdbCourses = await getCachedKdb();
+      if (cancelled) return;
+      const calculated = calculateRequirementStatus(
+        requirements,
+        enrollment.courses,
+        kdbCourses,
+      );
+      if (cancelled) return;
+      setStatus(calculated);
+    })();
   });
 
   const handleDataLoaded = async (courses: TwinsCourse[], _validation: ValidationResult) => {

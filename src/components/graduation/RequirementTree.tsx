@@ -76,15 +76,28 @@ const SubcategoryItem: Component<{ subcategory: SubcategoryStatus }> = (props) =
 const CourseItem: Component<{ course: MatchedCourse }> = (props) => {
   return (
     <div class="flex items-center gap-2 text-sm py-1">
-      <StatusIcon isSatisfied={props.course.isPassed} isInProgress={props.course.isInProgress} />
-      <span>{props.course.courseName}</span>
+      <StatusIcon
+        isSatisfied={props.course.isPassed}
+        isInProgress={props.course.isInProgress}
+        isUnregistered={props.course.isUnregistered}
+      />
+      <span class={props.course.isUnregistered ? "text-muted-foreground" : ""}>
+        {props.course.courseName}
+      </span>
       <span class="text-muted-foreground">({props.course.credits}単位)</span>
       <GradeBadge grade={props.course.grade} />
     </div>
   );
 };
 
-const StatusIcon: Component<{ isSatisfied: boolean; isInProgress?: boolean }> = (props) => {
+const StatusIcon: Component<{
+  isSatisfied: boolean;
+  isInProgress?: boolean;
+  isUnregistered?: boolean;
+}> = (props) => {
+  if (props.isUnregistered) {
+    return <Circle class="size-4 text-gray-300" />;
+  }
   if (props.isInProgress) {
     return <Circle class="size-4 text-blue-500 fill-blue-500" />;
   }
@@ -105,6 +118,7 @@ const GradeBadge: Component<{ grade: string }> = (props) => {
     P: "bg-purple-500",
     認: "bg-purple-500",
     履修中: "bg-blue-500",
+    未履修: "bg-gray-400",
   };
 
   return (

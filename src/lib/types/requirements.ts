@@ -97,4 +97,5 @@ export interface MatchedCourse {
   grade: string;
   isPassed: boolean;
   isInProgress: boolean;
+  isUnregistered?: boolean;
 }
