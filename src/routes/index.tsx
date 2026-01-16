@@ -1,18 +1,18 @@
-import { Component, createSignal, onMount, Show, createEffect } from 'solid-js';
-import { Header } from '~/components/layout/Header';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
-import { GraduationChecker } from '~/components/graduation/GraduationChecker';
-import { RequirementsSelector } from '~/components/graduation/RequirementsSelector';
-import { CourseManager } from '~/components/course/CourseManager';
-import { ExportDialog } from '~/components/dialogs/ExportDialog';
-import { ImportDialog } from '~/components/dialogs/ImportDialog';
-import { initializeApp, type AppState } from '~/lib/init';
-import type { EnrollmentData } from '~/lib/types';
-import { getEnrollment } from '~/lib/db/enrollment';
-import { getRequirements } from '~/lib/db/requirements';
+import { Component, createSignal, onMount, Show, createEffect } from "solid-js";
+import { Header } from "~/components/layout/Header";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
+import { GraduationChecker } from "~/components/graduation/GraduationChecker";
+import { RequirementsSelector } from "~/components/graduation/RequirementsSelector";
+import { CourseManager } from "~/components/course/CourseManager";
+import { ExportDialog } from "~/components/dialogs/ExportDialog";
+import { ImportDialog } from "~/components/dialogs/ImportDialog";
+import { initializeApp, type AppState } from "~/lib/init";
+import type { EnrollmentData } from "~/lib/types";
+import { getEnrollment } from "~/lib/db/enrollment";
+import { getRequirements } from "~/lib/db/requirements";
 
 const Home: Component = () => {
-  const [activeTab, setActiveTab] = createSignal<string>('graduation');
+  const [activeTab, setActiveTab] = createSignal<string>("graduation");
   const [isLoading, setIsLoading] = createSignal(true);
   const [appState, setAppState] = createSignal<AppState | null>(null);
   const [showExportDialog, setShowExportDialog] = createSignal(false);
@@ -24,7 +24,7 @@ const Home: Component = () => {
       const state = await initializeApp();
       setAppState(state);
     } catch (error) {
-      console.error('Failed to initialize app:', error);
+      console.error("Failed to initialize app:", error);
     } finally {
       setIsLoading(false);
     }
@@ -55,7 +55,7 @@ const Home: Component = () => {
 
   const handleSyncTwins = () => {
     // CSVアップローダーを表示するためにタブを切り替え
-    setActiveTab('graduation');
+    setActiveTab("graduation");
   };
 
   const handleEditRequirements = () => {
@@ -70,28 +70,34 @@ const Home: Component = () => {
       />
 
       <main class="container mx-auto px-4 py-6">
-        <Show when={!isLoading()} fallback={
-          <div class="flex items-center justify-center py-12">
-            <div class="text-center">
-              <div class="text-4xl mb-4 animate-pulse">⏳</div>
-              <p class="text-muted-foreground">読み込み中...</p>
+        <Show
+          when={!isLoading()}
+          fallback={
+            <div class="flex items-center justify-center py-12">
+              <div class="text-center">
+                <div class="text-4xl mb-4 animate-pulse">⏳</div>
+                <p class="text-muted-foreground">読み込み中...</p>
+              </div>
             </div>
-          </div>
-        }>
+          }
+        >
           <Show when={appState()}>
-            <RequirementsSelector
-              profileId={appState()!.profile.id}
-              selectedRequirementsId={appState()!.profile.selectedRequirementsId}
-              onRequirementsChange={handleRequirementsChange}
-            />
-
             <Tabs value={activeTab()} onChange={setActiveTab} class="w-full">
-              <TabsList class="grid w-full grid-cols-2 max-w-md mx-auto mb-6">
+              <TabsList class="grid w-full grid-cols-2 max-w-md mx-auto mb-9">
                 <TabsTrigger value="graduation">卒業要件チェック</TabsTrigger>
                 <TabsTrigger value="course">履修管理</TabsTrigger>
               </TabsList>
 
               <TabsContent value="graduation">
+                <div class="flex justify-center mb-6">
+                  <RequirementsSelector
+                    profileId={appState()!.profile.id}
+                    selectedRequirementsId={
+                      appState()!.profile.selectedRequirementsId
+                    }
+                    onRequirementsChange={handleRequirementsChange}
+                  />
+                </div>
                 <GraduationChecker
                   requirements={appState()!.requirements}
                   enrollment={appState()!.enrollment}

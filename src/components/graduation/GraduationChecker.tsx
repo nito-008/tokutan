@@ -1,20 +1,20 @@
-import { Component, Show, createSignal, createEffect, For } from 'solid-js';
-import { CsvUploader } from './CsvUploader';
-import { RequirementsSummary } from './RequirementsSummary';
-import { DonutChart, getCategoryColor } from './DonutChart';
-import { RequirementTree } from './RequirementTree';
-import { Button } from '~/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
+import { Component, Show, createSignal, createEffect, For } from "solid-js";
+import { CsvUploader } from "./CsvUploader";
+import { RequirementsSummary } from "./RequirementsSummary";
+import { DonutChart, getCategoryColor } from "./DonutChart";
+import { RequirementTree } from "./RequirementTree";
+import { Button } from "~/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import type {
   GraduationRequirements,
   RequirementStatus,
   EnrollmentData,
-  TwinsCourse
-} from '~/lib/types';
-import type { ValidationResult } from '~/lib/parsers/twins-csv';
-import { calculateRequirementStatus } from '~/lib/calculator/requirements';
-import { importTwinsData, getEnrollment } from '~/lib/db/enrollment';
-import { getActiveProfile } from '~/lib/db/profiles';
+  TwinsCourse,
+} from "~/lib/types";
+import type { ValidationResult } from "~/lib/parsers/twins-csv";
+import { calculateRequirementStatus } from "~/lib/calculator/requirements";
+import { importTwinsData, getEnrollment } from "~/lib/db/enrollment";
+import { getActiveProfile } from "~/lib/db/profiles";
 
 interface GraduationCheckerProps {
   requirements: GraduationRequirements | null;
@@ -38,7 +38,10 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
     }
   });
 
-  const handleDataLoaded = async (courses: TwinsCourse[], validation: ValidationResult) => {
+  const handleDataLoaded = async (
+    courses: TwinsCourse[],
+    validation: ValidationResult
+  ) => {
     const profile = await getActiveProfile();
     if (!profile) return;
 
@@ -90,7 +93,11 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
                     <div class="flex items-center gap-2 text-sm">
                       <div
                         class="w-3 h-3 rounded"
-                        style={{ 'background-color': getCategoryColor(cat.categoryName) }}
+                        style={{
+                          "background-color": getCategoryColor(
+                            cat.categoryName
+                          ),
+                        }}
                       />
                       <span>{cat.categoryName}</span>
                       <span class="ml-auto text-muted-foreground">
@@ -105,12 +112,16 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
 
           <Card class="lg:col-span-2">
             <CardHeader class="flex flex-row items-center justify-between">
-              <CardTitle class="text-lg">詳細要件</CardTitle>
+              <CardTitle class="text-lg">卒業要件</CardTitle>
               <div class="flex gap-2">
                 <Button variant="outline" size="sm" onClick={handleReupload}>
                   データ更新
                 </Button>
-                <Button variant="outline" size="sm" onClick={props.onEditRequirements}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={props.onEditRequirements}
+                >
                   要件編集
                 </Button>
               </div>
@@ -128,9 +139,7 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
             <p class="text-muted-foreground mb-4">
               卒業要件が設定されていません
             </p>
-            <Button onClick={props.onEditRequirements}>
-              卒業要件を設定
-            </Button>
+            <Button onClick={props.onEditRequirements}>卒業要件を設定</Button>
           </CardContent>
         </Card>
       </Show>
