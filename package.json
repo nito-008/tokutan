@@ -4,7 +4,7 @@
   "scripts": {
     "dev": "vinxi dev",
     "build": "vinxi build",
-    "start": "vinxi start",
+    "start": "serve .output/public",
     "format": "biome format --write ./src",
     "lint": "biome lint ./src",
     "check": "biome check --write ./src",
