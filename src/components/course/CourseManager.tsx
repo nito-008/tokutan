@@ -167,7 +167,7 @@ export const CourseManager: Component<CourseManagerProps> = (props) => {
             <div class="grid grid-cols-4 gap-4 text-center">
               <For each={yearOptions()}>
                 {(year) => {
-                  const yearPlans = () => plan()?.plans.filter((p) => p.year === year);
+                  const yearPlans = () => plan()?.plans.filter((p) => p.year === year) ?? [];
                   const totalCredits = () =>
                     yearPlans().reduce(
                       (sum, p) => sum + p.courses.reduce((s, c) => s + c.credits, 0),

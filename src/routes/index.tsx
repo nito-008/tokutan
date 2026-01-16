@@ -81,37 +81,39 @@ const Home: Component = () => {
           }
         >
           <Show when={appState()}>
-            <Tabs value={activeTab()} onChange={setActiveTab} class="w-full">
-              <TabsList class="grid w-full grid-cols-2 max-w-md mx-auto mb-9">
-                <TabsTrigger value="graduation">卒業要件チェック</TabsTrigger>
-                <TabsTrigger value="course">履修管理</TabsTrigger>
-              </TabsList>
+            {(state) => (
+              <Tabs value={activeTab()} onChange={setActiveTab} class="w-full">
+                <TabsList class="grid w-full grid-cols-2 max-w-md mx-auto mb-9">
+                  <TabsTrigger value="graduation">卒業要件チェック</TabsTrigger>
+                  <TabsTrigger value="course">履修管理</TabsTrigger>
+                </TabsList>
 
-              <TabsContent value="graduation">
-                <div class="flex justify-center mb-6">
-                  <RequirementsSelector
-                    profileId={appState()?.profile.id}
-                    selectedRequirementsId={appState()?.profile.selectedRequirementsId}
-                    onRequirementsChange={handleRequirementsChange}
+                <TabsContent value="graduation">
+                  <div class="flex justify-center mb-6">
+                    <RequirementsSelector
+                      profileId={state().profile.id}
+                      selectedRequirementsId={state().profile.selectedRequirementsId}
+                      onRequirementsChange={handleRequirementsChange}
+                    />
+                  </div>
+                  <GraduationChecker
+                    requirements={state().requirements}
+                    enrollment={state().enrollment}
+                    onEnrollmentUpdate={handleEnrollmentUpdate}
+                    onEditRequirements={handleEditRequirements}
                   />
-                </div>
-                <GraduationChecker
-                  requirements={appState()?.requirements}
-                  enrollment={appState()?.enrollment}
-                  onEnrollmentUpdate={handleEnrollmentUpdate}
-                  onEditRequirements={handleEditRequirements}
-                />
-              </TabsContent>
+                </TabsContent>
 
-              <TabsContent value="course">
-                <CourseManager
-                  profileId={appState()?.profile.id}
-                  enrollmentYear={appState()?.profile.enrollmentYear}
-                  enrollment={appState()?.enrollment}
-                  onSyncTwins={handleSyncTwins}
-                />
-              </TabsContent>
-            </Tabs>
+                <TabsContent value="course">
+                  <CourseManager
+                    profileId={state().profile.id}
+                    enrollmentYear={state().profile.enrollmentYear}
+                    enrollment={state().enrollment}
+                    onSyncTwins={handleSyncTwins}
+                  />
+                </TabsContent>
+              </Tabs>
+            )}
           </Show>
         </Show>
       </main>

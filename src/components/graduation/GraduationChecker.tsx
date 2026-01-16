@@ -75,9 +75,9 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
             </CardHeader>
             <CardContent>
               <DonutChart
-                categoryStatuses={status()?.categoryStatuses}
-                totalEarned={status()?.totalEarnedCredits}
-                totalRequired={status()?.totalRequiredCredits}
+                categoryStatuses={status()?.categoryStatuses ?? []}
+                totalEarned={status()?.totalEarnedCredits ?? 0}
+                totalRequired={status()?.totalRequiredCredits ?? 0}
               />
 
               {/* 凡例 */}
@@ -115,7 +115,7 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
               </div>
             </CardHeader>
             <CardContent>
-              <RequirementTree categoryStatuses={status()?.categoryStatuses} />
+              <RequirementTree categoryStatuses={status()?.categoryStatuses ?? []} />
             </CardContent>
           </Card>
         </div>
