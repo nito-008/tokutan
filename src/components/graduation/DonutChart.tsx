@@ -1,6 +1,13 @@
-import { Component, onMount, onCleanup, createEffect } from 'solid-js';
-import { Chart, type ChartConfiguration, DoughnutController, ArcElement, Tooltip, Legend } from 'chart.js';
-import type { CategoryStatus } from '~/lib/types';
+import {
+  ArcElement,
+  Chart,
+  type ChartConfiguration,
+  DoughnutController,
+  Legend,
+  Tooltip,
+} from "chart.js";
+import { type Component, createEffect, onCleanup, onMount } from "solid-js";
+import type { CategoryStatus } from "~/lib/types";
 
 // Chart.jsのコンポーネントを登録
 Chart.register(DoughnutController, ArcElement, Tooltip, Legend);
@@ -12,52 +19,52 @@ interface DonutChartProps {
 }
 
 const categoryColors: Record<string, string> = {
-  '専門科目': '#3b82f6',
-  '専門基礎科目': '#8b5cf6',
-  '共通科目': '#22c55e',
-  '基礎科目': '#f97316',
+  専門科目: "#3b82f6",
+  専門基礎科目: "#8b5cf6",
+  共通科目: "#22c55e",
+  基礎科目: "#f97316",
 };
 
 export const DonutChart: Component<DonutChartProps> = (props) => {
   let canvasRef: HTMLCanvasElement | undefined;
   let chartInstance: Chart | null = null;
 
-  const getChartConfig = (): ChartConfiguration<'doughnut'> => {
-    const labels = props.categoryStatuses.map(c => c.categoryName);
-    const data = props.categoryStatuses.map(c => c.earnedCredits);
-    const colors = props.categoryStatuses.map(c =>
-      categoryColors[c.categoryName] || '#94a3b8'
-    );
+  const getChartConfig = (): ChartConfiguration<"doughnut"> => {
+    const labels = props.categoryStatuses.map((c) => c.categoryName);
+    const data = props.categoryStatuses.map((c) => c.earnedCredits);
+    const colors = props.categoryStatuses.map((c) => categoryColors[c.categoryName] || "#94a3b8");
 
     return {
-      type: 'doughnut',
+      type: "doughnut",
       data: {
         labels,
-        datasets: [{
-          data,
-          backgroundColor: colors,
-          borderWidth: 0,
-          hoverOffset: 4
-        }]
+        datasets: [
+          {
+            data,
+            backgroundColor: colors,
+            borderWidth: 0,
+            hoverOffset: 4,
+          },
+        ],
       },
       options: {
         responsive: true,
         maintainAspectRatio: true,
-        cutout: '70%',
+        cutout: "70%",
         plugins: {
           legend: {
-            display: false
+            display: false,
           },
           tooltip: {
             callbacks: {
               label: (context) => {
                 const category = props.categoryStatuses[context.dataIndex];
                 return `${context.label}: ${category.earnedCredits}/${category.requiredCredits}単位`;
-              }
-            }
-          }
-        }
-      }
+              },
+            },
+          },
+        },
+      },
     };
   };
 
@@ -95,5 +102,5 @@ export const DonutChart: Component<DonutChartProps> = (props) => {
 };
 
 export function getCategoryColor(name: string): string {
-  return categoryColors[name] || '#94a3b8';
+  return categoryColors[name] || "#94a3b8";
 }

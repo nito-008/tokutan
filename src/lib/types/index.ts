@@ -1,3 +1,3 @@
-export * from './requirements';
-export * from './course';
-export * from './enrollment';
+export * from "./course";
+export * from "./enrollment";
+export * from "./requirements";

@@ -1,6 +1,6 @@
-import { db } from './index';
-import { getSetting, setSetting, SettingKeys } from './settings';
-import type { UserProfile } from '../types';
+import type { UserProfile } from "../types";
+import { db } from "./index";
+import { getSetting, SettingKeys, setSetting } from "./settings";
 
 // 全プロファイルを取得
 export async function getAllProfiles(): Promise<UserProfile[]> {
@@ -30,7 +30,7 @@ export async function saveProfile(profile: UserProfile): Promise<string> {
   const data: UserProfile = {
     ...profile,
     updatedAt: now,
-    createdAt: profile.createdAt || now
+    createdAt: profile.createdAt || now,
   };
   await db.profiles.put(data);
   return data.id;
@@ -40,7 +40,7 @@ export async function saveProfile(profile: UserProfile): Promise<string> {
 export async function createProfile(
   name: string,
   enrollmentYear: number,
-  department: string
+  department: string,
 ): Promise<UserProfile> {
   const now = new Date().toISOString();
   const profile: UserProfile = {
@@ -49,7 +49,7 @@ export async function createProfile(
     enrollmentYear,
     department,
     createdAt: now,
-    updatedAt: now
+    updatedAt: now,
   };
   await db.profiles.add(profile);
   return profile;
@@ -58,10 +58,10 @@ export async function createProfile(
 // プロファイルを削除
 export async function deleteProfile(id: string): Promise<void> {
   // 関連データも削除
-  await db.transaction('rw', [db.profiles, db.enrollment, db.coursePlans], async () => {
+  await db.transaction("rw", [db.profiles, db.enrollment, db.coursePlans], async () => {
     await db.profiles.delete(id);
-    await db.enrollment.where('profileId').equals(id).delete();
-    await db.coursePlans.where('profileId').equals(id).delete();
+    await db.enrollment.where("profileId").equals(id).delete();
+    await db.coursePlans.where("profileId").equals(id).delete();
   });
 
   // アクティブプロファイルの場合はクリア
@@ -79,11 +79,11 @@ export async function deleteProfile(id: string): Promise<void> {
 // 選択中の卒業要件を更新
 export async function updateSelectedRequirements(
   profileId: string,
-  requirementsId: string
+  requirementsId: string,
 ): Promise<void> {
   await db.profiles.update(profileId, {
     selectedRequirementsId: requirementsId,
-    updatedAt: new Date().toISOString()
+    updatedAt: new Date().toISOString(),
   });
 }
 
@@ -99,11 +99,7 @@ export async function ensureDefaultProfile(): Promise<UserProfile> {
   }
 
   // 新規作成
-  const profile = await createProfile(
-    'デフォルト',
-    new Date().getFullYear(),
-    '工学システム学類'
-  );
+  const profile = await createProfile("デフォルト", new Date().getFullYear(), "工学システム学類");
   await setActiveProfile(profile.id);
   return profile;
 }

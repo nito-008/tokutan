@@ -1,10 +1,5 @@
-import { db } from './index';
-import type {
-  GraduationRequirements,
-  EnrollmentData,
-  UserProfile,
-  CoursePlan
-} from '../types';
+import type { CoursePlan, EnrollmentData, GraduationRequirements, UserProfile } from "../types";
+import { db } from "./index";
 
 export interface ExportData {
   version: string;
@@ -21,26 +16,26 @@ export async function exportAllData(): Promise<ExportData> {
     db.profiles.toArray(),
     db.requirements.toArray(),
     db.enrollment.toArray(),
-    db.coursePlans.toArray()
+    db.coursePlans.toArray(),
   ]);
 
   return {
-    version: '1.0.0',
+    version: "1.0.0",
     exportedAt: new Date().toISOString(),
     profiles,
     requirements,
     enrollment,
-    coursePlans
+    coursePlans,
   };
 }
 
 // JSONファイルとしてダウンロード
 export function downloadJson(data: unknown, filename: string): void {
   const json = JSON.stringify(data, null, 2);
-  const blob = new Blob([json], { type: 'application/json' });
+  const blob = new Blob([json], { type: "application/json" });
   const url = URL.createObjectURL(blob);
 
-  const a = document.createElement('a');
+  const a = document.createElement("a");
   a.href = url;
   a.download = filename;
   document.body.appendChild(a);
@@ -52,7 +47,7 @@ export function downloadJson(data: unknown, filename: string): void {
 // 全データをエクスポートしてダウンロード
 export async function exportAndDownload(): Promise<void> {
   const data = await exportAllData();
-  const filename = `tokutan-backup-${new Date().toISOString().split('T')[0]}.json`;
+  const filename = `tokutan-backup-${new Date().toISOString().split("T")[0]}.json`;
   downloadJson(data, filename);
 }
 
@@ -65,9 +60,9 @@ export async function exportRequirements(id: string): Promise<GraduationRequirem
 export async function exportRequirementsAndDownload(id: string): Promise<void> {
   const req = await exportRequirements(id);
   if (!req) {
-    throw new Error('Requirements not found');
+    throw new Error("Requirements not found");
   }
 
-  const filename = `tokutan-requirements-${req.name.replace(/\s+/g, '-')}.json`;
+  const filename = `tokutan-requirements-${req.name.replace(/\s+/g, "-")}.json`;
   downloadJson(req, filename);
 }

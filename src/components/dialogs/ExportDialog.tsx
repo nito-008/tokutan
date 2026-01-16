@@ -1,15 +1,15 @@
-import { Component, createSignal } from 'solid-js';
+import { type Component, createSignal } from "solid-js";
+import { Button } from "~/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
-  DialogTitle
-} from '~/components/ui/dialog';
-import { Button } from '~/components/ui/button';
-import { exportAndDownload, exportRequirementsAndDownload } from '~/lib/db/export';
-import { getAllRequirements } from '~/lib/db/requirements';
-import type { GraduationRequirements } from '~/lib/types';
+  DialogTitle,
+} from "~/components/ui/dialog";
+import { exportAndDownload, exportRequirementsAndDownload } from "~/lib/db/export";
+import { getAllRequirements } from "~/lib/db/requirements";
+import type { GraduationRequirements } from "~/lib/types";
 
 interface ExportDialogProps {
   open: boolean;
@@ -39,7 +39,7 @@ export const ExportDialog: Component<ExportDialogProps> = (props) => {
     try {
       await exportAndDownload();
     } catch (error) {
-      console.error('Export failed:', error);
+      console.error("Export failed:", error);
     } finally {
       setIsExporting(false);
     }
@@ -50,7 +50,7 @@ export const ExportDialog: Component<ExportDialogProps> = (props) => {
     try {
       await exportRequirementsAndDownload(id);
     } catch (error) {
-      console.error('Export requirements failed:', error);
+      console.error("Export requirements failed:", error);
     } finally {
       setIsExporting(false);
     }
@@ -61,9 +61,7 @@ export const ExportDialog: Component<ExportDialogProps> = (props) => {
       <DialogContent>
         <DialogHeader>
           <DialogTitle>データをエクスポート</DialogTitle>
-          <DialogDescription>
-            バックアップファイルをダウンロードします
-          </DialogDescription>
+          <DialogDescription>バックアップファイルをダウンロードします</DialogDescription>
         </DialogHeader>
 
         <div class="space-y-4 mt-4">
@@ -73,7 +71,7 @@ export const ExportDialog: Component<ExportDialogProps> = (props) => {
               プロファイル、履修データ、卒業要件、履修計画を含むすべてのデータをバックアップします。
             </p>
             <Button onClick={handleExportAll} disabled={isExporting()}>
-              {isExporting() ? 'エクスポート中...' : '全データをダウンロード'}
+              {isExporting() ? "エクスポート中..." : "全データをダウンロード"}
             </Button>
           </div>
 
@@ -86,7 +84,7 @@ export const ExportDialog: Component<ExportDialogProps> = (props) => {
               {requirements().length === 0 ? (
                 <p class="text-sm text-muted-foreground">卒業要件がありません</p>
               ) : (
-                requirements().map(req => (
+                requirements().map((req) => (
                   <div class="flex items-center justify-between p-2 bg-muted rounded">
                     <span class="text-sm">{req.name}</span>
                     <Button

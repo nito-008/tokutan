@@ -1,9 +1,9 @@
-import { db } from './index';
-import { getSetting, setSetting, SettingKeys } from './settings';
-import type { Course, KdbCourse } from '../types';
-import { convertKdbCourse } from '../types';
+import type { Course, KdbCourse } from "../types";
+import { convertKdbCourse } from "../types";
+import { db } from "./index";
+import { getSetting, SettingKeys, setSetting } from "./settings";
 
-const KDB_URL = 'https://raw.githubusercontent.com/s7tya/kdb-crawler/master/dist/kdb.json';
+const KDB_URL = "https://raw.githubusercontent.com/s7tya/kdb-crawler/master/dist/kdb.json";
 const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24時間
 
 // kdbキャッシュの年齢を取得（ミリ秒）
@@ -36,13 +36,13 @@ export async function refreshKdbCache(): Promise<void> {
     const now = new Date().toISOString();
 
     // 内部形式に変換
-    const courses: Course[] = kdbData.map(kdb => ({
+    const courses: Course[] = kdbData.map((kdb) => ({
       ...convertKdbCourse(kdb),
-      cachedAt: now
+      cachedAt: now,
     }));
 
     // トランザクションで一括更新
-    await db.transaction('rw', db.kdbCache, async () => {
+    await db.transaction("rw", db.kdbCache, async () => {
       await db.kdbCache.clear();
       await db.kdbCache.bulkAdd(courses);
     });
@@ -50,7 +50,7 @@ export async function refreshKdbCache(): Promise<void> {
     await setSetting(SettingKeys.KDB_CACHED_AT, now);
     console.log(`kdb cache updated: ${courses.length} courses`);
   } catch (error) {
-    console.error('Failed to refresh kdb cache:', error);
+    console.error("Failed to refresh kdb cache:", error);
     throw error;
   }
 }
@@ -80,9 +80,10 @@ export async function searchKdb(query: string): Promise<Course[]> {
 
   // 部分一致検索（科目番号または科目名）
   const allCourses = await db.kdbCache.toArray();
-  const results = allCourses.filter(course =>
-    course.id.toLowerCase().includes(normalizedQuery) ||
-    course.name.toLowerCase().includes(normalizedQuery)
+  const results = allCourses.filter(
+    (course) =>
+      course.id.toLowerCase().includes(normalizedQuery) ||
+      course.name.toLowerCase().includes(normalizedQuery),
   );
 
   // 最大50件まで返す
@@ -98,7 +99,7 @@ export async function getCourseById(courseId: string): Promise<Course | undefine
 // 複数の科目番号で取得
 export async function getCoursesByIds(courseIds: string[]): Promise<Course[]> {
   await ensureKdbCache();
-  return db.kdbCache.where('id').anyOf(courseIds).toArray();
+  return db.kdbCache.where("id").anyOf(courseIds).toArray();
 }
 
 // kdbキャッシュの統計
@@ -114,6 +115,6 @@ export async function getKdbStats(): Promise<{
   return {
     count,
     cachedAt: cachedAt || null,
-    isValid
+    isValid,
   };
 }

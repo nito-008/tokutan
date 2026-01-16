@@ -1,4 +1,4 @@
-import { Component, Show, createSignal } from "solid-js";
+import { type Component, Show } from "solid-js";
 import { Button } from "~/components/ui/button";
 
 interface HeaderProps {

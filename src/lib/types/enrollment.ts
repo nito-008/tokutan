@@ -1,8 +1,8 @@
 // 成績
-export type Grade = 'A+' | 'A' | 'B' | 'C' | 'D' | 'P' | '認' | '履修中' | '-';
+export type Grade = "A+" | "A" | "B" | "C" | "D" | "P" | "認" | "履修中" | "-";
 
 // 科目区分(TWINSの値)
-export type CourseCategory = 'A' | 'B' | 'C';
+export type CourseCategory = "A" | "B" | "C";
 
 // TWINSからパースした科目データ
 export interface TwinsCourse {
@@ -27,7 +27,7 @@ export interface UserCourseRecord {
   credits: number;
   grade: Grade;
   year: number;
-  semester: 'spring' | 'fall' | 'full';
+  semester: "spring" | "fall" | "full";
   category: CourseCategory;
   isPassed: boolean;
   isInProgress: boolean;
@@ -65,7 +65,7 @@ export interface CoursePlan {
 
 export interface SemesterPlan {
   year: number;
-  semester: 'spring' | 'fall';
+  semester: "spring" | "fall";
   courses: PlannedCourse[];
 }
 
@@ -73,23 +73,23 @@ export interface PlannedCourse {
   courseId: string;
   courseName: string;
   credits: number;
-  status: 'planned' | 'enrolled' | 'completed' | 'failed';
+  status: "planned" | "enrolled" | "completed" | "failed";
   actualGrade?: Grade;
   notes?: string;
 }
 
 // 成績判定
 export function isPassed(grade: Grade): boolean {
-  return ['A+', 'A', 'B', 'C', 'P', '認'].includes(grade);
+  return ["A+", "A", "B", "C", "P", "認"].includes(grade);
 }
 
 export function isInProgress(grade: Grade): boolean {
-  return grade === '履修中';
+  return grade === "履修中";
 }
 
 // カテゴリ名のマッピング
 export const categoryNames: Record<CourseCategory, string> = {
-  'A': '専門科目',
-  'B': '専門基礎科目',
-  'C': '共通科目'
+  A: "専門科目",
+  B: "専門基礎科目",
+  C: "共通科目",
 };

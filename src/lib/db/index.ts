@@ -1,11 +1,11 @@
-import Dexie, { type EntityTable } from 'dexie';
+import Dexie, { type EntityTable } from "dexie";
 import type {
-  GraduationRequirements,
-  EnrollmentData,
-  UserProfile,
+  Course,
   CoursePlan,
-  Course
-} from '../types';
+  EnrollmentData,
+  GraduationRequirements,
+  UserProfile,
+} from "../types";
 
 // 設定の型
 export interface Setting {
@@ -15,23 +15,23 @@ export interface Setting {
 
 // Dexie DBクラス定義
 export class TokutanDB extends Dexie {
-  requirements!: EntityTable<GraduationRequirements, 'id'>;
-  enrollment!: EntityTable<EnrollmentData, 'id'>;
-  profiles!: EntityTable<UserProfile, 'id'>;
-  coursePlans!: EntityTable<CoursePlan, 'id'>;
-  kdbCache!: EntityTable<Course, 'id'>;
-  settings!: EntityTable<Setting, 'key'>;
+  requirements!: EntityTable<GraduationRequirements, "id">;
+  enrollment!: EntityTable<EnrollmentData, "id">;
+  profiles!: EntityTable<UserProfile, "id">;
+  coursePlans!: EntityTable<CoursePlan, "id">;
+  kdbCache!: EntityTable<Course, "id">;
+  settings!: EntityTable<Setting, "key">;
 
   constructor() {
-    super('tokutan');
+    super("tokutan");
 
     this.version(1).stores({
-      requirements: 'id, name, year, department, isDefault',
-      enrollment: 'id, profileId',
-      profiles: 'id, name, enrollmentYear',
-      coursePlans: 'id, profileId',
-      kdbCache: 'id, name',
-      settings: 'key'
+      requirements: "id, name, year, department, isDefault",
+      enrollment: "id, profileId",
+      profiles: "id, name, enrollmentYear",
+      coursePlans: "id, profileId",
+      kdbCache: "id, name",
+      settings: "key",
     });
   }
 }

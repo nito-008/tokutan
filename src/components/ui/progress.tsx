@@ -1,18 +1,17 @@
-import type { Component, JSX, ValidComponent } from "solid-js"
-import { splitProps } from "solid-js"
+import type { PolymorphicProps } from "@kobalte/core/polymorphic";
+import * as ProgressPrimitive from "@kobalte/core/progress";
+import type { Component, JSX, ValidComponent } from "solid-js";
+import { splitProps } from "solid-js";
 
-import type { PolymorphicProps } from "@kobalte/core/polymorphic"
-import * as ProgressPrimitive from "@kobalte/core/progress"
-
-import { Label } from "~/components/ui/label"
+import { Label } from "~/components/ui/label";
 
 type ProgressRootProps<T extends ValidComponent = "div"> =
-  ProgressPrimitive.ProgressRootProps<T> & { children?: JSX.Element }
+  ProgressPrimitive.ProgressRootProps<T> & { children?: JSX.Element };
 
 const Progress = <T extends ValidComponent = "div">(
-  props: PolymorphicProps<T, ProgressRootProps<T>>
+  props: PolymorphicProps<T, ProgressRootProps<T>>,
 ) => {
-  const [local, others] = splitProps(props as ProgressRootProps, ["children"])
+  const [local, others] = splitProps(props as ProgressRootProps, ["children"]);
   return (
     <ProgressPrimitive.Root {...others}>
       {local.children}
@@ -20,15 +19,15 @@ const Progress = <T extends ValidComponent = "div">(
         <ProgressPrimitive.Fill class="h-full w-[var(--kb-progress-fill-width)] flex-1 bg-primary transition-all" />
       </ProgressPrimitive.Track>
     </ProgressPrimitive.Root>
-  )
-}
+  );
+};
 
 const ProgressLabel: Component<ProgressPrimitive.ProgressLabelProps> = (props) => {
-  return <ProgressPrimitive.Label as={Label} {...props} />
-}
+  return <ProgressPrimitive.Label as={Label} {...props} />;
+};
 
 const ProgressValueLabel: Component<ProgressPrimitive.ProgressValueLabelProps> = (props) => {
-  return <ProgressPrimitive.ValueLabel as={Label} {...props} />
-}
+  return <ProgressPrimitive.ValueLabel as={Label} {...props} />;
+};
 
-export { Progress, ProgressLabel, ProgressValueLabel }
+export { Progress, ProgressLabel, ProgressValueLabel };

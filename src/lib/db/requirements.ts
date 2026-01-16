@@ -1,5 +1,5 @@
-import { db } from './index';
-import type { GraduationRequirements } from '../types';
+import type { GraduationRequirements } from "../types";
+import { db } from "./index";
 
 // 全要件を取得
 export async function getAllRequirements(): Promise<GraduationRequirements[]> {
@@ -13,23 +13,21 @@ export async function getRequirements(id: string): Promise<GraduationRequirement
 
 // デフォルト要件を取得
 export async function getDefaultRequirements(): Promise<GraduationRequirements | undefined> {
-  return db.requirements.where('isDefault').equals(1).first();
+  return db.requirements.where("isDefault").equals(1).first();
 }
 
 // 年度と学類で要件を取得
 export async function getRequirementsByYearAndDepartment(
   year: number,
-  department: string
+  department: string,
 ): Promise<GraduationRequirements | undefined> {
   return db.requirements
-    .where('[year+department]')
+    .where("[year+department]")
     .equals([year, department])
     .first()
     .catch(() => {
       // インデックスがない場合はフィルタで検索
-      return db.requirements
-        .filter(r => r.year === year && r.department === department)
-        .first();
+      return db.requirements.filter((r) => r.year === year && r.department === department).first();
     });
 }
 
@@ -39,7 +37,7 @@ export async function saveRequirements(requirements: GraduationRequirements): Pr
   const data: GraduationRequirements = {
     ...requirements,
     updatedAt: now,
-    createdAt: requirements.createdAt || now
+    createdAt: requirements.createdAt || now,
   };
   await db.requirements.put(data);
   return data.id;
@@ -52,7 +50,7 @@ export async function deleteRequirements(id: string): Promise<void> {
 
 // デフォルト要件を設定
 export async function setDefaultRequirements(id: string): Promise<void> {
-  await db.transaction('rw', db.requirements, async () => {
+  await db.transaction("rw", db.requirements, async () => {
     // 既存のデフォルトを解除
     const current = await getDefaultRequirements();
     if (current) {
@@ -66,11 +64,11 @@ export async function setDefaultRequirements(id: string): Promise<void> {
 // 要件をコピー
 export async function copyRequirements(
   id: string,
-  newName: string
+  newName: string,
 ): Promise<GraduationRequirements> {
   const original = await getRequirements(id);
   if (!original) {
-    throw new Error('Original requirements not found');
+    throw new Error("Original requirements not found");
   }
 
   const now = new Date().toISOString();
@@ -80,7 +78,7 @@ export async function copyRequirements(
     name: newName,
     isDefault: false,
     createdAt: now,
-    updatedAt: now
+    updatedAt: now,
   };
 
   await db.requirements.add(copy);

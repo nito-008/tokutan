@@ -1,15 +1,14 @@
-import { Component, createSignal, onMount, Show, createEffect } from "solid-js";
-import { Header } from "~/components/layout/Header";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
-import { GraduationChecker } from "~/components/graduation/GraduationChecker";
-import { RequirementsSelector } from "~/components/graduation/RequirementsSelector";
+import { type Component, createSignal, onMount, Show } from "solid-js";
 import { CourseManager } from "~/components/course/CourseManager";
 import { ExportDialog } from "~/components/dialogs/ExportDialog";
 import { ImportDialog } from "~/components/dialogs/ImportDialog";
-import { initializeApp, type AppState } from "~/lib/init";
-import type { EnrollmentData } from "~/lib/types";
-import { getEnrollment } from "~/lib/db/enrollment";
+import { GraduationChecker } from "~/components/graduation/GraduationChecker";
+import { RequirementsSelector } from "~/components/graduation/RequirementsSelector";
+import { Header } from "~/components/layout/Header";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { getRequirements } from "~/lib/db/requirements";
+import { type AppState, initializeApp } from "~/lib/init";
+import type { EnrollmentData } from "~/lib/types";
 
 const Home: Component = () => {
   const [activeTab, setActiveTab] = createSignal<string>("graduation");
@@ -17,7 +16,7 @@ const Home: Component = () => {
   const [appState, setAppState] = createSignal<AppState | null>(null);
   const [showExportDialog, setShowExportDialog] = createSignal(false);
   const [showImportDialog, setShowImportDialog] = createSignal(false);
-  const [showRequirementEditor, setShowRequirementEditor] = createSignal(false);
+  const [_showRequirementEditor, setShowRequirementEditor] = createSignal(false);
 
   onMount(async () => {
     try {
@@ -91,16 +90,14 @@ const Home: Component = () => {
               <TabsContent value="graduation">
                 <div class="flex justify-center mb-6">
                   <RequirementsSelector
-                    profileId={appState()!.profile.id}
-                    selectedRequirementsId={
-                      appState()!.profile.selectedRequirementsId
-                    }
+                    profileId={appState()?.profile.id}
+                    selectedRequirementsId={appState()?.profile.selectedRequirementsId}
                     onRequirementsChange={handleRequirementsChange}
                   />
                 </div>
                 <GraduationChecker
-                  requirements={appState()!.requirements}
-                  enrollment={appState()!.enrollment}
+                  requirements={appState()?.requirements}
+                  enrollment={appState()?.enrollment}
                   onEnrollmentUpdate={handleEnrollmentUpdate}
                   onEditRequirements={handleEditRequirements}
                 />
@@ -108,9 +105,9 @@ const Home: Component = () => {
 
               <TabsContent value="course">
                 <CourseManager
-                  profileId={appState()!.profile.id}
-                  enrollmentYear={appState()!.profile.enrollmentYear}
-                  enrollment={appState()!.enrollment}
+                  profileId={appState()?.profile.id}
+                  enrollmentYear={appState()?.profile.enrollmentYear}
+                  enrollment={appState()?.enrollment}
                   onSyncTwins={handleSyncTwins}
                 />
               </TabsContent>
@@ -119,10 +116,7 @@ const Home: Component = () => {
         </Show>
       </main>
 
-      <ExportDialog
-        open={showExportDialog()}
-        onClose={() => setShowExportDialog(false)}
-      />
+      <ExportDialog open={showExportDialog()} onClose={() => setShowExportDialog(false)} />
 
       <ImportDialog
         open={showImportDialog()}

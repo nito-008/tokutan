@@ -1,24 +1,24 @@
 import type {
-  GraduationRequirements,
-  RequirementStatus,
   CategoryStatus,
-  SubcategoryStatus,
-  RuleStatus,
+  GraduationRequirements,
   MatchedCourse,
+  RequirementRule,
+  RequirementStatus,
+  RuleStatus,
+  SubcategoryStatus,
   UserCourseRecord,
-  RequirementRule
-} from '../types';
+} from "../types";
 
 // 要件充足状況を計算
 export function calculateRequirementStatus(
   requirements: GraduationRequirements,
-  courses: UserCourseRecord[]
+  courses: UserCourseRecord[],
 ): RequirementStatus {
   // 各科目が使用済みかどうかを追跡（同じ科目を複数カテゴリでカウントしない）
   const usedCourseIds = new Set<string>();
 
-  const categoryStatuses: CategoryStatus[] = requirements.categories.map(category => {
-    const subcategoryStatuses: SubcategoryStatus[] = category.subcategories.map(subcategory => {
+  const categoryStatuses: CategoryStatus[] = requirements.categories.map((category) => {
+    const subcategoryStatuses: SubcategoryStatus[] = category.subcategories.map((subcategory) => {
       const ruleStatuses: RuleStatus[] = [];
       const matchedCourses: MatchedCourse[] = [];
 
@@ -26,36 +26,38 @@ export function calculateRequirementStatus(
         const ruleMatches = matchCoursesToRule(courses, rule, usedCourseIds);
 
         const earnedCredits = ruleMatches
-          .filter(m => m.isPassed)
+          .filter((m) => m.isPassed)
           .reduce((sum, m) => sum + m.credits, 0);
 
         const inProgressCredits = ruleMatches
-          .filter(m => m.isInProgress)
+          .filter((m) => m.isInProgress)
           .reduce((sum, m) => sum + m.credits, 0);
 
         const isSatisfied = rule.required
-          ? ruleMatches.every(m => m.isPassed || m.isInProgress)
-          : (rule.minCredits ? earnedCredits >= rule.minCredits : true);
+          ? ruleMatches.every((m) => m.isPassed || m.isInProgress)
+          : rule.minCredits
+            ? earnedCredits >= rule.minCredits
+            : true;
 
         ruleStatuses.push({
           ruleId: rule.id,
-          description: rule.description || '',
+          description: rule.description || "",
           isSatisfied,
           earnedCredits,
           inProgressCredits,
           requiredCredits: rule.minCredits,
-          matchedCourses: ruleMatches
+          matchedCourses: ruleMatches,
         });
 
         matchedCourses.push(...ruleMatches);
       }
 
       const earnedCredits = matchedCourses
-        .filter(m => m.isPassed)
+        .filter((m) => m.isPassed)
         .reduce((sum, m) => sum + m.credits, 0);
 
       const inProgressCredits = matchedCourses
-        .filter(m => m.isInProgress)
+        .filter((m) => m.isInProgress)
         .reduce((sum, m) => sum + m.credits, 0);
 
       const isSatisfied = earnedCredits >= subcategory.minCredits;
@@ -69,15 +71,15 @@ export function calculateRequirementStatus(
         maxCredits: subcategory.maxCredits,
         isSatisfied,
         ruleStatuses,
-        matchedCourses
+        matchedCourses,
       };
     });
 
     const earnedCredits = subcategoryStatuses.reduce((sum, s) => sum + s.earnedCredits, 0);
     const inProgressCredits = subcategoryStatuses.reduce((sum, s) => sum + s.inProgressCredits, 0);
-    const requiredCredits = category.minCredits ||
-      subcategoryStatuses.reduce((sum, s) => sum + s.requiredCredits, 0);
-    const isSatisfied = subcategoryStatuses.every(s => s.isSatisfied);
+    const requiredCredits =
+      category.minCredits || subcategoryStatuses.reduce((sum, s) => sum + s.requiredCredits, 0);
+    const isSatisfied = subcategoryStatuses.every((s) => s.isSatisfied);
 
     return {
       categoryId: category.id,
@@ -87,7 +89,7 @@ export function calculateRequirementStatus(
       requiredCredits,
       maxCredits: category.maxCredits,
       isSatisfied,
-      subcategoryStatuses
+      subcategoryStatuses,
     };
   });
 
@@ -102,7 +104,7 @@ export function calculateRequirementStatus(
     totalRequiredCredits: requirements.totalCredits,
     isGraduationEligible,
     categoryStatuses,
-    calculatedAt: new Date().toISOString()
+    calculatedAt: new Date().toISOString(),
   };
 }
 
@@ -110,7 +112,7 @@ export function calculateRequirementStatus(
 function matchCoursesToRule(
   courses: UserCourseRecord[],
   rule: RequirementRule,
-  usedCourseIds: Set<string>
+  usedCourseIds: Set<string>,
 ): MatchedCourse[] {
   const matches: MatchedCourse[] = [];
 
@@ -121,18 +123,18 @@ function matchCoursesToRule(
     let isMatch = false;
 
     switch (rule.type) {
-      case 'specific':
+      case "specific":
         isMatch = rule.courseIds?.includes(course.courseId) || false;
         break;
 
-      case 'pattern':
+      case "pattern":
         if (rule.courseIdPattern) {
           const regex = new RegExp(rule.courseIdPattern);
           isMatch = regex.test(course.courseId);
         }
         break;
 
-      case 'group':
+      case "group":
         isMatch = rule.groupCourseIds?.includes(course.courseId) || false;
         break;
     }
@@ -145,7 +147,7 @@ function matchCoursesToRule(
         credits: course.credits,
         grade: course.grade,
         isPassed: course.isPassed,
-        isInProgress: course.isInProgress
+        isInProgress: course.isInProgress,
       });
     }
   }

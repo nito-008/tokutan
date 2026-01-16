@@ -36,12 +36,12 @@ export function convertKdbCourse(kdb: KdbCourse): Course {
     name: kdb.科目名,
     method: kdb.授業方法,
     credits: parseFloat(kdb.単位数) || 0,
-    gradeYear: parseInt(kdb.標準履修年次) || 0,
+    gradeYear: parseInt(kdb.標準履修年次, 10) || 0,
     semester: kdb.実施学期,
     schedule: kdb.曜時限,
     instructor: kdb.担当教員,
     description: kdb.授業概要,
     notes: kdb.備考,
-    updatedAt: kdb.データ更新日
+    updatedAt: kdb.データ更新日,
   };
 }

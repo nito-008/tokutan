@@ -1,18 +1,18 @@
-import type { TwinsCourse, Grade, CourseCategory } from '../types';
+import type { CourseCategory, Grade, TwinsCourse } from "../types";
 
 // CSVをパース
 export function parseTwinsCsv(csvContent: string): TwinsCourse[] {
-  const lines = csvContent.trim().split('\n');
+  const lines = csvContent.trim().split("\n");
 
   // ヘッダー行をスキップ
   if (lines.length < 2) {
-    throw new Error('CSVファイルにデータがありません');
+    throw new Error("CSVファイルにデータがありません");
   }
 
   // ヘッダー確認
   const header = lines[0];
-  if (!header.includes('学籍番号') || !header.includes('科目番号')) {
-    throw new Error('TWINSの成績CSVファイルではないようです');
+  if (!header.includes("学籍番号") || !header.includes("科目番号")) {
+    throw new Error("TWINSの成績CSVファイルではないようです");
   }
 
   const courses: TwinsCourse[] = [];
@@ -37,7 +37,7 @@ export function parseTwinsCsv(csvContent: string): TwinsCourse[] {
 // CSV行をパース（ダブルクォートとカンマを考慮）
 function parseCsvLine(line: string): TwinsCourse | null {
   const values: string[] = [];
-  let current = '';
+  let current = "";
   let inQuotes = false;
 
   for (let i = 0; i < line.length; i++) {
@@ -45,9 +45,9 @@ function parseCsvLine(line: string): TwinsCourse | null {
 
     if (char === '"') {
       inQuotes = !inQuotes;
-    } else if (char === ',' && !inQuotes) {
+    } else if (char === "," && !inQuotes) {
       values.push(current.trim());
-      current = '';
+      current = "";
     } else {
       current += char;
     }
@@ -70,7 +70,7 @@ function parseCsvLine(line: string): TwinsCourse | null {
     finalGrade,
     category,
     year,
-    type
+    type,
   ] = values;
 
   // 科目番号がない場合はスキップ
@@ -88,30 +88,30 @@ function parseCsvLine(line: string): TwinsCourse | null {
     fallGrade,
     finalGrade: parseGrade(finalGrade),
     category: parseCategory(category),
-    year: parseInt(year) || new Date().getFullYear(),
-    type
+    year: parseInt(year, 10) || new Date().getFullYear(),
+    type,
   };
 }
 
 // 成績をパース
 function parseGrade(grade: string): Grade {
   const normalized = grade.trim();
-  const validGrades: Grade[] = ['A+', 'A', 'B', 'C', 'D', 'P', '認', '履修中'];
+  const validGrades: Grade[] = ["A+", "A", "B", "C", "D", "P", "認", "履修中"];
 
   for (const g of validGrades) {
     if (normalized === g) return g;
   }
 
-  return '-';
+  return "-";
 }
 
 // 科目区分をパース
 function parseCategory(category: string): CourseCategory {
   const normalized = category.trim().toUpperCase();
-  if (normalized === 'A' || normalized === 'B' || normalized === 'C') {
+  if (normalized === "A" || normalized === "B" || normalized === "C") {
     return normalized;
   }
-  return 'C'; // デフォルト
+  return "C"; // デフォルト
 }
 
 // バリデーション結果
@@ -143,12 +143,12 @@ export function validateTwinsCourses(courses: TwinsCourse[]): ValidationResult {
   for (const course of courses) {
     totalCredits += course.credits;
 
-    if (['A+', 'A', 'B', 'C', 'P', '認'].includes(course.finalGrade)) {
+    if (["A+", "A", "B", "C", "P", "認"].includes(course.finalGrade)) {
       passedCourses++;
       earnedCredits += course.credits;
-    } else if (course.finalGrade === '履修中') {
+    } else if (course.finalGrade === "履修中") {
       inProgressCourses++;
-    } else if (course.finalGrade === 'D') {
+    } else if (course.finalGrade === "D") {
       failedCourses++;
     }
 
@@ -168,7 +168,7 @@ export function validateTwinsCourses(courses: TwinsCourse[]): ValidationResult {
       inProgressCourses,
       failedCourses,
       totalCredits,
-      earnedCredits
-    }
+      earnedCredits,
+    },
   };
 }

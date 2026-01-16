@@ -1,10 +1,10 @@
-import { db } from './index';
-import type { EnrollmentData, UserCourseRecord, TwinsCourse } from '../types';
-import { isPassed, isInProgress } from '../types';
+import type { EnrollmentData, TwinsCourse, UserCourseRecord } from "../types";
+import { isInProgress, isPassed } from "../types";
+import { db } from "./index";
 
 // プロファイルの履修データを取得
 export async function getEnrollment(profileId: string): Promise<EnrollmentData | undefined> {
-  return db.enrollment.where('profileId').equals(profileId).first();
+  return db.enrollment.where("profileId").equals(profileId).first();
 }
 
 // 履修データを保存
@@ -13,7 +13,7 @@ export async function saveEnrollment(data: EnrollmentData): Promise<string> {
   const enrollment: EnrollmentData = {
     ...data,
     updatedAt: now,
-    importedAt: data.importedAt || now
+    importedAt: data.importedAt || now,
   };
   await db.enrollment.put(enrollment);
   return enrollment.id;
@@ -22,7 +22,7 @@ export async function saveEnrollment(data: EnrollmentData): Promise<string> {
 // TWINSデータから履修データを作成
 export async function importTwinsData(
   profileId: string,
-  twinsCourses: TwinsCourse[]
+  twinsCourses: TwinsCourse[],
 ): Promise<EnrollmentData> {
   const now = new Date().toISOString();
 
@@ -37,7 +37,7 @@ export async function importTwinsData(
     semester: determineSemester(tc),
     category: tc.category,
     isPassed: isPassed(tc.finalGrade),
-    isInProgress: isInProgress(tc.finalGrade)
+    isInProgress: isInProgress(tc.finalGrade),
   }));
 
   // 既存データを取得
@@ -48,7 +48,7 @@ export async function importTwinsData(
     profileId,
     courses: mergeCourses(existing?.courses || [], courses),
     importedAt: now,
-    updatedAt: now
+    updatedAt: now,
   };
 
   await saveEnrollment(enrollment);
@@ -56,20 +56,20 @@ export async function importTwinsData(
 }
 
 // 学期を判定
-function determineSemester(tc: TwinsCourse): 'spring' | 'fall' | 'full' {
-  const hasSpring = tc.springGrade && tc.springGrade !== '-';
-  const hasFall = tc.fallGrade && tc.fallGrade !== '-';
+function determineSemester(tc: TwinsCourse): "spring" | "fall" | "full" {
+  const hasSpring = tc.springGrade && tc.springGrade !== "-";
+  const hasFall = tc.fallGrade && tc.fallGrade !== "-";
 
-  if (hasSpring && hasFall) return 'full';
-  if (hasSpring) return 'spring';
-  if (hasFall) return 'fall';
-  return 'spring'; // デフォルト
+  if (hasSpring && hasFall) return "full";
+  if (hasSpring) return "spring";
+  if (hasFall) return "fall";
+  return "spring"; // デフォルト
 }
 
 // 科目をマージ（重複を更新）
 function mergeCourses(
   existing: UserCourseRecord[],
-  newCourses: UserCourseRecord[]
+  newCourses: UserCourseRecord[],
 ): UserCourseRecord[] {
   const map = new Map<string, UserCourseRecord>();
 
@@ -90,22 +90,22 @@ function mergeCourses(
 
 // 履修データを削除
 export async function deleteEnrollment(profileId: string): Promise<void> {
-  await db.enrollment.where('profileId').equals(profileId).delete();
+  await db.enrollment.where("profileId").equals(profileId).delete();
 }
 
 // 単一科目を追加
 export async function addCourse(
   profileId: string,
-  course: Omit<UserCourseRecord, 'id'>
+  course: Omit<UserCourseRecord, "id">,
 ): Promise<void> {
   const enrollment = await getEnrollment(profileId);
   if (!enrollment) {
-    throw new Error('Enrollment not found');
+    throw new Error("Enrollment not found");
   }
 
   const newCourse: UserCourseRecord = {
     ...course,
-    id: `course-${profileId}-${Date.now()}`
+    id: `course-${profileId}-${Date.now()}`,
   };
 
   enrollment.courses.push(newCourse);
@@ -117,7 +117,7 @@ export async function removeCourse(profileId: string, courseRecordId: string): P
   const enrollment = await getEnrollment(profileId);
   if (!enrollment) return;
 
-  enrollment.courses = enrollment.courses.filter(c => c.id !== courseRecordId);
+  enrollment.courses = enrollment.courses.filter((c) => c.id !== courseRecordId);
   await saveEnrollment(enrollment);
 }
 
@@ -125,12 +125,12 @@ export async function removeCourse(profileId: string, courseRecordId: string): P
 export async function updateCourse(
   profileId: string,
   courseRecordId: string,
-  updates: Partial<UserCourseRecord>
+  updates: Partial<UserCourseRecord>,
 ): Promise<void> {
   const enrollment = await getEnrollment(profileId);
   if (!enrollment) return;
 
-  const index = enrollment.courses.findIndex(c => c.id === courseRecordId);
+  const index = enrollment.courses.findIndex((c) => c.id === courseRecordId);
   if (index >= 0) {
     enrollment.courses[index] = { ...enrollment.courses[index], ...updates };
     await saveEnrollment(enrollment);
@@ -154,17 +154,17 @@ export async function getEnrollmentStats(profileId: string): Promise<{
       inProgressCredits: 0,
       passedCount: 0,
       failedCount: 0,
-      inProgressCount: 0
+      inProgressCount: 0,
     };
   }
 
   const courses = enrollment.courses;
   return {
     totalCredits: courses.reduce((sum, c) => sum + c.credits, 0),
-    earnedCredits: courses.filter(c => c.isPassed).reduce((sum, c) => sum + c.credits, 0),
-    inProgressCredits: courses.filter(c => c.isInProgress).reduce((sum, c) => sum + c.credits, 0),
-    passedCount: courses.filter(c => c.isPassed).length,
-    failedCount: courses.filter(c => !c.isPassed && !c.isInProgress).length,
-    inProgressCount: courses.filter(c => c.isInProgress).length
+    earnedCredits: courses.filter((c) => c.isPassed).reduce((sum, c) => sum + c.credits, 0),
+    inProgressCredits: courses.filter((c) => c.isInProgress).reduce((sum, c) => sum + c.credits, 0),
+    passedCount: courses.filter((c) => c.isPassed).length,
+    failedCount: courses.filter((c) => !c.isPassed && !c.isInProgress).length,
+    inProgressCount: courses.filter((c) => c.isInProgress).length,
   };
 }

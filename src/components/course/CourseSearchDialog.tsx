@@ -1,15 +1,10 @@
-import { Component, createSignal, Show, For } from 'solid-js';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle
-} from '~/components/ui/dialog';
-import { Input } from '~/components/ui/input';
-import { Button } from '~/components/ui/button';
-import { Label } from '~/components/ui/label';
-import { searchKdb } from '~/lib/db/kdb';
-import type { Course, PlannedCourse } from '~/lib/types';
+import { type Component, createSignal, For, Show } from "solid-js";
+import { Button } from "~/components/ui/button";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "~/components/ui/dialog";
+import { Input } from "~/components/ui/input";
+import { Label } from "~/components/ui/label";
+import { searchKdb } from "~/lib/db/kdb";
+import type { Course, PlannedCourse } from "~/lib/types";
 
 interface CourseSearchDialogProps {
   open: boolean;
@@ -18,15 +13,15 @@ interface CourseSearchDialogProps {
 }
 
 export const CourseSearchDialog: Component<CourseSearchDialogProps> = (props) => {
-  const [query, setQuery] = createSignal('');
+  const [query, setQuery] = createSignal("");
   const [results, setResults] = createSignal<Course[]>([]);
   const [isSearching, setIsSearching] = createSignal(false);
   const [showManual, setShowManual] = createSignal(false);
 
   // 手動入力用
-  const [manualId, setManualId] = createSignal('');
-  const [manualName, setManualName] = createSignal('');
-  const [manualCredits, setManualCredits] = createSignal('2');
+  const [manualId, setManualId] = createSignal("");
+  const [manualName, setManualName] = createSignal("");
+  const [manualCredits, setManualCredits] = createSignal("2");
 
   let searchTimeout: number | null = null;
 
@@ -47,7 +42,7 @@ export const CourseSearchDialog: Component<CourseSearchDialogProps> = (props) =>
         const found = await searchKdb(value);
         setResults(found);
       } catch (error) {
-        console.error('Search error:', error);
+        console.error("Search error:", error);
       } finally {
         setIsSearching(false);
       }
@@ -59,7 +54,7 @@ export const CourseSearchDialog: Component<CourseSearchDialogProps> = (props) =>
       courseId: course.id,
       courseName: course.name,
       credits: course.credits,
-      status: 'planned'
+      status: "planned",
     });
   };
 
@@ -70,13 +65,13 @@ export const CourseSearchDialog: Component<CourseSearchDialogProps> = (props) =>
       courseId: manualId(),
       courseName: manualName(),
       credits: parseFloat(manualCredits()) || 2,
-      status: 'planned'
+      status: "planned",
     });
 
     // リセット
-    setManualId('');
-    setManualName('');
-    setManualCredits('2');
+    setManualId("");
+    setManualName("");
+    setManualCredits("2");
   };
 
   return (
@@ -97,9 +92,7 @@ export const CourseSearchDialog: Component<CourseSearchDialogProps> = (props) =>
           {/* 検索結果 */}
           <div class="flex-1 overflow-y-auto">
             <Show when={isSearching()}>
-              <p class="text-sm text-muted-foreground text-center py-4">
-                検索中...
-              </p>
+              <p class="text-sm text-muted-foreground text-center py-4">検索中...</p>
             </Show>
 
             <Show when={!isSearching() && results().length > 0}>
@@ -112,9 +105,7 @@ export const CourseSearchDialog: Component<CourseSearchDialogProps> = (props) =>
                     >
                       <div class="flex items-center justify-between">
                         <span class="font-medium">{course.name}</span>
-                        <span class="text-sm text-muted-foreground">
-                          {course.credits}単位
-                        </span>
+                        <span class="text-sm text-muted-foreground">{course.credits}単位</span>
                       </div>
                       <div class="text-xs text-muted-foreground mt-1">
                         {course.id} / {course.semester} {course.schedule}
@@ -134,12 +125,8 @@ export const CourseSearchDialog: Component<CourseSearchDialogProps> = (props) =>
 
           {/* 手動追加フォーム */}
           <div class="border-t pt-4">
-            <Button
-              variant="link"
-              class="p-0 h-auto"
-              onClick={() => setShowManual(!showManual())}
-            >
-              {showManual() ? '▲ 手動入力を閉じる' : '▼ 手動で追加'}
+            <Button variant="link" class="p-0 h-auto" onClick={() => setShowManual(!showManual())}>
+              {showManual() ? "▲ 手動入力を閉じる" : "▼ 手動で追加"}
             </Button>
 
             <Show when={showManual()}>

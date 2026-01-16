@@ -1,9 +1,12 @@
-import { Component, createSignal, Show } from 'solid-js';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card';
-import { Button } from '~/components/ui/button';
-import { Alert, AlertDescription } from '~/components/ui/alert';
-import { parseTwinsCsv, validateTwinsCourses, type ValidationResult } from '~/lib/parsers/twins-csv';
-import type { TwinsCourse } from '~/lib/types';
+import { type Component, createSignal, Show } from "solid-js";
+import { Alert, AlertDescription } from "~/components/ui/alert";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
+import {
+  parseTwinsCsv,
+  type ValidationResult,
+  validateTwinsCourses,
+} from "~/lib/parsers/twins-csv";
+import type { TwinsCourse } from "~/lib/types";
 
 interface CsvUploaderProps {
   onDataLoaded: (courses: TwinsCourse[], validation: ValidationResult) => void;
@@ -17,8 +20,8 @@ export const CsvUploader: Component<CsvUploaderProps> = (props) => {
   let fileInputRef: HTMLInputElement | undefined;
 
   const handleFile = async (file: File) => {
-    if (!file.name.endsWith('.csv')) {
-      setError('CSVファイルを選択してください');
+    if (!file.name.endsWith(".csv")) {
+      setError("CSVファイルを選択してください");
       return;
     }
 
@@ -31,13 +34,13 @@ export const CsvUploader: Component<CsvUploaderProps> = (props) => {
       const validation = validateTwinsCourses(courses);
 
       if (courses.length === 0) {
-        setError('有効なデータが見つかりませんでした');
+        setError("有効なデータが見つかりませんでした");
         return;
       }
 
       props.onDataLoaded(courses, validation);
     } catch (e) {
-      setError(e instanceof Error ? e.message : 'ファイルの読み込みに失敗しました');
+      setError(e instanceof Error ? e.message : "ファイルの読み込みに失敗しました");
     } finally {
       setIsLoading(false);
     }
@@ -83,7 +86,7 @@ export const CsvUploader: Component<CsvUploaderProps> = (props) => {
           class={`
             border-2 border-dashed rounded-lg p-8 text-center cursor-pointer
             transition-colors
-            ${isDragging() ? 'border-primary bg-primary/5' : 'border-muted-foreground/25 hover:border-primary/50'}
+            ${isDragging() ? "border-primary bg-primary/5" : "border-muted-foreground/25 hover:border-primary/50"}
           `}
           onDrop={handleDrop}
           onDragOver={handleDragOver}
@@ -98,17 +101,16 @@ export const CsvUploader: Component<CsvUploaderProps> = (props) => {
             onChange={handleFileInput}
           />
 
-          <Show when={isLoading()} fallback={
-            <>
-              <div class="text-4xl mb-4">📂</div>
-              <p class="text-lg font-medium mb-2">
-                CSVファイルをドラッグ＆ドロップ
-              </p>
-              <p class="text-sm text-muted-foreground">
-                または クリックしてファイルを選択
-              </p>
-            </>
-          }>
+          <Show
+            when={isLoading()}
+            fallback={
+              <>
+                <div class="text-4xl mb-4">📂</div>
+                <p class="text-lg font-medium mb-2">CSVファイルをドラッグ＆ドロップ</p>
+                <p class="text-sm text-muted-foreground">または クリックしてファイルを選択</p>
+              </>
+            }
+          >
             <div class="text-4xl mb-4 animate-pulse">⏳</div>
             <p>読み込み中...</p>
           </Show>

@@ -1,9 +1,9 @@
-import { db } from './index';
-import type { CoursePlan, SemesterPlan, PlannedCourse } from '../types';
+import type { CoursePlan, PlannedCourse, SemesterPlan } from "../types";
+import { db } from "./index";
 
 // 履修計画を取得
 export async function getCoursePlan(profileId: string): Promise<CoursePlan | undefined> {
-  return db.coursePlans.where('profileId').equals(profileId).first();
+  return db.coursePlans.where("profileId").equals(profileId).first();
 }
 
 // 履修計画を保存
@@ -12,7 +12,7 @@ export async function saveCoursePlan(plan: CoursePlan): Promise<string> {
   const data = {
     ...plan,
     updatedAt: now,
-    createdAt: plan.createdAt || now
+    createdAt: plan.createdAt || now,
   };
   await db.coursePlans.put(data);
   return data.id;
@@ -21,7 +21,7 @@ export async function saveCoursePlan(plan: CoursePlan): Promise<string> {
 // デフォルトの履修計画を作成
 export async function createDefaultCoursePlan(
   profileId: string,
-  enrollmentYear: number
+  enrollmentYear: number,
 ): Promise<CoursePlan> {
   const now = new Date().toISOString();
 
@@ -29,8 +29,8 @@ export async function createDefaultCoursePlan(
   const plans: SemesterPlan[] = [];
   for (let i = 0; i < 4; i++) {
     const year = enrollmentYear + i;
-    plans.push({ year, semester: 'spring', courses: [] });
-    plans.push({ year, semester: 'fall', courses: [] });
+    plans.push({ year, semester: "spring", courses: [] });
+    plans.push({ year, semester: "fall", courses: [] });
   }
 
   const plan: CoursePlan = {
@@ -38,7 +38,7 @@ export async function createDefaultCoursePlan(
     profileId,
     plans,
     createdAt: now,
-    updatedAt: now
+    updatedAt: now,
   };
 
   await db.coursePlans.add(plan);
@@ -48,7 +48,7 @@ export async function createDefaultCoursePlan(
 // 履修計画があることを保証
 export async function ensureCoursePlan(
   profileId: string,
-  enrollmentYear: number
+  enrollmentYear: number,
 ): Promise<CoursePlan> {
   const existing = await getCoursePlan(profileId);
   if (existing) return existing;
@@ -59,17 +59,17 @@ export async function ensureCoursePlan(
 export async function addCourseToSemester(
   profileId: string,
   year: number,
-  semester: 'spring' | 'fall',
-  course: PlannedCourse
+  semester: "spring" | "fall",
+  course: PlannedCourse,
 ): Promise<void> {
   const plan = await getCoursePlan(profileId);
   if (!plan) return;
 
-  const semesterPlan = plan.plans.find(p => p.year === year && p.semester === semester);
+  const semesterPlan = plan.plans.find((p) => p.year === year && p.semester === semester);
   if (!semesterPlan) return;
 
   // 重複チェック
-  const exists = semesterPlan.courses.some(c => c.courseId === course.courseId);
+  const exists = semesterPlan.courses.some((c) => c.courseId === course.courseId);
   if (exists) return;
 
   semesterPlan.courses.push(course);
@@ -80,16 +80,16 @@ export async function addCourseToSemester(
 export async function removeCourseFromSemester(
   profileId: string,
   year: number,
-  semester: 'spring' | 'fall',
-  courseId: string
+  semester: "spring" | "fall",
+  courseId: string,
 ): Promise<void> {
   const plan = await getCoursePlan(profileId);
   if (!plan) return;
 
-  const semesterPlan = plan.plans.find(p => p.year === year && p.semester === semester);
+  const semesterPlan = plan.plans.find((p) => p.year === year && p.semester === semester);
   if (!semesterPlan) return;
 
-  semesterPlan.courses = semesterPlan.courses.filter(c => c.courseId !== courseId);
+  semesterPlan.courses = semesterPlan.courses.filter((c) => c.courseId !== courseId);
   await saveCoursePlan(plan);
 }
 
@@ -97,17 +97,17 @@ export async function removeCourseFromSemester(
 export async function updateCourseInPlan(
   profileId: string,
   year: number,
-  semester: 'spring' | 'fall',
+  semester: "spring" | "fall",
   courseId: string,
-  updates: Partial<PlannedCourse>
+  updates: Partial<PlannedCourse>,
 ): Promise<void> {
   const plan = await getCoursePlan(profileId);
   if (!plan) return;
 
-  const semesterPlan = plan.plans.find(p => p.year === year && p.semester === semester);
+  const semesterPlan = plan.plans.find((p) => p.year === year && p.semester === semester);
   if (!semesterPlan) return;
 
-  const course = semesterPlan.courses.find(c => c.courseId === courseId);
+  const course = semesterPlan.courses.find((c) => c.courseId === courseId);
   if (!course) return;
 
   Object.assign(course, updates);
@@ -118,19 +118,19 @@ export async function updateCourseInPlan(
 export async function moveCourseToSemester(
   profileId: string,
   fromYear: number,
-  fromSemester: 'spring' | 'fall',
+  fromSemester: "spring" | "fall",
   toYear: number,
-  toSemester: 'spring' | 'fall',
-  courseId: string
+  toSemester: "spring" | "fall",
+  courseId: string,
 ): Promise<void> {
   const plan = await getCoursePlan(profileId);
   if (!plan) return;
 
-  const fromPlan = plan.plans.find(p => p.year === fromYear && p.semester === fromSemester);
-  const toPlan = plan.plans.find(p => p.year === toYear && p.semester === toSemester);
+  const fromPlan = plan.plans.find((p) => p.year === fromYear && p.semester === fromSemester);
+  const toPlan = plan.plans.find((p) => p.year === toYear && p.semester === toSemester);
   if (!fromPlan || !toPlan) return;
 
-  const courseIndex = fromPlan.courses.findIndex(c => c.courseId === courseId);
+  const courseIndex = fromPlan.courses.findIndex((c) => c.courseId === courseId);
   if (courseIndex < 0) return;
 
   const [course] = fromPlan.courses.splice(courseIndex, 1);
@@ -141,7 +141,7 @@ export async function moveCourseToSemester(
 
 // 履修計画を削除
 export async function deleteCoursePlan(profileId: string): Promise<void> {
-  await db.coursePlans.where('profileId').equals(profileId).delete();
+  await db.coursePlans.where("profileId").equals(profileId).delete();
 }
 
 // 学期の単位合計を取得
@@ -164,11 +164,11 @@ export async function getCoursePlanStats(profileId: string): Promise<{
       totalEnrolled: 0,
       totalCompleted: 0,
       totalFailed: 0,
-      creditsByYear: {}
+      creditsByYear: {},
     };
   }
 
-  const allCourses = plan.plans.flatMap(p => p.courses);
+  const allCourses = plan.plans.flatMap((p) => p.courses);
   const creditsByYear: Record<number, number> = {};
 
   for (const sp of plan.plans) {
@@ -177,10 +177,16 @@ export async function getCoursePlanStats(profileId: string): Promise<{
   }
 
   return {
-    totalPlanned: allCourses.filter(c => c.status === 'planned').reduce((s, c) => s + c.credits, 0),
-    totalEnrolled: allCourses.filter(c => c.status === 'enrolled').reduce((s, c) => s + c.credits, 0),
-    totalCompleted: allCourses.filter(c => c.status === 'completed').reduce((s, c) => s + c.credits, 0),
-    totalFailed: allCourses.filter(c => c.status === 'failed').reduce((s, c) => s + c.credits, 0),
-    creditsByYear
+    totalPlanned: allCourses
+      .filter((c) => c.status === "planned")
+      .reduce((s, c) => s + c.credits, 0),
+    totalEnrolled: allCourses
+      .filter((c) => c.status === "enrolled")
+      .reduce((s, c) => s + c.credits, 0),
+    totalCompleted: allCourses
+      .filter((c) => c.status === "completed")
+      .reduce((s, c) => s + c.credits, 0),
+    totalFailed: allCourses.filter((c) => c.status === "failed").reduce((s, c) => s + c.credits, 0),
+    creditsByYear,
   };
 }

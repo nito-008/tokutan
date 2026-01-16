@@ -1,20 +1,20 @@
-import { Component, Show, createSignal, createEffect, For } from "solid-js";
-import { CsvUploader } from "./CsvUploader";
-import { RequirementsSummary } from "./RequirementsSummary";
-import { DonutChart, getCategoryColor } from "./DonutChart";
-import { RequirementTree } from "./RequirementTree";
+import { type Component, createEffect, createSignal, For, Show } from "solid-js";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import { calculateRequirementStatus } from "~/lib/calculator/requirements";
+import { importTwinsData } from "~/lib/db/enrollment";
+import { getActiveProfile } from "~/lib/db/profiles";
+import type { ValidationResult } from "~/lib/parsers/twins-csv";
 import type {
+  EnrollmentData,
   GraduationRequirements,
   RequirementStatus,
-  EnrollmentData,
   TwinsCourse,
 } from "~/lib/types";
-import type { ValidationResult } from "~/lib/parsers/twins-csv";
-import { calculateRequirementStatus } from "~/lib/calculator/requirements";
-import { importTwinsData, getEnrollment } from "~/lib/db/enrollment";
-import { getActiveProfile } from "~/lib/db/profiles";
+import { CsvUploader } from "./CsvUploader";
+import { DonutChart, getCategoryColor } from "./DonutChart";
+import { RequirementsSummary } from "./RequirementsSummary";
+import { RequirementTree } from "./RequirementTree";
 
 interface GraduationCheckerProps {
   requirements: GraduationRequirements | null;
@@ -30,18 +30,12 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
   // 要件充足状況を計算
   createEffect(() => {
     if (props.requirements && props.enrollment) {
-      const calculated = calculateRequirementStatus(
-        props.requirements,
-        props.enrollment.courses
-      );
+      const calculated = calculateRequirementStatus(props.requirements, props.enrollment.courses);
       setStatus(calculated);
     }
   });
 
-  const handleDataLoaded = async (
-    courses: TwinsCourse[],
-    validation: ValidationResult
-  ) => {
+  const handleDataLoaded = async (courses: TwinsCourse[], _validation: ValidationResult) => {
     const profile = await getActiveProfile();
     if (!profile) return;
 
@@ -69,10 +63,7 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
       </Show>
 
       <Show when={!showUploader() && status() && props.requirements}>
-        <RequirementsSummary
-          status={status()!}
-          requirementsName={props.requirements!.name}
-        />
+        <RequirementsSummary status={status()!} requirementsName={props.requirements?.name} />
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <Card class="lg:col-span-1">
@@ -81,22 +72,20 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
             </CardHeader>
             <CardContent>
               <DonutChart
-                categoryStatuses={status()!.categoryStatuses}
-                totalEarned={status()!.totalEarnedCredits}
-                totalRequired={status()!.totalRequiredCredits}
+                categoryStatuses={status()?.categoryStatuses}
+                totalEarned={status()?.totalEarnedCredits}
+                totalRequired={status()?.totalRequiredCredits}
               />
 
               {/* 凡例 */}
               <div class="mt-4 space-y-2">
-                <For each={status()!.categoryStatuses}>
+                <For each={status()?.categoryStatuses}>
                   {(cat) => (
                     <div class="flex items-center gap-2 text-sm">
                       <div
                         class="w-3 h-3 rounded"
                         style={{
-                          "background-color": getCategoryColor(
-                            cat.categoryName
-                          ),
+                          "background-color": getCategoryColor(cat.categoryName),
                         }}
                       />
                       <span>{cat.categoryName}</span>
@@ -117,17 +106,13 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
                 <Button variant="outline" size="sm" onClick={handleReupload}>
                   データ更新
                 </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={props.onEditRequirements}
-                >
+                <Button variant="outline" size="sm" onClick={props.onEditRequirements}>
                   要件編集
                 </Button>
               </div>
             </CardHeader>
             <CardContent>
-              <RequirementTree categoryStatuses={status()!.categoryStatuses} />
+              <RequirementTree categoryStatuses={status()?.categoryStatuses} />
             </CardContent>
           </Card>
         </div>
@@ -136,9 +121,7 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
       <Show when={!showUploader() && !props.requirements}>
         <Card>
           <CardContent class="py-12 text-center">
-            <p class="text-muted-foreground mb-4">
-              卒業要件が設定されていません
-            </p>
+            <p class="text-muted-foreground mb-4">卒業要件が設定されていません</p>
             <Button onClick={props.onEditRequirements}>卒業要件を設定</Button>
           </CardContent>
         </Card>

@@ -1,14 +1,19 @@
-import { Component, createSignal, Show } from 'solid-js';
+import { type Component, createSignal, Show } from "solid-js";
+import { Alert, AlertDescription } from "~/components/ui/alert";
+import { Button } from "~/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
-  DialogTitle
-} from '~/components/ui/dialog';
-import { Button } from '~/components/ui/button';
-import { Alert, AlertDescription } from '~/components/ui/alert';
-import { importAllData, importRequirements, importAllDataWithOverwrite, type ImportResult } from '~/lib/db/import';
+  DialogTitle,
+} from "~/components/ui/dialog";
+import {
+  type ImportResult,
+  importAllData,
+  importAllDataWithOverwrite,
+  importRequirements,
+} from "~/lib/db/import";
 
 interface ImportDialogProps {
   open: boolean;
@@ -20,7 +25,7 @@ export const ImportDialog: Component<ImportDialogProps> = (props) => {
   const [isImporting, setIsImporting] = createSignal(false);
   const [result, setResult] = createSignal<ImportResult | null>(null);
   const [error, setError] = createSignal<string | null>(null);
-  const [importType, setImportType] = createSignal<'all' | 'requirements' | 'overwrite'>('all');
+  const [importType, setImportType] = createSignal<"all" | "requirements" | "overwrite">("all");
 
   let fileInputRef: HTMLInputElement | undefined;
 
@@ -41,15 +46,15 @@ export const ImportDialog: Component<ImportDialogProps> = (props) => {
       let importResult: ImportResult;
 
       switch (importType()) {
-        case 'requirements':
+        case "requirements":
           await importRequirements(file);
           importResult = {
             success: true,
-            message: '卒業要件をインポートしました',
-            imported: { profiles: 0, requirements: 1, enrollment: 0, coursePlans: 0 }
+            message: "卒業要件をインポートしました",
+            imported: { profiles: 0, requirements: 1, enrollment: 0, coursePlans: 0 },
           };
           break;
-        case 'overwrite':
+        case "overwrite":
           importResult = await importAllDataWithOverwrite(file);
           break;
         default:
@@ -59,12 +64,12 @@ export const ImportDialog: Component<ImportDialogProps> = (props) => {
       setResult(importResult);
       props.onImportComplete();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'インポートに失敗しました');
+      setError(err instanceof Error ? err.message : "インポートに失敗しました");
     } finally {
       setIsImporting(false);
       // ファイル入力をリセット
       if (fileInputRef) {
-        fileInputRef.value = '';
+        fileInputRef.value = "";
       }
     }
   };
@@ -74,9 +79,7 @@ export const ImportDialog: Component<ImportDialogProps> = (props) => {
       <DialogContent>
         <DialogHeader>
           <DialogTitle>データをインポート</DialogTitle>
-          <DialogDescription>
-            バックアップファイルからデータを復元します
-          </DialogDescription>
+          <DialogDescription>バックアップファイルからデータを復元します</DialogDescription>
         </DialogHeader>
 
         <input
@@ -97,13 +100,12 @@ export const ImportDialog: Component<ImportDialogProps> = (props) => {
           <Show when={result()}>
             <Alert>
               <AlertDescription>
-                {result()!.message}
+                {result()?.message}
                 <br />
                 <span class="text-sm text-muted-foreground">
-                  プロファイル: {result()!.imported.profiles}件,
-                  要件: {result()!.imported.requirements}件,
-                  履修データ: {result()!.imported.enrollment}件,
-                  履修計画: {result()!.imported.coursePlans}件
+                  プロファイル: {result()?.imported.profiles}件, 要件:{" "}
+                  {result()?.imported.requirements}件, 履修データ: {result()?.imported.enrollment}
+                  件, 履修計画: {result()?.imported.coursePlans}件
                 </span>
               </AlertDescription>
             </Alert>
@@ -116,12 +118,12 @@ export const ImportDialog: Component<ImportDialogProps> = (props) => {
             </p>
             <Button
               onClick={() => {
-                setImportType('all');
+                setImportType("all");
                 handleFileSelect();
               }}
               disabled={isImporting()}
             >
-              {isImporting() && importType() === 'all' ? 'インポート中...' : 'ファイルを選択'}
+              {isImporting() && importType() === "all" ? "インポート中..." : "ファイルを選択"}
             </Button>
           </div>
 
@@ -133,12 +135,14 @@ export const ImportDialog: Component<ImportDialogProps> = (props) => {
             <Button
               variant="destructive"
               onClick={() => {
-                setImportType('overwrite');
+                setImportType("overwrite");
                 handleFileSelect();
               }}
               disabled={isImporting()}
             >
-              {isImporting() && importType() === 'overwrite' ? 'インポート中...' : '上書きインポート'}
+              {isImporting() && importType() === "overwrite"
+                ? "インポート中..."
+                : "上書きインポート"}
             </Button>
           </div>
 
@@ -150,12 +154,14 @@ export const ImportDialog: Component<ImportDialogProps> = (props) => {
             <Button
               variant="outline"
               onClick={() => {
-                setImportType('requirements');
+                setImportType("requirements");
                 handleFileSelect();
               }}
               disabled={isImporting()}
             >
-              {isImporting() && importType() === 'requirements' ? 'インポート中...' : '要件ファイルを選択'}
+              {isImporting() && importType() === "requirements"
+                ? "インポート中..."
+                : "要件ファイルを選択"}
             </Button>
           </div>
         </div>

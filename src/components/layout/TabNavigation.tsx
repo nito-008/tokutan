@@ -1,5 +1,5 @@
-import { Component } from 'solid-js';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
+import type { Component } from "solid-js";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 
 interface TabNavigationProps {
   activeTab: string;
@@ -16,13 +16,9 @@ export const TabNavigation: Component<TabNavigationProps> = (props) => {
         <TabsTrigger value="course">履修管理</TabsTrigger>
       </TabsList>
 
-      <TabsContent value="graduation">
-        {props.graduationContent}
-      </TabsContent>
+      <TabsContent value="graduation">{props.graduationContent}</TabsContent>
 
-      <TabsContent value="course">
-        {props.courseContent}
-      </TabsContent>
+      <TabsContent value="course">{props.courseContent}</TabsContent>
     </Tabs>
   );
 };

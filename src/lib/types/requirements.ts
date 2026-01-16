@@ -25,7 +25,7 @@ export interface RequirementCategory {
 export interface RequirementSubcategory {
   id: string;
   name: string;
-  type: 'required' | 'elective' | 'free';
+  type: "required" | "elective" | "free";
   minCredits: number;
   maxCredits?: number;
   rules: RequirementRule[];
@@ -35,7 +35,7 @@ export interface RequirementSubcategory {
 // ルール
 export interface RequirementRule {
   id: string;
-  type: 'specific' | 'pattern' | 'group';
+  type: "specific" | "pattern" | "group";
   description?: string;
   courseIds?: string[];
   courseIdPattern?: string;

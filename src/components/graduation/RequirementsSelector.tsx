@@ -1,4 +1,4 @@
-import { Component, createSignal, onMount, Show } from "solid-js";
+import { type Component, createSignal, onMount, Show } from "solid-js";
 import {
   Select,
   SelectContent,
@@ -6,8 +6,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
-import { getAllRequirements } from "~/lib/db/requirements";
 import { updateSelectedRequirements } from "~/lib/db/profiles";
+import { getAllRequirements } from "~/lib/db/requirements";
 import type { GraduationRequirements } from "~/lib/types";
 
 interface RequirementsSelectorProps {
@@ -16,15 +16,9 @@ interface RequirementsSelectorProps {
   onRequirementsChange?: (requirementsId: string) => void;
 }
 
-export const RequirementsSelector: Component<RequirementsSelectorProps> = (
-  props
-) => {
-  const [requirements, setRequirements] = createSignal<
-    GraduationRequirements[]
-  >([]);
-  const [selectedReq, setSelectedReq] = createSignal<
-    GraduationRequirements | undefined
-  >();
+export const RequirementsSelector: Component<RequirementsSelectorProps> = (props) => {
+  const [requirements, setRequirements] = createSignal<GraduationRequirements[]>([]);
+  const [selectedReq, setSelectedReq] = createSignal<GraduationRequirements | undefined>();
   const [isLoading, setIsLoading] = createSignal(true);
 
   onMount(async () => {
@@ -33,9 +27,7 @@ export const RequirementsSelector: Component<RequirementsSelectorProps> = (
       setRequirements(allReqs);
       // 初期選択値を設定
       if (props.selectedRequirementsId) {
-        const found = allReqs.find(
-          (r) => r.id === props.selectedRequirementsId
-        );
+        const found = allReqs.find((r) => r.id === props.selectedRequirementsId);
         setSelectedReq(found);
       }
     } catch (error) {
@@ -58,14 +50,9 @@ export const RequirementsSelector: Component<RequirementsSelectorProps> = (
 
   return (
     <div>
-      <Show
-        when={!isLoading()}
-        fallback={<div class="h-10 animate-pulse bg-muted rounded-md" />}
-      >
+      <Show when={!isLoading()} fallback={<div class="h-10 animate-pulse bg-muted rounded-md" />}>
         <div class="flex items-center gap-3">
-          <label class="text-sm font-medium text-foreground whitespace-nowrap">
-            卒業要件:
-          </label>
+          <label class="text-sm font-medium text-foreground whitespace-nowrap">卒業要件:</label>
           <Select
             value={selectedReq()}
             onChange={handleChange}
@@ -74,9 +61,7 @@ export const RequirementsSelector: Component<RequirementsSelectorProps> = (
             optionTextValue="name"
             placeholder="卒業要件を選択"
             itemComponent={(props) => (
-              <SelectItem item={props.item}>
-                {props.item.rawValue.name}
-              </SelectItem>
+              <SelectItem item={props.item}>{props.item.rawValue.name}</SelectItem>
             )}
           >
             <SelectTrigger class="w-80">

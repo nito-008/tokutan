@@ -1,9 +1,14 @@
-import { ensureDefaultProfile, getActiveProfile } from './db/profiles';
-import { getDefaultRequirements, saveRequirements, hasRequirements, getRequirements } from './db/requirements';
-import { getEnrollment } from './db/enrollment';
-import { defaultRequirements } from '~/data/default-requirements';
-import { mockRequirements } from '~/data/mock-requirements';
-import type { UserProfile, GraduationRequirements, EnrollmentData } from './types';
+import { defaultRequirements } from "~/data/default-requirements";
+import { mockRequirements } from "~/data/mock-requirements";
+import { getEnrollment } from "./db/enrollment";
+import { ensureDefaultProfile } from "./db/profiles";
+import {
+  getDefaultRequirements,
+  getRequirements,
+  hasRequirements,
+  saveRequirements,
+} from "./db/requirements";
+import type { EnrollmentData, GraduationRequirements, UserProfile } from "./types";
 
 export interface AppState {
   profile: UserProfile;
@@ -37,18 +42,18 @@ export async function initializeApp(): Promise<AppState> {
   // 要件を取得（プロファイルに紐づくものがあればそれを、なければデフォルト）
   let requirements: GraduationRequirements | null = null;
   if (profile.selectedRequirementsId) {
-    requirements = await getRequirements(profile.selectedRequirementsId) || null;
+    requirements = (await getRequirements(profile.selectedRequirementsId)) || null;
   }
   if (!requirements) {
-    requirements = await getDefaultRequirements() || null;
+    requirements = (await getDefaultRequirements()) || null;
   }
 
   // 履修データを取得
-  const enrollment = await getEnrollment(profile.id) || null;
+  const enrollment = (await getEnrollment(profile.id)) || null;
 
   return {
     profile,
     requirements,
-    enrollment
+    enrollment,
   };
 }

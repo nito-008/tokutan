@@ -1,7 +1,12 @@
-import { Component, For, Show, createSignal } from 'solid-js';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '~/components/ui/accordion';
-import { Badge } from '~/components/ui/badge';
-import type { CategoryStatus, SubcategoryStatus, MatchedCourse } from '~/lib/types';
+import { type Component, createSignal, For, Show } from "solid-js";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "~/components/ui/accordion";
+import { Badge } from "~/components/ui/badge";
+import type { CategoryStatus, MatchedCourse, SubcategoryStatus } from "~/lib/types";
 
 interface RequirementTreeProps {
   categoryStatuses: CategoryStatus[];
@@ -28,9 +33,7 @@ export const RequirementTree: Component<RequirementTreeProps> = (props) => {
             <AccordionContent>
               <div class="pl-6 space-y-2">
                 <For each={category.subcategoryStatuses}>
-                  {(subcategory) => (
-                    <SubcategoryItem subcategory={subcategory} />
-                  )}
+                  {(subcategory) => <SubcategoryItem subcategory={subcategory} />}
                 </For>
               </div>
             </AccordionContent>
@@ -46,24 +49,19 @@ const SubcategoryItem: Component<{ subcategory: SubcategoryStatus }> = (props) =
 
   return (
     <div class="border rounded-lg p-3">
-      <button
-        class="flex items-center gap-3 w-full text-left"
-        onClick={() => setIsOpen(!isOpen())}
-      >
+      <button class="flex items-center gap-3 w-full text-left" onClick={() => setIsOpen(!isOpen())}>
         <StatusIcon isSatisfied={props.subcategory.isSatisfied} />
         <span class="font-medium text-sm">{props.subcategory.subcategoryName}</span>
         <span class="text-xs text-muted-foreground ml-auto">
           {props.subcategory.earnedCredits}/{props.subcategory.requiredCredits}単位
         </span>
-        <span class="text-xs">{isOpen() ? '▲' : '▼'}</span>
+        <span class="text-xs">{isOpen() ? "▲" : "▼"}</span>
       </button>
 
       <Show when={isOpen()}>
         <div class="mt-3 pl-6 space-y-1">
           <For each={props.subcategory.matchedCourses}>
-            {(course) => (
-              <CourseItem course={course} />
-            )}
+            {(course) => <CourseItem course={course} />}
           </For>
           <Show when={props.subcategory.matchedCourses.length === 0}>
             <p class="text-sm text-muted-foreground">該当する科目がありません</p>
@@ -89,25 +87,27 @@ const StatusIcon: Component<{ isSatisfied: boolean; isInProgress?: boolean }> = 
   if (props.isInProgress) {
     return <span class="text-blue-500">🔵</span>;
   }
-  return props.isSatisfied
-    ? <span class="text-green-500">✅</span>
-    : <span class="text-yellow-500">🟡</span>;
+  return props.isSatisfied ? (
+    <span class="text-green-500">✅</span>
+  ) : (
+    <span class="text-yellow-500">🟡</span>
+  );
 };
 
 const GradeBadge: Component<{ grade: string }> = (props) => {
   const variants: Record<string, string> = {
-    'A+': 'bg-green-500',
-    'A': 'bg-lime-500',
-    'B': 'bg-yellow-500',
-    'C': 'bg-orange-500',
-    'D': 'bg-red-500',
-    'P': 'bg-purple-500',
-    '認': 'bg-purple-500',
-    '履修中': 'bg-blue-500',
+    "A+": "bg-green-500",
+    A: "bg-lime-500",
+    B: "bg-yellow-500",
+    C: "bg-orange-500",
+    D: "bg-red-500",
+    P: "bg-purple-500",
+    認: "bg-purple-500",
+    履修中: "bg-blue-500",
   };
 
   return (
-    <Badge class={`${variants[props.grade] || 'bg-gray-500'} text-white text-xs`}>
+    <Badge class={`${variants[props.grade] || "bg-gray-500"} text-white text-xs`}>
       {props.grade}
     </Badge>
   );
