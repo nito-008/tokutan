@@ -1,3 +1,4 @@
+import { Loader2 } from "lucide-solid";
 import { type Component, createSignal, onMount, Show } from "solid-js";
 import { CourseManager } from "~/components/course/CourseManager";
 import { ExportDialog } from "~/components/dialogs/ExportDialog";
@@ -74,7 +75,9 @@ const Home: Component = () => {
           fallback={
             <div class="flex items-center justify-center py-12">
               <div class="text-center">
-                <div class="text-4xl mb-4 animate-pulse">⏳</div>
+                <div class="mb-4">
+                  <Loader2 class="size-12 mx-auto text-muted-foreground animate-spin" />
+                </div>
                 <p class="text-muted-foreground">読み込み中...</p>
               </div>
             </div>

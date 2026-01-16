@@ -1,4 +1,5 @@
-import { type Component, createSignal, For, Show } from "solid-js";
+import { Circle, CircleCheck } from "lucide-solid";
+import { type Component, For, Show } from "solid-js";
 import {
   Accordion,
   AccordionContent,
@@ -31,10 +32,12 @@ export const RequirementTree: Component<RequirementTreeProps> = (props) => {
               </div>
             </AccordionTrigger>
             <AccordionContent>
-              <div class="pl-6 space-y-2">
-                <For each={category.subcategoryStatuses}>
-                  {(subcategory) => <SubcategoryItem subcategory={subcategory} />}
-                </For>
+              <div class="pl-6">
+                <Accordion multiple={true} collapsible class="space-y-2">
+                  <For each={category.subcategoryStatuses}>
+                    {(subcategory) => <SubcategoryItem subcategory={subcategory} />}
+                  </For>
+                </Accordion>
               </div>
             </AccordionContent>
           </AccordionItem>
@@ -45,25 +48,19 @@ export const RequirementTree: Component<RequirementTreeProps> = (props) => {
 };
 
 const SubcategoryItem: Component<{ subcategory: SubcategoryStatus }> = (props) => {
-  const [isOpen, setIsOpen] = createSignal(false);
-
   return (
-    <div class="border rounded-lg p-3">
-      <button
-        type="button"
-        class="flex items-center gap-3 w-full text-left"
-        onClick={() => setIsOpen(!isOpen())}
-      >
-        <StatusIcon isSatisfied={props.subcategory.isSatisfied} />
-        <span class="font-medium text-sm">{props.subcategory.subcategoryName}</span>
-        <span class="text-xs text-muted-foreground ml-auto">
-          {props.subcategory.earnedCredits}/{props.subcategory.requiredCredits}単位
-        </span>
-        <span class="text-xs">{isOpen() ? "▲" : "▼"}</span>
-      </button>
-
-      <Show when={isOpen()}>
-        <div class="mt-3 pl-6 space-y-1">
+    <AccordionItem value={props.subcategory.subcategoryId}>
+      <AccordionTrigger class="hover:no-underline">
+        <div class="flex items-center gap-3 w-full">
+          <StatusIcon isSatisfied={props.subcategory.isSatisfied} />
+          <span class="font-medium text-sm">{props.subcategory.subcategoryName}</span>
+          <span class="text-xs text-muted-foreground ml-auto mr-4">
+            {props.subcategory.earnedCredits}/{props.subcategory.requiredCredits}単位
+          </span>
+        </div>
+      </AccordionTrigger>
+      <AccordionContent>
+        <div class="pl-6 space-y-1">
           <For each={props.subcategory.matchedCourses}>
             {(course) => <CourseItem course={course} />}
           </For>
@@ -71,8 +68,8 @@ const SubcategoryItem: Component<{ subcategory: SubcategoryStatus }> = (props) =
             <p class="text-sm text-muted-foreground">該当する科目がありません</p>
           </Show>
         </div>
-      </Show>
-    </div>
+      </AccordionContent>
+    </AccordionItem>
   );
 };
 
@@ -89,12 +86,12 @@ const CourseItem: Component<{ course: MatchedCourse }> = (props) => {
 
 const StatusIcon: Component<{ isSatisfied: boolean; isInProgress?: boolean }> = (props) => {
   if (props.isInProgress) {
-    return <span class="text-blue-500">🔵</span>;
+    return <Circle class="size-4 text-blue-500 fill-blue-500" />;
   }
   return props.isSatisfied ? (
-    <span class="text-green-500">✅</span>
+    <CircleCheck class="size-4 text-green-500" />
   ) : (
-    <span class="text-yellow-500">🟡</span>
+    <Circle class="size-4 text-yellow-500 fill-yellow-500" />
   );
 };
 

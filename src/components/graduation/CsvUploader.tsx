@@ -1,3 +1,4 @@
+import { FolderOpen, Loader2 } from "lucide-solid";
 import { type Component, createSignal, Show } from "solid-js";
 import { Alert, AlertDescription } from "~/components/ui/alert";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
@@ -106,13 +107,17 @@ export const CsvUploader: Component<CsvUploaderProps> = (props) => {
             when={isLoading()}
             fallback={
               <>
-                <div class="text-4xl mb-4">📂</div>
+                <div class="mb-4">
+                  <FolderOpen class="size-12 mx-auto text-muted-foreground" />
+                </div>
                 <p class="text-lg font-medium mb-2">CSVファイルをドラッグ＆ドロップ</p>
                 <p class="text-sm text-muted-foreground">または クリックしてファイルを選択</p>
               </>
             }
           >
-            <div class="text-4xl mb-4 animate-pulse">⏳</div>
+            <div class="mb-4">
+              <Loader2 class="size-12 mx-auto text-muted-foreground animate-spin" />
+            </div>
             <p>読み込み中...</p>
           </Show>
         </button>

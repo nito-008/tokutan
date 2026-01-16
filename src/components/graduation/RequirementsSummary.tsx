@@ -1,3 +1,4 @@
+import { CircleCheck } from "lucide-solid";
 import { type Component, Show } from "solid-js";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import type { RequirementStatus } from "~/lib/types";
@@ -21,7 +22,7 @@ export const RequirementsSummary: Component<RequirementsSummaryProps> = (props) 
               when={props.status.isGraduationEligible}
               fallback={<span>卒業まであと&nbsp;{remaining()}単位</span>}
             >
-              <span class="text-green-500">✅</span>
+              <CircleCheck class="size-6 text-green-500" />
               <span>卒業可能</span>
             </Show>
           </CardTitle>
