@@ -52,7 +52,13 @@ export const CourseCard: Component<CourseCardProps> = (props) => {
           <Badge variant="outline" class="text-xs">
             {statusLabels[props.course.status]}
           </Badge>
-          <Show when={props.course.actualGrade && props.course.actualGrade !== "-" ? props.course.actualGrade : undefined}>
+          <Show
+            when={
+              props.course.actualGrade && props.course.actualGrade !== "-"
+                ? props.course.actualGrade
+                : undefined
+            }
+          >
             {(grade) => (
               <Badge class={`${gradeColors[grade()] || "bg-gray-500"} text-white text-xs`}>
                 {grade()}
