@@ -12,10 +12,7 @@ type SwitchProps<T extends ValidComponent = "div"> = SwitchPrimitive.SwitchRootP
 const Switch = <T extends ValidComponent = "div">(props: PolymorphicProps<T, SwitchProps<T>>) => {
   const [local, others] = splitProps(props as SwitchProps, ["class", "children"]);
   return (
-    <SwitchPrimitive.Root
-      class={cn("inline-flex items-center gap-2", local.class)}
-      {...others}
-    >
+    <SwitchPrimitive.Root class={cn("inline-flex items-center gap-2", local.class)} {...others}>
       {(state) => (
         <>
           <SwitchPrimitive.Input class="peer" />
@@ -26,9 +23,10 @@ const Switch = <T extends ValidComponent = "div">(props: PolymorphicProps<T, Swi
   );
 };
 
-type SwitchControlProps<T extends ValidComponent = "div"> = SwitchPrimitive.SwitchControlProps<T> & {
-  class?: string | undefined;
-};
+type SwitchControlProps<T extends ValidComponent = "div"> =
+  SwitchPrimitive.SwitchControlProps<T> & {
+    class?: string | undefined;
+  };
 
 const SwitchControl = <T extends ValidComponent = "div">(
   props: PolymorphicProps<T, SwitchControlProps<T>>,

@@ -60,45 +60,45 @@ export const CategoryEditModal: Component<CategoryEditModalProps> = (props) => {
         </DialogHeader>
 
         <div class="space-y-4 py-4">
+          <div class="space-y-2">
+            <Label for="category-name">名前</Label>
+            <Input
+              id="category-name"
+              value={name()}
+              onInput={(e) => setName(e.currentTarget.value)}
+            />
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
             <div class="space-y-2">
-              <Label for="category-name">名前</Label>
+              <Label for="min-credits">最小単位数</Label>
               <Input
-                id="category-name"
-                value={name()}
-                onInput={(e) => setName(e.currentTarget.value)}
+                id="min-credits"
+                type="number"
+                min="0"
+                value={minCredits() ?? ""}
+                onInput={(e) => {
+                  const val = e.currentTarget.value;
+                  setMinCredits(val ? Number.parseInt(val, 10) : undefined);
+                }}
               />
             </div>
 
-            <div class="grid grid-cols-2 gap-4">
-              <div class="space-y-2">
-                <Label for="min-credits">最小単位数</Label>
-                <Input
-                  id="min-credits"
-                  type="number"
-                  min="0"
-                  value={minCredits() ?? ""}
-                  onInput={(e) => {
-                    const val = e.currentTarget.value;
-                    setMinCredits(val ? Number.parseInt(val, 10) : undefined);
-                  }}
-                />
-              </div>
-
-              <div class="space-y-2">
-                <Label for="max-credits">最大単位数</Label>
-                <Input
-                  id="max-credits"
-                  type="number"
-                  min="0"
-                  value={maxCredits() ?? ""}
-                  onInput={(e) => {
-                    const val = e.currentTarget.value;
-                    setMaxCredits(val ? Number.parseInt(val, 10) : undefined);
-                  }}
-                />
-              </div>
+            <div class="space-y-2">
+              <Label for="max-credits">最大単位数</Label>
+              <Input
+                id="max-credits"
+                type="number"
+                min="0"
+                value={maxCredits() ?? ""}
+                onInput={(e) => {
+                  const val = e.currentTarget.value;
+                  setMaxCredits(val ? Number.parseInt(val, 10) : undefined);
+                }}
+              />
             </div>
           </div>
+        </div>
 
         <DialogFooter>
           <Button variant="outline" onClick={props.onClose}>

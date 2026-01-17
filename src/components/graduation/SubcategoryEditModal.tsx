@@ -1,6 +1,5 @@
 import { Plus, Trash2 } from "lucide-solid";
 import { type Component, createEffect, createSignal, For, onCleanup, Show } from "solid-js";
-import { getCoursesByIds } from "~/lib/db/kdb";
 import { Button } from "~/components/ui/button";
 import {
   Dialog,
@@ -18,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
+import { getCoursesByIds } from "~/lib/db/kdb";
 import type { RequirementRule, RequirementSubcategory } from "~/lib/types";
 
 interface SubcategoryEditModalProps {
@@ -109,97 +109,99 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
     <Dialog open={props.open} onOpenChange={handleOpenChange}>
       <DialogContent class="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>{props.subcategory ? "サブカテゴリを編集" : "サブカテゴリを追加"}</DialogTitle>
+          <DialogTitle>
+            {props.subcategory ? "サブカテゴリを編集" : "サブカテゴリを追加"}
+          </DialogTitle>
         </DialogHeader>
-          <div class="space-y-4 py-4">
+        <div class="space-y-4 py-4">
+          <div class="space-y-2">
+            <Label for="subcategory-name">名前</Label>
+            <Input
+              id="subcategory-name"
+              value={name()}
+              onInput={(e) => setName(e.currentTarget.value)}
+            />
+          </div>
+
+          <div class="space-y-2">
+            <Label>タイプ</Label>
+            <Select
+              value={selectedType()}
+              onChange={(val) => val && setType(val.value)}
+              options={typeOptions}
+              optionValue="value"
+              optionTextValue="label"
+              placeholder="タイプを選択"
+              itemComponent={(itemProps) => (
+                <SelectItem item={itemProps.item}>{itemProps.item.rawValue.label}</SelectItem>
+              )}
+            >
+              <SelectTrigger>
+                <SelectValue<{ value: string; label: string }>>
+                  {(state) => state.selectedOption().label}
+                </SelectValue>
+              </SelectTrigger>
+              <SelectContent />
+            </Select>
+          </div>
+
+          <div class="grid grid-cols-2 gap-4">
             <div class="space-y-2">
-              <Label for="subcategory-name">名前</Label>
+              <Label for="sub-min-credits">最小単位数</Label>
               <Input
-                id="subcategory-name"
-                value={name()}
-                onInput={(e) => setName(e.currentTarget.value)}
+                id="sub-min-credits"
+                type="number"
+                min="0"
+                value={minCredits()}
+                onInput={(e) => {
+                  const val = e.currentTarget.value;
+                  setMinCredits(val ? Number.parseInt(val, 10) : 0);
+                }}
               />
             </div>
 
             <div class="space-y-2">
-              <Label>タイプ</Label>
-              <Select
-                value={selectedType()}
-                onChange={(val) => val && setType(val.value)}
-                options={typeOptions}
-                optionValue="value"
-                optionTextValue="label"
-                placeholder="タイプを選択"
-                itemComponent={(itemProps) => (
-                  <SelectItem item={itemProps.item}>{itemProps.item.rawValue.label}</SelectItem>
-                )}
-              >
-                <SelectTrigger>
-                  <SelectValue<{ value: string; label: string }>>
-                    {(state) => state.selectedOption().label}
-                  </SelectValue>
-                </SelectTrigger>
-                <SelectContent />
-              </Select>
-            </div>
-
-            <div class="grid grid-cols-2 gap-4">
-              <div class="space-y-2">
-                <Label for="sub-min-credits">最小単位数</Label>
-                <Input
-                  id="sub-min-credits"
-                  type="number"
-                  min="0"
-                  value={minCredits()}
-                  onInput={(e) => {
-                    const val = e.currentTarget.value;
-                    setMinCredits(val ? Number.parseInt(val, 10) : 0);
-                  }}
-                />
-              </div>
-
-              <div class="space-y-2">
-                <Label for="sub-max-credits">最大単位数</Label>
-                <Input
-                  id="sub-max-credits"
-                  type="number"
-                  min="0"
-                  value={maxCredits() ?? ""}
-                  onInput={(e) => {
-                    const val = e.currentTarget.value;
-                    setMaxCredits(val ? Number.parseInt(val, 10) : undefined);
-                  }}
-                />
-              </div>
-            </div>
-
-            {/* ルール編集セクション */}
-            <div class="space-y-3 pt-4 border-t">
-              <div class="flex items-center justify-between">
-                <Label class="text-base font-semibold">条件（ルール）</Label>
-                <Button variant="outline" size="sm" onClick={addRule}>
-                  <Plus class="size-4 mr-1" />
-                  追加
-                </Button>
-              </div>
-
-              <For each={rules()}>
-                {(rule, index) => (
-                  <RuleEditor
-                    rule={rule}
-                    onUpdate={(updates) => updateRule(index(), updates)}
-                    onRemove={() => removeRule(index())}
-                  />
-                )}
-              </For>
-
-              <Show when={rules().length === 0}>
-                <p class="text-sm text-muted-foreground text-center py-4">
-                  ルールがありません。「追加」ボタンでルールを追加してください。
-                </p>
-              </Show>
+              <Label for="sub-max-credits">最大単位数</Label>
+              <Input
+                id="sub-max-credits"
+                type="number"
+                min="0"
+                value={maxCredits() ?? ""}
+                onInput={(e) => {
+                  const val = e.currentTarget.value;
+                  setMaxCredits(val ? Number.parseInt(val, 10) : undefined);
+                }}
+              />
             </div>
           </div>
+
+          {/* ルール編集セクション */}
+          <div class="space-y-3 pt-4 border-t">
+            <div class="flex items-center justify-between">
+              <Label class="text-base font-semibold">条件（ルール）</Label>
+              <Button variant="outline" size="sm" onClick={addRule}>
+                <Plus class="size-4 mr-1" />
+                追加
+              </Button>
+            </div>
+
+            <For each={rules()}>
+              {(rule, index) => (
+                <RuleEditor
+                  rule={rule}
+                  onUpdate={(updates) => updateRule(index(), updates)}
+                  onRemove={() => removeRule(index())}
+                />
+              )}
+            </For>
+
+            <Show when={rules().length === 0}>
+              <p class="text-sm text-muted-foreground text-center py-4">
+                ルールがありません。「追加」ボタンでルールを追加してください。
+              </p>
+            </Show>
+          </div>
+        </div>
 
         <DialogFooter>
           <Button variant="outline" onClick={props.onClose}>
@@ -230,7 +232,9 @@ const RuleEditor: Component<{
     }
 
     let cancelled = false;
-    onCleanup(() => { cancelled = true; });
+    onCleanup(() => {
+      cancelled = true;
+    });
 
     void (async () => {
       const courses = await getCoursesByIds(courseIds);
@@ -305,9 +309,7 @@ const RuleEditor: Component<{
                         <Show when={index() > 0}>, </Show>
                         <span>
                           {id}
-                          <Show when={courseNames().get(id)}>
-                            {" "}({courseNames().get(id)})
-                          </Show>
+                          <Show when={courseNames().get(id)}> ({courseNames().get(id)})</Show>
                         </span>
                       </>
                     )}
