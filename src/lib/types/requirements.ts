@@ -35,12 +35,10 @@ export interface RequirementSubcategory {
 // ルール
 export interface RequirementRule {
   id: string;
-  type: "specific" | "pattern" | "group";
+  type: "specific" | "pattern";
   description?: string;
   courseIds?: string[];
   courseIdPattern?: string;
-  groupName?: string;
-  groupCourseIds?: string[];
   minCredits?: number;
   maxCredits?: number;
   required?: boolean;

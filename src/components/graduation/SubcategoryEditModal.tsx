@@ -38,10 +38,9 @@ const typeOptions: { value: "required" | "elective" | "free"; label: string }[] 
   { value: "free", label: "自由" },
 ];
 
-const ruleTypeOptions: { value: "specific" | "pattern" | "group"; label: string }[] = [
+const ruleTypeOptions: { value: "specific" | "pattern"; label: string }[] = [
   { value: "specific", label: "特定科目" },
   { value: "pattern", label: "パターン" },
-  { value: "group", label: "グループ" },
 ];
 
 export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props) => {
@@ -49,7 +48,6 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
   const [type, setType] = createSignal<"required" | "elective" | "free">("required");
   const [minCredits, setMinCredits] = createSignal(0);
   const [maxCredits, setMaxCredits] = createSignal<number | undefined>(undefined);
-  const [notes, setNotes] = createSignal<string | undefined>(undefined);
   const [rules, setRules] = createSignal<RequirementRule[]>([]);
 
   createEffect(() => {
@@ -58,14 +56,12 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
       setType(props.subcategory.type);
       setMinCredits(props.subcategory.minCredits);
       setMaxCredits(props.subcategory.maxCredits);
-      setNotes(props.subcategory.notes);
       setRules(JSON.parse(JSON.stringify(props.subcategory.rules)));
     } else if (props.open) {
       setName("");
       setType("elective");
       setMinCredits(0);
       setMaxCredits(undefined);
-      setNotes(undefined);
       setRules([]);
     }
   });
@@ -76,7 +72,6 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
       type: type(),
       minCredits: minCredits(),
       maxCredits: maxCredits(),
-      notes: notes(),
       rules: rules(),
     };
 
@@ -178,19 +173,6 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
               </div>
             </div>
 
-            <div class="space-y-2">
-              <Label for="subcategory-notes">メモ</Label>
-              <Input
-                id="subcategory-notes"
-                value={notes() ?? ""}
-                onInput={(e) => {
-                  const val = e.currentTarget.value;
-                  setNotes(val || undefined);
-                }}
-                placeholder="任意"
-              />
-            </div>
-
             {/* ルール編集セクション */}
             <div class="space-y-3 pt-4 border-t">
               <div class="flex items-center justify-between">
@@ -240,11 +222,7 @@ const RuleEditor: Component<{
 
   // 科目IDから科目名を取得
   createEffect(() => {
-    const courseIds = props.rule.type === "specific"
-      ? props.rule.courseIds
-      : props.rule.type === "group"
-        ? props.rule.groupCourseIds
-        : undefined;
+    const courseIds = props.rule.type === "specific" ? props.rule.courseIds : undefined;
 
     if (!courseIds || courseIds.length === 0) {
       setCourseNames(new Map());
@@ -350,52 +328,6 @@ const RuleEditor: Component<{
                 }
                 placeholder="例: ^FG(17|24|25)"
               />
-            </div>
-          </Show>
-
-          <Show when={props.rule.type === "group"}>
-            <div class="space-y-2">
-              <div class="space-y-1">
-                <Label class="text-xs">グループ名</Label>
-                <Input
-                  class="h-8"
-                  value={props.rule.groupName ?? ""}
-                  onInput={(e) => props.onUpdate({ groupName: e.currentTarget.value || undefined })}
-                  placeholder="例: 数学系科目"
-                />
-              </div>
-              <div class="space-y-1">
-                <Label class="text-xs">科目ID（カンマ区切り）</Label>
-                <Input
-                  class="h-8"
-                  value={props.rule.groupCourseIds?.join(", ") ?? ""}
-                  onInput={(e) => {
-                    const ids = e.currentTarget.value
-                      .split(",")
-                      .map((s) => s.trim())
-                      .filter((s) => s);
-                    props.onUpdate({ groupCourseIds: ids.length > 0 ? ids : undefined });
-                  }}
-                  placeholder="例: GA15111, GA15121"
-                />
-                <Show when={props.rule.groupCourseIds && props.rule.groupCourseIds.length > 0}>
-                  <div class="text-xs text-muted-foreground mt-1">
-                    <For each={props.rule.groupCourseIds}>
-                      {(id, index) => (
-                        <>
-                          <Show when={index() > 0}>, </Show>
-                          <span>
-                            {id}
-                            <Show when={courseNames().get(id)}>
-                              {" "}({courseNames().get(id)})
-                            </Show>
-                          </span>
-                        </>
-                      )}
-                    </For>
-                  </div>
-                </Show>
-              </div>
             </div>
           </Show>
 

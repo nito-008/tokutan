@@ -170,10 +170,6 @@ function matchCoursesToRule(
           }
         }
         break;
-
-      case "group":
-        isMatch = rule.groupCourseIds?.includes(course.courseId) || false;
-        break;
     }
 
     if (isMatch) {
