@@ -1,5 +1,6 @@
 import { Plus, Trash2 } from "lucide-solid";
-import { type Component, createEffect, createSignal, For, Show } from "solid-js";
+import { type Component, createEffect, createSignal, For, onCleanup, Show } from "solid-js";
+import { getCoursesByIds } from "~/lib/db/kdb";
 import { Button } from "~/components/ui/button";
 import {
   Dialog,
@@ -233,6 +234,34 @@ const RuleEditor: Component<{
   onRemove: () => void;
 }> = (props) => {
   const selectedRuleType = () => ruleTypeOptions.find((opt) => opt.value === props.rule.type);
+  const [courseNames, setCourseNames] = createSignal<Map<string, string>>(new Map());
+
+  // 科目IDから科目名を取得
+  createEffect(() => {
+    const courseIds = props.rule.type === "specific"
+      ? props.rule.courseIds
+      : props.rule.type === "group"
+        ? props.rule.groupCourseIds
+        : undefined;
+
+    if (!courseIds || courseIds.length === 0) {
+      setCourseNames(new Map());
+      return;
+    }
+
+    let cancelled = false;
+    onCleanup(() => { cancelled = true; });
+
+    void (async () => {
+      const courses = await getCoursesByIds(courseIds);
+      if (cancelled) return;
+      const nameMap = new Map<string, string>();
+      for (const course of courses) {
+        nameMap.set(course.id, course.name);
+      }
+      setCourseNames(nameMap);
+    })();
+  });
 
   return (
     <div class="border rounded-lg p-3 space-y-3 bg-muted/30">
@@ -288,6 +317,23 @@ const RuleEditor: Component<{
                 }}
                 placeholder="例: FG20204, FG20214"
               />
+              <Show when={props.rule.courseIds && props.rule.courseIds.length > 0}>
+                <div class="text-xs text-muted-foreground mt-1">
+                  <For each={props.rule.courseIds}>
+                    {(id, index) => (
+                      <>
+                        <Show when={index() > 0}>, </Show>
+                        <span>
+                          {id}
+                          <Show when={courseNames().get(id)}>
+                            {" "}({courseNames().get(id)})
+                          </Show>
+                        </span>
+                      </>
+                    )}
+                  </For>
+                </div>
+              </Show>
             </div>
           </Show>
 
@@ -330,6 +376,23 @@ const RuleEditor: Component<{
                   }}
                   placeholder="例: GA15111, GA15121"
                 />
+                <Show when={props.rule.groupCourseIds && props.rule.groupCourseIds.length > 0}>
+                  <div class="text-xs text-muted-foreground mt-1">
+                    <For each={props.rule.groupCourseIds}>
+                      {(id, index) => (
+                        <>
+                          <Show when={index() > 0}>, </Show>
+                          <span>
+                            {id}
+                            <Show when={courseNames().get(id)}>
+                              {" "}({courseNames().get(id)})
+                            </Show>
+                          </span>
+                        </>
+                      )}
+                    </For>
+                  </div>
+                </Show>
               </div>
             </div>
           </Show>
