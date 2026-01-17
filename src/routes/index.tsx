@@ -9,7 +9,7 @@ import { Header } from "~/components/layout/Header";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { getRequirements } from "~/lib/db/requirements";
 import { type AppState, initializeApp } from "~/lib/init";
-import type { EnrollmentData } from "~/lib/types";
+import type { EnrollmentData, GraduationRequirements } from "~/lib/types";
 
 const Home: Component = () => {
   const [activeTab, setActiveTab] = createSignal<string>("graduation");
@@ -62,6 +62,13 @@ const Home: Component = () => {
     setShowRequirementEditor(true);
   };
 
+  const handleRequirementsUpdate = (requirements: GraduationRequirements) => {
+    const current = appState();
+    if (current) {
+      setAppState({ ...current, requirements });
+    }
+  };
+
   return (
     <div class="min-h-screen bg-background">
       <Header
@@ -104,6 +111,7 @@ const Home: Component = () => {
                     enrollment={state().enrollment}
                     onEnrollmentUpdate={handleEnrollmentUpdate}
                     onEditRequirements={handleEditRequirements}
+                    onRequirementsUpdate={handleRequirementsUpdate}
                   />
                 </TabsContent>
 

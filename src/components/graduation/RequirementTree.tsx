@@ -1,5 +1,5 @@
-import { Circle, CircleCheck } from "lucide-solid";
-import { type Component, For, Show } from "solid-js";
+import { Circle, CircleCheck, Pencil } from "lucide-solid";
+import { type Component, createSignal, For, Show } from "solid-js";
 import {
   Accordion,
   AccordionContent,
@@ -7,53 +7,160 @@ import {
   AccordionTrigger,
 } from "~/components/ui/accordion";
 import { Badge } from "~/components/ui/badge";
-import type { CategoryStatus, MatchedCourse, SubcategoryStatus } from "~/lib/types";
+import type {
+  CategoryStatus,
+  GraduationRequirements,
+  MatchedCourse,
+  RequirementCategory,
+  RequirementSubcategory,
+  SubcategoryStatus,
+} from "~/lib/types";
+import { CategoryEditModal } from "./CategoryEditModal";
+import { SubcategoryEditModal } from "./SubcategoryEditModal";
 
 interface RequirementTreeProps {
   categoryStatuses: CategoryStatus[];
+  requirements?: GraduationRequirements;
+  onCategoryUpdate?: (categoryId: string, updates: Partial<RequirementCategory>) => void;
+  onSubcategoryUpdate?: (
+    categoryId: string,
+    subcategoryId: string,
+    updates: Partial<RequirementSubcategory>,
+  ) => void;
 }
 
 export const RequirementTree: Component<RequirementTreeProps> = (props) => {
+  const [editingCategory, setEditingCategory] = createSignal<RequirementCategory | null>(null);
+  const [editingSubcategory, setEditingSubcategory] = createSignal<{
+    categoryId: string;
+    subcategory: RequirementSubcategory;
+  } | null>(null);
+
+  const findCategory = (categoryId: string): RequirementCategory | undefined => {
+    return props.requirements?.categories.find((c) => c.id === categoryId);
+  };
+
+  const findSubcategory = (
+    categoryId: string,
+    subcategoryId: string,
+  ): { categoryId: string; subcategory: RequirementSubcategory } | undefined => {
+    const category = findCategory(categoryId);
+    const subcategory = category?.subcategories.find((s) => s.id === subcategoryId);
+    return subcategory ? { categoryId, subcategory } : undefined;
+  };
+
+  const handleCategorySave = (categoryId: string, updates: Partial<RequirementCategory>) => {
+    props.onCategoryUpdate?.(categoryId, updates);
+  };
+
+  const handleSubcategorySave = (
+    categoryId: string,
+    subcategoryId: string,
+    updates: Partial<RequirementSubcategory>,
+  ) => {
+    props.onSubcategoryUpdate?.(categoryId, subcategoryId, updates);
+  };
+
   return (
-    <Accordion multiple={true} collapsible class="w-full">
-      <For each={props.categoryStatuses}>
-        {(category) => (
-          <AccordionItem value={category.categoryId}>
-            <AccordionTrigger class="hover:no-underline">
-              <div class="flex items-center gap-3 w-full">
-                <StatusIcon isSatisfied={category.isSatisfied} />
-                <span class="font-medium">{category.categoryName}</span>
-                <span class="text-sm text-muted-foreground ml-auto mr-4">
-                  {category.earnedCredits}/{category.requiredCredits}単位
-                  {category.inProgressCredits > 0 && (
-                    <span class="text-blue-500"> (+{category.inProgressCredits}履修中)</span>
-                  )}
-                </span>
-              </div>
-            </AccordionTrigger>
-            <AccordionContent>
-              <div class="pl-6">
-                <Accordion multiple={true} collapsible class="space-y-2">
-                  <For each={category.subcategoryStatuses}>
-                    {(subcategory) => <SubcategoryItem subcategory={subcategory} />}
-                  </For>
-                </Accordion>
-              </div>
-            </AccordionContent>
-          </AccordionItem>
-        )}
-      </For>
-    </Accordion>
+    <>
+      <Accordion multiple={true} collapsible class="w-full">
+        <For each={props.categoryStatuses}>
+          {(category) => (
+            <AccordionItem value={category.categoryId}>
+              <AccordionTrigger class="hover:no-underline">
+                <div class="flex items-center gap-3 w-full">
+                  <StatusIcon isSatisfied={category.isSatisfied} />
+                  <span class="font-medium">{category.categoryName}</span>
+                  <Show when={props.requirements && props.onCategoryUpdate}>
+                    <button
+                      type="button"
+                      class="p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        const cat = findCategory(category.categoryId);
+                        if (cat) setEditingCategory(cat);
+                      }}
+                    >
+                      <Pencil class="size-4" />
+                    </button>
+                  </Show>
+                  <span class="text-sm text-muted-foreground ml-auto mr-4">
+                    {category.earnedCredits}/{category.requiredCredits}単位
+                    {category.inProgressCredits > 0 && (
+                      <span class="text-blue-500"> (+{category.inProgressCredits}履修中)</span>
+                    )}
+                  </span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent>
+                <div class="pl-6">
+                  <Accordion multiple={true} collapsible class="space-y-2">
+                    <For each={category.subcategoryStatuses}>
+                      {(subcategory) => (
+                        <SubcategoryItem
+                          subcategory={subcategory}
+                          categoryId={category.categoryId}
+                          editable={!!props.requirements && !!props.onSubcategoryUpdate}
+                          onEdit={() => {
+                            const sub = findSubcategory(
+                              category.categoryId,
+                              subcategory.subcategoryId,
+                            );
+                            if (sub) setEditingSubcategory(sub);
+                          }}
+                        />
+                      )}
+                    </For>
+                  </Accordion>
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          )}
+        </For>
+      </Accordion>
+
+      <CategoryEditModal
+        open={!!editingCategory()}
+        category={editingCategory()}
+        onClose={() => setEditingCategory(null)}
+        onSave={handleCategorySave}
+      />
+
+      <SubcategoryEditModal
+        open={!!editingSubcategory()}
+        subcategory={editingSubcategory()?.subcategory ?? null}
+        categoryId={editingSubcategory()?.categoryId ?? ""}
+        onClose={() => setEditingSubcategory(null)}
+        onSave={handleSubcategorySave}
+      />
+    </>
   );
 };
 
-const SubcategoryItem: Component<{ subcategory: SubcategoryStatus }> = (props) => {
+const SubcategoryItem: Component<{
+  subcategory: SubcategoryStatus;
+  categoryId: string;
+  editable: boolean;
+  onEdit: () => void;
+}> = (props) => {
   return (
     <AccordionItem value={props.subcategory.subcategoryId}>
       <AccordionTrigger class="hover:no-underline">
         <div class="flex items-center gap-3 w-full">
           <StatusIcon isSatisfied={props.subcategory.isSatisfied} />
           <span class="font-medium text-sm">{props.subcategory.subcategoryName}</span>
+          <Show when={props.editable}>
+            <button
+              type="button"
+              class="p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground"
+              onClick={(e) => {
+                e.stopPropagation();
+                props.onEdit();
+              }}
+            >
+              <Pencil class="size-4" />
+            </button>
+          </Show>
           <span class="text-xs text-muted-foreground ml-auto mr-4">
             {props.subcategory.earnedCredits}/{props.subcategory.requiredCredits}単位
           </span>

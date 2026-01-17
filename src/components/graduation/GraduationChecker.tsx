@@ -9,9 +9,12 @@ import type { ValidationResult } from "~/lib/parsers/twins-csv";
 import type {
   EnrollmentData,
   GraduationRequirements,
+  RequirementCategory,
   RequirementStatus,
+  RequirementSubcategory,
   TwinsCourse,
 } from "~/lib/types";
+import { saveRequirements } from "~/lib/db/requirements";
 import { CsvUploader } from "./CsvUploader";
 import { DonutChart, getCategoryColor } from "./DonutChart";
 import { RequirementsSummary } from "./RequirementsSummary";
@@ -22,6 +25,7 @@ interface GraduationCheckerProps {
   enrollment: EnrollmentData | null;
   onEnrollmentUpdate: (enrollment: EnrollmentData) => void;
   onEditRequirements: () => void;
+  onRequirementsUpdate?: (requirements: GraduationRequirements) => void;
 }
 
 export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
@@ -66,6 +70,53 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
 
   const handleReupload = () => {
     setShowUploader(true);
+  };
+
+  const handleCategoryUpdate = async (
+    categoryId: string,
+    updates: Partial<RequirementCategory>,
+  ) => {
+    const requirements = props.requirements;
+    if (!requirements) return;
+
+    const updatedCategories = requirements.categories.map((cat) =>
+      cat.id === categoryId ? { ...cat, ...updates } : cat,
+    );
+
+    const updatedRequirements: GraduationRequirements = {
+      ...requirements,
+      categories: updatedCategories,
+    };
+
+    await saveRequirements(updatedRequirements);
+    props.onRequirementsUpdate?.(updatedRequirements);
+  };
+
+  const handleSubcategoryUpdate = async (
+    categoryId: string,
+    subcategoryId: string,
+    updates: Partial<RequirementSubcategory>,
+  ) => {
+    const requirements = props.requirements;
+    if (!requirements) return;
+
+    const updatedCategories = requirements.categories.map((cat) => {
+      if (cat.id !== categoryId) return cat;
+      return {
+        ...cat,
+        subcategories: cat.subcategories.map((sub) =>
+          sub.id === subcategoryId ? { ...sub, ...updates } : sub,
+        ),
+      };
+    });
+
+    const updatedRequirements: GraduationRequirements = {
+      ...requirements,
+      categories: updatedCategories,
+    };
+
+    await saveRequirements(updatedRequirements);
+    props.onRequirementsUpdate?.(updatedRequirements);
   };
 
   return (
@@ -135,7 +186,12 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
               </div>
             </CardHeader>
             <CardContent>
-              <RequirementTree categoryStatuses={status()?.categoryStatuses ?? []} />
+              <RequirementTree
+                categoryStatuses={status()?.categoryStatuses ?? []}
+                requirements={props.requirements ?? undefined}
+                onCategoryUpdate={handleCategoryUpdate}
+                onSubcategoryUpdate={handleSubcategoryUpdate}
+              />
             </CardContent>
           </Card>
         </div>
