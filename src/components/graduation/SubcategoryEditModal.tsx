@@ -1,4 +1,5 @@
-import { type Component, createEffect, createSignal, Show } from "solid-js";
+import { Plus, Trash2 } from "lucide-solid";
+import { type Component, createEffect, createSignal, For, Show } from "solid-js";
 import { Button } from "~/components/ui/button";
 import {
   Dialog,
@@ -16,7 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
-import type { RequirementSubcategory } from "~/lib/types";
+import type { RequirementRule, RequirementSubcategory } from "~/lib/types";
 
 interface SubcategoryEditModalProps {
   open: boolean;
@@ -30,11 +31,17 @@ interface SubcategoryEditModalProps {
   ) => void;
 }
 
-const typeOptions = [
+const typeOptions: { value: "required" | "elective" | "free"; label: string }[] = [
   { value: "required", label: "必修" },
   { value: "elective", label: "選択" },
   { value: "free", label: "自由" },
-] as const;
+];
+
+const ruleTypeOptions: { value: "specific" | "pattern" | "group"; label: string }[] = [
+  { value: "specific", label: "特定科目" },
+  { value: "pattern", label: "パターン" },
+  { value: "group", label: "グループ" },
+];
 
 export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props) => {
   const [name, setName] = createSignal("");
@@ -42,6 +49,7 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
   const [minCredits, setMinCredits] = createSignal(0);
   const [maxCredits, setMaxCredits] = createSignal<number | undefined>(undefined);
   const [notes, setNotes] = createSignal<string | undefined>(undefined);
+  const [rules, setRules] = createSignal<RequirementRule[]>([]);
 
   createEffect(() => {
     if (props.subcategory) {
@@ -50,6 +58,7 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
       setMinCredits(props.subcategory.minCredits);
       setMaxCredits(props.subcategory.maxCredits);
       setNotes(props.subcategory.notes);
+      setRules(JSON.parse(JSON.stringify(props.subcategory.rules)));
     }
   });
 
@@ -62,6 +71,7 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
       minCredits: minCredits(),
       maxCredits: maxCredits(),
       notes: notes(),
+      rules: rules(),
     };
 
     props.onSave(props.categoryId, props.subcategory.id, updates);
@@ -76,9 +86,27 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
 
   const selectedType = () => typeOptions.find((opt) => opt.value === type());
 
+  const updateRule = (index: number, updates: Partial<RequirementRule>) => {
+    setRules((prev) => prev.map((rule, i) => (i === index ? { ...rule, ...updates } : rule)));
+  };
+
+  const addRule = () => {
+    const newRule: RequirementRule = {
+      id: `rule-${Date.now()}`,
+      type: "pattern",
+      description: "",
+      courseIdPattern: "",
+    };
+    setRules((prev) => [...prev, newRule]);
+  };
+
+  const removeRule = (index: number) => {
+    setRules((prev) => prev.filter((_, i) => i !== index));
+  };
+
   return (
     <Dialog open={props.open} onOpenChange={handleOpenChange}>
-      <DialogContent>
+      <DialogContent class="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>サブカテゴリを編集</DialogTitle>
         </DialogHeader>
@@ -108,7 +136,7 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
                 )}
               >
                 <SelectTrigger>
-                  <SelectValue<(typeof typeOptions)[number]>>
+                  <SelectValue<{ value: string; label: string }>>
                     {(state) => state.selectedOption().label}
                   </SelectValue>
                 </SelectTrigger>
@@ -158,6 +186,33 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
                 placeholder="任意"
               />
             </div>
+
+            {/* ルール編集セクション */}
+            <div class="space-y-3 pt-4 border-t">
+              <div class="flex items-center justify-between">
+                <Label class="text-base font-semibold">条件（ルール）</Label>
+                <Button variant="outline" size="sm" onClick={addRule}>
+                  <Plus class="size-4 mr-1" />
+                  追加
+                </Button>
+              </div>
+
+              <For each={rules()}>
+                {(rule, index) => (
+                  <RuleEditor
+                    rule={rule}
+                    onUpdate={(updates) => updateRule(index(), updates)}
+                    onRemove={() => removeRule(index())}
+                  />
+                )}
+              </For>
+
+              <Show when={rules().length === 0}>
+                <p class="text-sm text-muted-foreground text-center py-4">
+                  ルールがありません。「追加」ボタンでルールを追加してください。
+                </p>
+              </Show>
+            </div>
           </div>
         </Show>
 
@@ -169,5 +224,166 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
         </DialogFooter>
       </DialogContent>
     </Dialog>
+  );
+};
+
+const RuleEditor: Component<{
+  rule: RequirementRule;
+  onUpdate: (updates: Partial<RequirementRule>) => void;
+  onRemove: () => void;
+}> = (props) => {
+  const selectedRuleType = () => ruleTypeOptions.find((opt) => opt.value === props.rule.type);
+
+  return (
+    <div class="border rounded-lg p-3 space-y-3 bg-muted/30">
+      <div class="flex items-start gap-2">
+        <div class="flex-1 space-y-3">
+          <div class="grid grid-cols-2 gap-3">
+            <div class="space-y-1">
+              <Label class="text-xs">ルールタイプ</Label>
+              <Select
+                value={selectedRuleType()}
+                onChange={(val) => val && props.onUpdate({ type: val.value })}
+                options={ruleTypeOptions}
+                optionValue="value"
+                optionTextValue="label"
+                placeholder="タイプを選択"
+                itemComponent={(itemProps) => (
+                  <SelectItem item={itemProps.item}>{itemProps.item.rawValue.label}</SelectItem>
+                )}
+              >
+                <SelectTrigger class="h-8">
+                  <SelectValue<{ value: string; label: string }>>
+                    {(state) => state.selectedOption().label}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent />
+              </Select>
+            </div>
+
+            <div class="space-y-1">
+              <Label class="text-xs">説明</Label>
+              <Input
+                class="h-8"
+                value={props.rule.description ?? ""}
+                onInput={(e) => props.onUpdate({ description: e.currentTarget.value || undefined })}
+                placeholder="例: プログラミング序論"
+              />
+            </div>
+          </div>
+
+          {/* タイプ別の入力フィールド */}
+          <Show when={props.rule.type === "specific"}>
+            <div class="space-y-1">
+              <Label class="text-xs">科目ID（カンマ区切り）</Label>
+              <Input
+                class="h-8"
+                value={props.rule.courseIds?.join(", ") ?? ""}
+                onInput={(e) => {
+                  const ids = e.currentTarget.value
+                    .split(",")
+                    .map((s) => s.trim())
+                    .filter((s) => s);
+                  props.onUpdate({ courseIds: ids.length > 0 ? ids : undefined });
+                }}
+                placeholder="例: FG20204, FG20214"
+              />
+            </div>
+          </Show>
+
+          <Show when={props.rule.type === "pattern"}>
+            <div class="space-y-1">
+              <Label class="text-xs">科目IDパターン（正規表現）</Label>
+              <Input
+                class="h-8"
+                value={props.rule.courseIdPattern ?? ""}
+                onInput={(e) =>
+                  props.onUpdate({ courseIdPattern: e.currentTarget.value || undefined })
+                }
+                placeholder="例: ^FG(17|24|25)"
+              />
+            </div>
+          </Show>
+
+          <Show when={props.rule.type === "group"}>
+            <div class="space-y-2">
+              <div class="space-y-1">
+                <Label class="text-xs">グループ名</Label>
+                <Input
+                  class="h-8"
+                  value={props.rule.groupName ?? ""}
+                  onInput={(e) => props.onUpdate({ groupName: e.currentTarget.value || undefined })}
+                  placeholder="例: 数学系科目"
+                />
+              </div>
+              <div class="space-y-1">
+                <Label class="text-xs">科目ID（カンマ区切り）</Label>
+                <Input
+                  class="h-8"
+                  value={props.rule.groupCourseIds?.join(", ") ?? ""}
+                  onInput={(e) => {
+                    const ids = e.currentTarget.value
+                      .split(",")
+                      .map((s) => s.trim())
+                      .filter((s) => s);
+                    props.onUpdate({ groupCourseIds: ids.length > 0 ? ids : undefined });
+                  }}
+                  placeholder="例: GA15111, GA15121"
+                />
+              </div>
+            </div>
+          </Show>
+
+          <div class="grid grid-cols-3 gap-2">
+            <div class="space-y-1">
+              <Label class="text-xs">最小単位</Label>
+              <Input
+                class="h-8"
+                type="number"
+                min="0"
+                value={props.rule.minCredits ?? ""}
+                onInput={(e) => {
+                  const val = e.currentTarget.value;
+                  props.onUpdate({ minCredits: val ? Number.parseInt(val, 10) : undefined });
+                }}
+              />
+            </div>
+            <div class="space-y-1">
+              <Label class="text-xs">最大単位</Label>
+              <Input
+                class="h-8"
+                type="number"
+                min="0"
+                value={props.rule.maxCredits ?? ""}
+                onInput={(e) => {
+                  const val = e.currentTarget.value;
+                  props.onUpdate({ maxCredits: val ? Number.parseInt(val, 10) : undefined });
+                }}
+              />
+            </div>
+            <div class="space-y-1 flex items-end">
+              <label class="flex items-center gap-2 text-xs h-8">
+                <input
+                  type="checkbox"
+                  checked={props.rule.required ?? false}
+                  onChange={(e) => props.onUpdate({ required: e.currentTarget.checked })}
+                  class="rounded"
+                />
+                必須
+              </label>
+            </div>
+          </div>
+        </div>
+
+        <Button
+          variant="ghost"
+          size="sm"
+          class="text-destructive hover:text-destructive hover:bg-destructive/10"
+          onClick={props.onRemove}
+        >
+          <Trash2 class="size-4" />
+        </Button>
+      </div>
+    </div>
   );
 };
