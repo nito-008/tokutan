@@ -73,15 +73,27 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
   };
 
   const handleCategoryUpdate = async (
-    categoryId: string,
+    categoryId: string | null,
     updates: Partial<RequirementCategory>,
   ) => {
     const requirements = props.requirements;
     if (!requirements) return;
 
-    const updatedCategories = requirements.categories.map((cat) =>
-      cat.id === categoryId ? { ...cat, ...updates } : cat,
-    );
+    let updatedCategories: RequirementCategory[];
+    if (categoryId === null) {
+      const newCategory: RequirementCategory = {
+        id: `cat-${Date.now()}`,
+        name: updates.name || "新しいカテゴリ",
+        subcategories: [],
+        minCredits: updates.minCredits,
+        maxCredits: updates.maxCredits,
+      };
+      updatedCategories = [...requirements.categories, newCategory];
+    } else {
+      updatedCategories = requirements.categories.map((cat) =>
+        cat.id === categoryId ? { ...cat, ...updates } : cat,
+      );
+    }
 
     const updatedRequirements: GraduationRequirements = {
       ...requirements,
@@ -94,7 +106,7 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
 
   const handleSubcategoryUpdate = async (
     categoryId: string,
-    subcategoryId: string,
+    subcategoryId: string | null,
     updates: Partial<RequirementSubcategory>,
   ) => {
     const requirements = props.requirements;
@@ -102,6 +114,23 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
 
     const updatedCategories = requirements.categories.map((cat) => {
       if (cat.id !== categoryId) return cat;
+
+      if (subcategoryId === null) {
+        const newSubcategory: RequirementSubcategory = {
+          id: `subcat-${Date.now()}`,
+          name: updates.name || "新しいサブカテゴリ",
+          type: updates.type || "elective",
+          minCredits: updates.minCredits ?? 0,
+          maxCredits: updates.maxCredits,
+          rules: updates.rules || [],
+          notes: updates.notes,
+        };
+        return {
+          ...cat,
+          subcategories: [...cat.subcategories, newSubcategory],
+        };
+      }
+
       return {
         ...cat,
         subcategories: cat.subcategories.map((sub) =>

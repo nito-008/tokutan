@@ -1,4 +1,4 @@
-import { Circle, CircleCheck, Pencil } from "lucide-solid";
+import { Circle, CircleCheck, Pencil, Plus } from "lucide-solid";
 import { type Component, createSignal, For, Show } from "solid-js";
 import {
   Accordion,
@@ -21,20 +21,22 @@ import { SubcategoryEditModal } from "./SubcategoryEditModal";
 interface RequirementTreeProps {
   categoryStatuses: CategoryStatus[];
   requirements?: GraduationRequirements;
-  onCategoryUpdate?: (categoryId: string, updates: Partial<RequirementCategory>) => void;
+  onCategoryUpdate?: (categoryId: string | null, updates: Partial<RequirementCategory>) => void;
   onSubcategoryUpdate?: (
     categoryId: string,
-    subcategoryId: string,
+    subcategoryId: string | null,
     updates: Partial<RequirementSubcategory>,
   ) => void;
 }
 
 export const RequirementTree: Component<RequirementTreeProps> = (props) => {
   const [editingCategory, setEditingCategory] = createSignal<RequirementCategory | null>(null);
+  const [addingCategory, setAddingCategory] = createSignal(false);
   const [editingSubcategory, setEditingSubcategory] = createSignal<{
     categoryId: string;
     subcategory: RequirementSubcategory;
   } | null>(null);
+  const [addingSubcategoryFor, setAddingSubcategoryFor] = createSignal<string | null>(null);
 
   const findCategory = (categoryId: string): RequirementCategory | undefined => {
     return props.requirements?.categories.find((c) => c.id === categoryId);
@@ -49,13 +51,13 @@ export const RequirementTree: Component<RequirementTreeProps> = (props) => {
     return subcategory ? { categoryId, subcategory } : undefined;
   };
 
-  const handleCategorySave = (categoryId: string, updates: Partial<RequirementCategory>) => {
+  const handleCategorySave = (categoryId: string | null, updates: Partial<RequirementCategory>) => {
     props.onCategoryUpdate?.(categoryId, updates);
   };
 
   const handleSubcategorySave = (
     categoryId: string,
-    subcategoryId: string,
+    subcategoryId: string | null,
     updates: Partial<RequirementSubcategory>,
   ) => {
     props.onSubcategoryUpdate?.(categoryId, subcategoryId, updates);
@@ -112,6 +114,16 @@ export const RequirementTree: Component<RequirementTreeProps> = (props) => {
                       )}
                     </For>
                   </Accordion>
+                  <Show when={props.requirements && props.onSubcategoryUpdate}>
+                    <button
+                      type="button"
+                      class="flex items-center gap-2 w-full p-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded mt-2"
+                      onClick={() => setAddingSubcategoryFor(category.categoryId)}
+                    >
+                      <Plus class="size-4" />
+                      サブカテゴリを追加
+                    </button>
+                  </Show>
                 </div>
               </AccordionContent>
             </AccordionItem>
@@ -119,18 +131,35 @@ export const RequirementTree: Component<RequirementTreeProps> = (props) => {
         </For>
       </Accordion>
 
+      <Show when={props.requirements && props.onCategoryUpdate}>
+        <button
+          type="button"
+          class="flex items-center gap-2 w-full p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded mt-2"
+          onClick={() => setAddingCategory(true)}
+        >
+          <Plus class="size-4" />
+          カテゴリを追加
+        </button>
+      </Show>
+
       <CategoryEditModal
-        open={!!editingCategory()}
+        open={!!editingCategory() || addingCategory()}
         category={editingCategory()}
-        onClose={() => setEditingCategory(null)}
+        onClose={() => {
+          setEditingCategory(null);
+          setAddingCategory(false);
+        }}
         onSave={handleCategorySave}
       />
 
       <SubcategoryEditModal
-        open={!!editingSubcategory()}
+        open={!!editingSubcategory() || !!addingSubcategoryFor()}
         subcategory={editingSubcategory()?.subcategory ?? null}
-        categoryId={editingSubcategory()?.categoryId ?? ""}
-        onClose={() => setEditingSubcategory(null)}
+        categoryId={editingSubcategory()?.categoryId ?? addingSubcategoryFor() ?? ""}
+        onClose={() => {
+          setEditingSubcategory(null);
+          setAddingSubcategoryFor(null);
+        }}
         onSave={handleSubcategorySave}
       />
     </>

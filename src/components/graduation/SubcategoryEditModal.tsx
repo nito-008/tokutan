@@ -27,7 +27,7 @@ interface SubcategoryEditModalProps {
   onClose: () => void;
   onSave: (
     categoryId: string,
-    subcategoryId: string,
+    subcategoryId: string | null,
     updates: Partial<RequirementSubcategory>,
   ) => void;
 }
@@ -60,12 +60,17 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
       setMaxCredits(props.subcategory.maxCredits);
       setNotes(props.subcategory.notes);
       setRules(JSON.parse(JSON.stringify(props.subcategory.rules)));
+    } else if (props.open) {
+      setName("");
+      setType("elective");
+      setMinCredits(0);
+      setMaxCredits(undefined);
+      setNotes(undefined);
+      setRules([]);
     }
   });
 
   const handleSave = () => {
-    if (!props.subcategory) return;
-
     const updates: Partial<RequirementSubcategory> = {
       name: name(),
       type: type(),
@@ -75,7 +80,7 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
       rules: rules(),
     };
 
-    props.onSave(props.categoryId, props.subcategory.id, updates);
+    props.onSave(props.categoryId, props.subcategory?.id ?? null, updates);
     props.onClose();
   };
 
@@ -109,10 +114,8 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
     <Dialog open={props.open} onOpenChange={handleOpenChange}>
       <DialogContent class="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>サブカテゴリを編集</DialogTitle>
+          <DialogTitle>{props.subcategory ? "サブカテゴリを編集" : "サブカテゴリを追加"}</DialogTitle>
         </DialogHeader>
-
-        <Show when={props.subcategory}>
           <div class="space-y-4 py-4">
             <div class="space-y-2">
               <Label for="subcategory-name">名前</Label>
@@ -215,7 +218,6 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
               </Show>
             </div>
           </div>
-        </Show>
 
         <DialogFooter>
           <Button variant="outline" onClick={props.onClose}>

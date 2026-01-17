@@ -1,4 +1,4 @@
-import { type Component, createEffect, createSignal, Show } from "solid-js";
+import { type Component, createEffect, createSignal } from "solid-js";
 import { Button } from "~/components/ui/button";
 import {
   Dialog,
@@ -15,7 +15,7 @@ interface CategoryEditModalProps {
   open: boolean;
   category: RequirementCategory | null;
   onClose: () => void;
-  onSave: (categoryId: string, updates: Partial<RequirementCategory>) => void;
+  onSave: (categoryId: string | null, updates: Partial<RequirementCategory>) => void;
 }
 
 export const CategoryEditModal: Component<CategoryEditModalProps> = (props) => {
@@ -28,19 +28,21 @@ export const CategoryEditModal: Component<CategoryEditModalProps> = (props) => {
       setName(props.category.name);
       setMinCredits(props.category.minCredits);
       setMaxCredits(props.category.maxCredits);
+    } else if (props.open) {
+      setName("");
+      setMinCredits(undefined);
+      setMaxCredits(undefined);
     }
   });
 
   const handleSave = () => {
-    if (!props.category) return;
-
     const updates: Partial<RequirementCategory> = {
       name: name(),
       minCredits: minCredits(),
       maxCredits: maxCredits(),
     };
 
-    props.onSave(props.category.id, updates);
+    props.onSave(props.category?.id ?? null, updates);
     props.onClose();
   };
 
@@ -54,11 +56,10 @@ export const CategoryEditModal: Component<CategoryEditModalProps> = (props) => {
     <Dialog open={props.open} onOpenChange={handleOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>カテゴリを編集</DialogTitle>
+          <DialogTitle>{props.category ? "カテゴリを編集" : "カテゴリを追加"}</DialogTitle>
         </DialogHeader>
 
-        <Show when={props.category}>
-          <div class="space-y-4 py-4">
+        <div class="space-y-4 py-4">
             <div class="space-y-2">
               <Label for="category-name">名前</Label>
               <Input
@@ -98,7 +99,6 @@ export const CategoryEditModal: Component<CategoryEditModalProps> = (props) => {
               </div>
             </div>
           </div>
-        </Show>
 
         <DialogFooter>
           <Button variant="outline" onClick={props.onClose}>
