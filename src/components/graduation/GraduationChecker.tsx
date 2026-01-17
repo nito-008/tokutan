@@ -1,10 +1,12 @@
 import { type Component, createEffect, createSignal, For, onCleanup, Show } from "solid-js";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import { Switch, SwitchControl, SwitchLabel } from "~/components/ui/switch";
 import { calculateRequirementStatus } from "~/lib/calculator/requirements";
 import { importTwinsData } from "~/lib/db/enrollment";
 import { getCachedKdb } from "~/lib/db/kdb";
 import { getActiveProfile } from "~/lib/db/profiles";
+import { saveRequirements } from "~/lib/db/requirements";
 import type { ValidationResult } from "~/lib/parsers/twins-csv";
 import type {
   EnrollmentData,
@@ -14,7 +16,6 @@ import type {
   RequirementSubcategory,
   TwinsCourse,
 } from "~/lib/types";
-import { saveRequirements } from "~/lib/db/requirements";
 import { CsvUploader } from "./CsvUploader";
 import { DonutChart, getCategoryColor } from "./DonutChart";
 import { RequirementsSummary } from "./RequirementsSummary";
@@ -31,6 +32,7 @@ interface GraduationCheckerProps {
 export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
   const [status, setStatus] = createSignal<RequirementStatus | null>(null);
   const [showUploader, setShowUploader] = createSignal(!props.enrollment);
+  const [editMode, setEditMode] = createSignal(false);
 
   // 要件充足状況を計算
   createEffect(() => {
@@ -49,11 +51,7 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
     void (async () => {
       const kdbCourses = await getCachedKdb();
       if (cancelled) return;
-      const calculated = calculateRequirementStatus(
-        requirements,
-        enrollment.courses,
-        kdbCourses,
-      );
+      const calculated = calculateRequirementStatus(requirements, enrollment.courses, kdbCourses);
       if (cancelled) return;
       setStatus(calculated);
     })();
@@ -209,9 +207,10 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
                 <Button variant="outline" size="sm" onClick={handleReupload}>
                   データ更新
                 </Button>
-                <Button variant="outline" size="sm" onClick={props.onEditRequirements}>
-                  要件編集
-                </Button>
+                <Switch checked={editMode()} onChange={setEditMode} class="flex items-center gap-2">
+                  <SwitchLabel>編集モード</SwitchLabel>
+                  <SwitchControl />
+                </Switch>
               </div>
             </CardHeader>
             <CardContent>
@@ -220,6 +219,7 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
                 requirements={props.requirements ?? undefined}
                 onCategoryUpdate={handleCategoryUpdate}
                 onSubcategoryUpdate={handleSubcategoryUpdate}
+                editMode={editMode()}
               />
             </CardContent>
           </Card>

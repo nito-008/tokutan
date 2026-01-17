@@ -27,6 +27,7 @@ interface RequirementTreeProps {
     subcategoryId: string | null,
     updates: Partial<RequirementSubcategory>,
   ) => void;
+  editMode?: boolean;
 }
 
 export const RequirementTree: Component<RequirementTreeProps> = (props) => {
@@ -73,7 +74,7 @@ export const RequirementTree: Component<RequirementTreeProps> = (props) => {
                 <div class="flex items-center gap-3 w-full">
                   <StatusIcon isSatisfied={category.isSatisfied} />
                   <span class="font-medium">{category.categoryName}</span>
-                  <Show when={props.requirements && props.onCategoryUpdate}>
+                  <Show when={props.editMode && props.requirements && props.onCategoryUpdate}>
                     <button
                       type="button"
                       class="p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground"
@@ -102,7 +103,9 @@ export const RequirementTree: Component<RequirementTreeProps> = (props) => {
                         <SubcategoryItem
                           subcategory={subcategory}
                           categoryId={category.categoryId}
-                          editable={!!props.requirements && !!props.onSubcategoryUpdate}
+                          editable={
+                            !!props.editMode && !!props.requirements && !!props.onSubcategoryUpdate
+                          }
                           onEdit={() => {
                             const sub = findSubcategory(
                               category.categoryId,
@@ -114,7 +117,7 @@ export const RequirementTree: Component<RequirementTreeProps> = (props) => {
                       )}
                     </For>
                   </Accordion>
-                  <Show when={props.requirements && props.onSubcategoryUpdate}>
+                  <Show when={props.editMode && props.requirements && props.onSubcategoryUpdate}>
                     <button
                       type="button"
                       class="flex items-center gap-2 w-full p-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded mt-2"
@@ -131,7 +134,7 @@ export const RequirementTree: Component<RequirementTreeProps> = (props) => {
         </For>
       </Accordion>
 
-      <Show when={props.requirements && props.onCategoryUpdate}>
+      <Show when={props.editMode && props.requirements && props.onCategoryUpdate}>
         <button
           type="button"
           class="flex items-center gap-2 w-full p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded mt-2"
