@@ -1,6 +1,5 @@
 import { Check, Plus, Trash2, X } from "lucide-solid";
 import { type Component, createEffect, createSignal, For, Index, onCleanup, Show } from "solid-js";
-import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import {
   Dialog,
@@ -60,9 +59,25 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
   const [suggestionIndex, setSuggestionIndex] = createSignal<number | null>(null);
   const [suggestionQuery, setSuggestionQuery] = createSignal("");
   const [searchQueries, setSearchQueries] = createSignal<string[]>([]);
-  const formatCourseLabel = (courseId: string) => {
+  const _formatCourseLabel = (courseId: string) => {
     const name = requiredCourseNames().get(courseId);
     return name ? `${courseId}（${name}）` : courseId;
+  };
+  // 同等科目の共通名を取得（最初に見つかった科目名を返す）
+  const getCommonCourseName = (courseIds: string[]) => {
+    for (const id of courseIds) {
+      const name = requiredCourseNames().get(id);
+      if (name) return name;
+    }
+    return courseIds[0]; // 名前が見つからない場合は最初のIDを返す
+  };
+  // 同等科目をすべてクリア
+  const clearEquivalentIds = (entryIndex: number) => {
+    setRequiredCourses((prev) =>
+      normalizeRequiredCourses(
+        prev.map((entry, i) => (i === entryIndex ? { ...entry, equivalentIds: [] } : entry)),
+      ),
+    );
   };
   const normalizeRequiredCourses = (courses: RequiredCourse[]) => {
     // 末尾の空エントリを削除してから1つ追加
@@ -245,7 +260,7 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
     );
   };
 
-  const removeEquivalentId = (entryIndex: number, courseId: string) => {
+  const _removeEquivalentId = (entryIndex: number, courseId: string) => {
     setRequiredCourses((prev) =>
       normalizeRequiredCourses(
         prev.map((entry, i) => {
@@ -480,29 +495,18 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
                             })()}
 
                             <Show when={entry().equivalentIds.length > 0}>
-                              <div class="space-y-1">
-                                <div class="text-xs text-muted-foreground">
-                                  選択中（いずれか1つを履修）:
-                                </div>
-                                <div class="flex flex-wrap gap-2">
-                                  <For each={entry().equivalentIds}>
-                                    {(courseId) => (
-                                      <Badge
-                                        variant="secondary"
-                                        class="flex items-center gap-1 pr-1"
-                                      >
-                                        <span class="text-xs">{formatCourseLabel(courseId)}</span>
-                                        <button
-                                          type="button"
-                                          class="rounded-full hover:bg-muted p-0.5"
-                                          onClick={() => removeEquivalentId(index, courseId)}
-                                        >
-                                          <X class="size-3" />
-                                        </button>
-                                      </Badge>
-                                    )}
-                                  </For>
-                                </div>
+                              <div class="flex items-center gap-2 p-2 border rounded-md bg-muted/50">
+                                <span class="text-sm flex-1">
+                                  {getCommonCourseName(entry().equivalentIds)}（
+                                  {entry().equivalentIds.join(", ")}）
+                                </span>
+                                <button
+                                  type="button"
+                                  class="text-muted-foreground hover:text-foreground"
+                                  onClick={() => clearEquivalentIds(index)}
+                                >
+                                  <X class="size-4" />
+                                </button>
                               </div>
                             </Show>
                           </div>
