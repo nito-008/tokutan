@@ -110,10 +110,10 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
     const requirements = props.requirements;
     if (!requirements) return;
 
-    const hasCourseIds = Object.prototype.hasOwnProperty.call(updates, "courseIds");
-    const hasMinCredits = Object.prototype.hasOwnProperty.call(updates, "minCredits");
-    const hasMaxCredits = Object.prototype.hasOwnProperty.call(updates, "maxCredits");
-    const hasRules = Object.prototype.hasOwnProperty.call(updates, "rules");
+    const hasCourseIds = Object.hasOwn(updates, "courseIds");
+    const hasMinCredits = Object.hasOwn(updates, "minCredits");
+    const hasMaxCredits = Object.hasOwn(updates, "maxCredits");
+    const hasRules = Object.hasOwn(updates, "rules");
 
     const buildSubcategory = (existing?: RequirementSubcategory): RequirementSubcategory => {
       const nextType = updates.type ?? existing?.type ?? "elective";
@@ -122,7 +122,7 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
 
       if (nextType === "required") {
         const courseIds = hasCourseIds
-          ? updates.courseIds ?? []
+          ? (updates.courseIds ?? [])
           : existing?.type === "required"
             ? existing.courseIds
             : [];
@@ -136,7 +136,7 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
       }
 
       const minCredits = hasMinCredits
-        ? updates.minCredits ?? 0
+        ? (updates.minCredits ?? 0)
         : existing && existing.type !== "required"
           ? existing.minCredits
           : 0;
@@ -146,7 +146,7 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
           ? existing.maxCredits
           : undefined;
       const rules = hasRules
-        ? updates.rules ?? []
+        ? (updates.rules ?? [])
         : existing && existing.type !== "required"
           ? existing.rules
           : [];

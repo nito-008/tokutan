@@ -233,23 +233,23 @@ function matchCoursesToRule(
 
     let isMatch = false;
 
-  switch (rule.type) {
-    case "specific":
-      isMatch = rule.courseIds.includes(course.courseId);
-      break;
+    switch (rule.type) {
+      case "specific":
+        isMatch = rule.courseIds.includes(course.courseId);
+        break;
 
-    case "pattern":
-      {
-        const regex = new RegExp(rule.courseIdPattern);
-        // 必修科目として定義されているものは除外
-        if (excludedCourseIds.has(course.courseId)) {
-          isMatch = false;
-        } else {
-          isMatch = regex.test(course.courseId);
+      case "pattern":
+        {
+          const regex = new RegExp(rule.courseIdPattern);
+          // 必修科目として定義されているものは除外
+          if (excludedCourseIds.has(course.courseId)) {
+            isMatch = false;
+          } else {
+            isMatch = regex.test(course.courseId);
+          }
         }
-      }
-      break;
-  }
+        break;
+    }
 
     if (isMatch) {
       usedCourseIds.add(course.id);

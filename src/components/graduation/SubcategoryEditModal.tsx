@@ -418,9 +418,7 @@ const RuleEditor: Component<{
               <Input
                 class="h-8"
                 value={props.rule.courseIdPattern}
-                onInput={(e) =>
-                  props.onUpdate({ courseIdPattern: e.currentTarget.value })
-                }
+                onInput={(e) => props.onUpdate({ courseIdPattern: e.currentTarget.value })}
                 placeholder="例: ^FG(17|24|25)"
               />
             </div>
