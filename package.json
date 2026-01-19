@@ -5,9 +5,10 @@
     "dev": "vinxi dev",
     "build": "vinxi build",
     "start": "serve .output/public",
-    "format": "biome format --write ./src",
-    "lint": "biome lint ./src",
-    "check": "biome check --write ./src",
+    "format": "biome format --write .",
+    "lint": "biome lint --write .",
+    "check": "biome check .",
+    "fix": "biome check --write .",
     "typecheck": "tsgo --noEmit"
   },
   "dependencies": {
