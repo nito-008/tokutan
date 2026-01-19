@@ -130,13 +130,7 @@ export function calculateRequirementStatus(
       }
 
       for (const rule of subcategory.rules) {
-        const ruleMatches = matchCoursesToRule(
-          courses,
-          rule,
-          usedCourseIds,
-          excludedCourseIds,
-          kdbMap,
-        );
+        const ruleMatches = matchCoursesToRule(courses, rule, usedCourseIds, excludedCourseIds);
 
         const earnedCredits = ruleMatches
           .filter((m) => m.isPassed)
@@ -223,7 +217,6 @@ function matchCoursesToRule(
   rule: RequirementRule,
   usedCourseIds: Set<string>,
   excludedCourseIds: Set<string>,
-  kdbMap: Map<string, Course>,
 ): MatchedCourse[] {
   const matches: MatchedCourse[] = [];
 

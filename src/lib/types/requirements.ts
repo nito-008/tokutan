@@ -56,10 +56,6 @@ export type RequirementRule =
       type: "pattern";
       courseIdPattern: string;
     });
-  minCredits?: number;
-  maxCredits?: number;
-  required?: boolean;
-}
 
 // 要件充足状況
 export interface RequirementStatus {
