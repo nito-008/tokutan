@@ -41,6 +41,36 @@ A web application for University of Tsukuba students to check their graduation r
 - User's Course Data
 - Settings & Preferences
 
+## ID Conventions
+
+All data entities use a unique identifier following a consistent naming pattern:
+
+### ID Format
+
+```
+[4-character prefix]_[nanoid-generated ID]
+```
+
+### Entity Prefixes
+
+- `catg`: Category
+- `subc`: SubCategory
+- `greq`: GraduationRequirements
+- `prof`: UserProfile
+- `rule`: RequirementRule
+
+### Generating IDs
+
+When generating a new unique ID, use nanoid:
+
+```bash
+npx nanoid
+```
+
+Then prepend the appropriate 4-character prefix followed by an underscore.
+
+**Example**: `catg_V1StGXR8_Z5jdHi6B-myT`
+
 ## Screen Layout
 
 ```text
