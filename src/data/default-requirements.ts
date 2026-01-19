@@ -14,7 +14,6 @@ export const defaultRequirements: GraduationRequirements = {
     {
       id: "specialized",
       name: "専門科目",
-      minCredits: 65,
       subcategories: [
         {
           id: "specialized-required",
@@ -48,7 +47,6 @@ export const defaultRequirements: GraduationRequirements = {
     {
       id: "foundation",
       name: "専門基礎科目",
-      minCredits: 31,
       subcategories: [
         {
           id: "foundation-required",
@@ -89,7 +87,6 @@ export const defaultRequirements: GraduationRequirements = {
     {
       id: "common",
       name: "共通科目",
-      minCredits: 13,
       subcategories: [
         {
           id: "common-fys",
@@ -153,8 +150,6 @@ export const defaultRequirements: GraduationRequirements = {
     {
       id: "basic",
       name: "基礎科目",
-      minCredits: 6,
-      maxCredits: 15,
       subcategories: [
         {
           id: "basic-other",

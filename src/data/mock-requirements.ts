@@ -15,7 +15,6 @@ export const mockRequirements: GraduationRequirements[] = [
       {
         id: "specialized",
         name: "専門科目",
-        minCredits: 70,
         subcategories: [
           {
             id: "specialized-required",
@@ -35,7 +34,6 @@ export const mockRequirements: GraduationRequirements[] = [
       {
         id: "foundation",
         name: "専門基礎科目",
-        minCredits: 25,
         subcategories: [
           {
             id: "foundation-required",
@@ -48,7 +46,6 @@ export const mockRequirements: GraduationRequirements[] = [
       {
         id: "common",
         name: "共通科目",
-        minCredits: 15,
         subcategories: [
           {
             id: "common-fys",
@@ -73,7 +70,6 @@ export const mockRequirements: GraduationRequirements[] = [
       {
         id: "basic",
         name: "基礎科目",
-        minCredits: 15,
         subcategories: [
           {
             id: "basic-other",
@@ -100,7 +96,6 @@ export const mockRequirements: GraduationRequirements[] = [
       {
         id: "specialized",
         name: "専門科目",
-        minCredits: 68,
         subcategories: [
           {
             id: "specialized-required",
@@ -120,7 +115,6 @@ export const mockRequirements: GraduationRequirements[] = [
       {
         id: "foundation",
         name: "専門基礎科目",
-        minCredits: 27,
         subcategories: [
           {
             id: "foundation-required",
@@ -133,7 +127,6 @@ export const mockRequirements: GraduationRequirements[] = [
       {
         id: "common",
         name: "共通科目",
-        minCredits: 15,
         subcategories: [
           {
             id: "common-fys",
@@ -158,7 +151,6 @@ export const mockRequirements: GraduationRequirements[] = [
       {
         id: "basic",
         name: "基礎科目",
-        minCredits: 15,
         subcategories: [
           {
             id: "basic-other",
@@ -185,7 +177,6 @@ export const mockRequirements: GraduationRequirements[] = [
       {
         id: "specialized",
         name: "専門科目",
-        minCredits: 66,
         subcategories: [
           {
             id: "specialized-required",
@@ -205,7 +196,6 @@ export const mockRequirements: GraduationRequirements[] = [
       {
         id: "foundation",
         name: "専門基礎科目",
-        minCredits: 29,
         subcategories: [
           {
             id: "foundation-required",
@@ -218,7 +208,6 @@ export const mockRequirements: GraduationRequirements[] = [
       {
         id: "common",
         name: "共通科目",
-        minCredits: 15,
         subcategories: [
           {
             id: "common-fys",
@@ -243,7 +232,6 @@ export const mockRequirements: GraduationRequirements[] = [
       {
         id: "basic",
         name: "基礎科目",
-        minCredits: 15,
         subcategories: [
           {
             id: "basic-other",

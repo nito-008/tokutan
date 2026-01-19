@@ -176,8 +176,7 @@ export function calculateRequirementStatus(
 
     const earnedCredits = subcategoryStatuses.reduce((sum, s) => sum + s.earnedCredits, 0);
     const inProgressCredits = subcategoryStatuses.reduce((sum, s) => sum + s.inProgressCredits, 0);
-    const requiredCredits =
-      category.minCredits || subcategoryStatuses.reduce((sum, s) => sum + s.requiredCredits, 0);
+    const requiredCredits = subcategoryStatuses.reduce((sum, s) => sum + s.requiredCredits, 0);
     const isSatisfied = subcategoryStatuses.every((s) => s.isSatisfied);
 
     return {
@@ -186,7 +185,6 @@ export function calculateRequirementStatus(
       earnedCredits,
       inProgressCredits,
       requiredCredits,
-      maxCredits: category.maxCredits,
       isSatisfied,
       subcategoryStatuses,
     };

@@ -20,26 +20,18 @@ interface CategoryEditModalProps {
 
 export const CategoryEditModal: Component<CategoryEditModalProps> = (props) => {
   const [name, setName] = createSignal("");
-  const [minCredits, setMinCredits] = createSignal<number | undefined>(undefined);
-  const [maxCredits, setMaxCredits] = createSignal<number | undefined>(undefined);
 
   createEffect(() => {
     if (props.category) {
       setName(props.category.name);
-      setMinCredits(props.category.minCredits);
-      setMaxCredits(props.category.maxCredits);
     } else if (props.open) {
       setName("");
-      setMinCredits(undefined);
-      setMaxCredits(undefined);
     }
   });
 
   const handleSave = () => {
     const updates: Partial<RequirementCategory> = {
       name: name(),
-      minCredits: minCredits(),
-      maxCredits: maxCredits(),
     };
 
     props.onSave(props.category?.id ?? null, updates);
@@ -67,36 +59,6 @@ export const CategoryEditModal: Component<CategoryEditModalProps> = (props) => {
               value={name()}
               onInput={(e) => setName(e.currentTarget.value)}
             />
-          </div>
-
-          <div class="grid grid-cols-2 gap-4">
-            <div class="space-y-2">
-              <Label for="min-credits">最小単位数</Label>
-              <Input
-                id="min-credits"
-                type="number"
-                min="0"
-                value={minCredits() ?? ""}
-                onInput={(e) => {
-                  const val = e.currentTarget.value;
-                  setMinCredits(val ? Number.parseInt(val, 10) : undefined);
-                }}
-              />
-            </div>
-
-            <div class="space-y-2">
-              <Label for="max-credits">最大単位数</Label>
-              <Input
-                id="max-credits"
-                type="number"
-                min="0"
-                value={maxCredits() ?? ""}
-                onInput={(e) => {
-                  const val = e.currentTarget.value;
-                  setMaxCredits(val ? Number.parseInt(val, 10) : undefined);
-                }}
-              />
-            </div>
           </div>
         </div>
 

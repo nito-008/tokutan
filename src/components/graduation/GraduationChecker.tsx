@@ -84,8 +84,6 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
         id: `cat-${Date.now()}`,
         name: updates.name || "新しいカテゴリ",
         subcategories: [],
-        minCredits: updates.minCredits,
-        maxCredits: updates.maxCredits,
       };
       updatedCategories = [...requirements.categories, newCategory];
     } else {

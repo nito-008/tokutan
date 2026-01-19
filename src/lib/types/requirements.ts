@@ -17,8 +17,6 @@ export interface RequirementCategory {
   id: string;
   name: string;
   subcategories: RequirementSubcategory[];
-  minCredits?: number;
-  maxCredits?: number;
 }
 
 // サブカテゴリ
@@ -74,7 +72,6 @@ export interface CategoryStatus {
   earnedCredits: number;
   inProgressCredits: number;
   requiredCredits: number;
-  maxCredits?: number;
   isSatisfied: boolean;
   subcategoryStatuses: SubcategoryStatus[];
 }
