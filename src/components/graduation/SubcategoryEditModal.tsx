@@ -155,8 +155,7 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
             description: merged.description,
             minCredits: merged.minCredits,
             type: "pattern",
-            courseIdPattern:
-              "courseIdPattern" in merged ? (merged.courseIdPattern as string) : "",
+            courseIdPattern: "courseIdPattern" in merged ? (merged.courseIdPattern as string) : "",
           } satisfies RequirementRule;
         }
       }),

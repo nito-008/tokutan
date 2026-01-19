@@ -23,20 +23,6 @@ export const defaultRequirements: GraduationRequirements = {
           courseIds: ["FG20204", "FG20214", "FG19103", "FG19113", "FG18112", "FG20222"],
         },
         {
-          id: "specialized-required-group",
-          name: "必修群",
-          type: "elective",
-          minCredits: 16,
-          rules: [
-            {
-              id: "fg17-24-25",
-              type: "pattern",
-              courseIdPattern: "^FG(17|24|25)",
-              description: "FG17, FG24, FG25で始まる授業科目",
-            },
-          ],
-        },
-        {
           id: "specialized-elective",
           name: "選択科目",
           type: "elective",
@@ -48,6 +34,12 @@ export const defaultRequirements: GraduationRequirements = {
               type: "pattern",
               courseIdPattern: "^(FG|FF|GB)",
               description: "FG, FF, GBで始まる専門選択科目",
+            },
+            {
+              id: "fg17-24-25",
+              type: "pattern",
+              courseIdPattern: "^FG(17|24|25)",
+              description: "FG17, FG24, FG25で始まる授業科目",
             },
           ],
         },

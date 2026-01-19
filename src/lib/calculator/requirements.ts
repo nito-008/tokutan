@@ -93,12 +93,7 @@ export function calculateRequirementStatus(
 
       if (subcategory.type === "required") {
         const courseIds = subcategory.courseIds ?? [];
-        const requiredMatches = matchRequiredCourses(
-          courseIds,
-          courses,
-          usedCourseIds,
-          kdbMap,
-        );
+        const requiredMatches = matchRequiredCourses(courseIds, courses, usedCourseIds, kdbMap);
         matchedCourses.push(...requiredMatches);
 
         const earnedCredits = matchedCourses
