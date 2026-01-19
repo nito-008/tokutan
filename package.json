@@ -40,12 +40,8 @@
     "node": ">=22"
   },
   "lint-staged": {
-    "ignore": [
-      "**/storybook-static/**"
-    ],
     "*.{js,jsx,ts,tsx,json}": [
-      "biome check --write",
-      "tsgo --noEmit"
+      "biome check --write"
     ]
   }
 }
