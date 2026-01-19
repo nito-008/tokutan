@@ -1,5 +1,5 @@
 import { Plus, Trash2 } from "lucide-solid";
-import { type Component, createEffect, createSignal, For, onCleanup, Show } from "solid-js";
+import { type Component, createEffect, createSignal, For, Index, onCleanup, Show } from "solid-js";
 import { Button } from "~/components/ui/button";
 import {
   Dialog,
@@ -240,18 +240,18 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
             <div class="space-y-2">
               <Label>科目番号</Label>
               <div class="space-y-2">
-                <For each={courseIds()}>
+                <Index each={courseIds()}>
                   {(id, index) => (
                     <div class="flex items-start gap-2">
                       <div class="flex-1 space-y-1">
                         <Input
-                          value={id}
-                          onInput={(e) => updateCourseId(index(), e.currentTarget.value)}
+                          value={id()}
+                          onInput={(e) => updateCourseId(index, e.currentTarget.value)}
                           placeholder="例: FG20204"
                         />
-                        <Show when={id && requiredCourseNames().get(id)}>
+                        <Show when={id() && requiredCourseNames().get(id())}>
                           <p class="text-xs text-muted-foreground">
-                            {requiredCourseNames().get(id)}
+                            {requiredCourseNames().get(id())}
                           </p>
                         </Show>
                       </div>
@@ -260,13 +260,13 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
                         variant="ghost"
                         size="icon"
                         class="mt-1 text-muted-foreground hover:text-foreground"
-                        onClick={() => removeCourseId(index())}
+                        onClick={() => removeCourseId(index)}
                       >
                         <Trash2 class="size-4" />
                       </Button>
                     </div>
                   )}
-                </For>
+                </Index>
                 <Show when={courseIds().length === 0}>
                   <p class="text-xs text-muted-foreground">科目番号を追加してください。</p>
                 </Show>
