@@ -53,6 +53,11 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
   const [requiredCourseNames, setRequiredCourseNames] = createSignal<Map<string, string>>(
     new Map(),
   );
+  const [focusedCourseIndex, setFocusedCourseIndex] = createSignal<number | null>(null);
+  const formatCourseLabel = (courseId: string) => {
+    const name = requiredCourseNames().get(courseId);
+    return name ? `${courseId}（${name}）` : courseId;
+  };
 
   createEffect(() => {
     if (props.subcategory) {
@@ -244,16 +249,30 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
                   {(id, index) => (
                     <div class="flex items-start gap-2">
                       <div class="flex-1 space-y-1">
-                        <Input
-                          value={id()}
-                          onInput={(e) => updateCourseId(index, e.currentTarget.value)}
-                          placeholder="例: FG20204"
-                        />
-                        <Show when={id() && requiredCourseNames().get(id())}>
-                          <p class="text-xs text-muted-foreground">
-                            {requiredCourseNames().get(id())}
-                          </p>
-                        </Show>
+                        {(() => {
+                          const isFocused = () => focusedCourseIndex() === index;
+                          return (
+                            <div class="relative">
+                              <Input
+                                class={isFocused() ? "" : "text-transparent caret-foreground"}
+                                value={id()}
+                                onInput={(e) => updateCourseId(index, e.currentTarget.value)}
+                                onFocus={() => setFocusedCourseIndex(index)}
+                                onBlur={() => {
+                                  if (focusedCourseIndex() === index) {
+                                    setFocusedCourseIndex(null);
+                                  }
+                                }}
+                                placeholder="例: FG20204"
+                              />
+                              <Show when={id() && !isFocused()}>
+                                <div class="pointer-events-none absolute inset-y-0 left-3 right-3 flex items-center text-sm text-foreground truncate">
+                                  {formatCourseLabel(id())}
+                                </div>
+                              </Show>
+                            </div>
+                          );
+                        })()}
                       </div>
                       <Button
                         type="button"
