@@ -53,6 +53,7 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
   const [requiredCourseNames, setRequiredCourseNames] = createSignal<Map<string, string>>(
     new Map(),
   );
+  const [isCourseLookupLoading, setIsCourseLookupLoading] = createSignal(false);
   const [focusedCourseIndex, setFocusedCourseIndex] = createSignal<number | null>(null);
   const formatCourseLabel = (courseId: string) => {
     const name = requiredCourseNames().get(courseId);
@@ -99,6 +100,7 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
   createEffect(() => {
     if (type() !== "required") {
       setRequiredCourseNames(new Map());
+      setIsCourseLookupLoading(false);
       return;
     }
 
@@ -107,6 +109,7 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
       .filter((id) => id);
     if (ids.length === 0) {
       setRequiredCourseNames(new Map());
+      setIsCourseLookupLoading(false);
       return;
     }
 
@@ -116,6 +119,7 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
     });
 
     void (async () => {
+      setIsCourseLookupLoading(true);
       const courses = await getCoursesByIds(ids);
       if (cancelled) return;
       const nameMap = new Map<string, string>();
@@ -123,6 +127,7 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
         nameMap.set(course.id, course.name);
       }
       setRequiredCourseNames(nameMap);
+      setIsCourseLookupLoading(false);
     })();
   });
 
@@ -265,6 +270,13 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
                 <Index each={courseIds()}>
                   {(id, index) => {
                     const isPlaceholderRow = () => index === courseIds().length - 1;
+                    const isFocused = () => focusedCourseIndex() === index;
+                    const showMissingCourse = () =>
+                      !!id() &&
+                      !isFocused() &&
+                      !isPlaceholderRow() &&
+                      !isCourseLookupLoading() &&
+                      !requiredCourseNames().has(id());
                     return (
                       <div class="flex items-start gap-2">
                         <div class="flex-1 space-y-1">
@@ -273,7 +285,6 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
                             const setBlurTarget = (el: HTMLDivElement) => {
                               blurTarget = el;
                             };
-                            const isFocused = () => focusedCourseIndex() === index;
                             return (
                               <div class="relative">
                                 <Input
@@ -311,6 +322,9 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
                               </div>
                             );
                           })()}
+                          <Show when={showMissingCourse()}>
+                            <p class="text-xs text-destructive">科目が見つかりません。</p>
+                          </Show>
                         </div>
                         <Show when={!isPlaceholderRow()}>
                           <Button
