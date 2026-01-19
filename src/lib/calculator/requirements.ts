@@ -10,7 +10,7 @@ import type {
 } from "../types";
 import type { Course } from "../types/course";
 
-// 全必修科目IDを収集するヘルパー関数
+// 全必修科目番号を収集するヘルパー関数
 function collectAllRequiredCourseIds(requirements: GraduationRequirements): Set<string> {
   const requiredCourseIds = new Set<string>();
 
@@ -77,7 +77,7 @@ export function calculateRequirementStatus(
   // 各科目が使用済みかどうかを追跡（同じ科目を複数カテゴリでカウントしない）
   const usedCourseIds = new Set<string>();
 
-  // 全必修科目IDを収集
+  // 全必修科目番号を収集
   const excludedCourseIds = collectAllRequiredCourseIds(requirements);
 
   // kdbキャッシュのMapを作成（科目番号→科目情報）

@@ -219,7 +219,7 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
 
           <Show when={type() === "required"}>
             <div class="space-y-2">
-              <Label for="sub-course-ids">必修科目ID（カンマ区切り）</Label>
+              <Label for="sub-course-ids">必修科目番号（カンマ区切り）</Label>
               <Input
                 id="sub-course-ids"
                 value={courseIds().join(", ")}
@@ -332,7 +332,7 @@ const RuleEditor: Component<{
   const selectedRuleType = () => ruleTypeOptions.find((opt) => opt.value === props.rule.type);
   const [courseNames, setCourseNames] = createSignal<Map<string, string>>(new Map());
 
-  // 科目IDから科目名を取得
+  // 科目番号から科目名を取得
   createEffect(() => {
     const courseIds = props.rule.type === "specific" ? props.rule.courseIds : [];
 
@@ -408,7 +408,7 @@ const RuleEditor: Component<{
               const rule = props.rule as Extract<RequirementRule, { type: "specific" }>;
               return (
                 <div class="space-y-1">
-                  <Label class="text-xs">科目ID（カンマ区切り）</Label>
+                  <Label class="text-xs">科目番号（カンマ区切り）</Label>
                   <Input
                     class="h-8"
                     value={rule.courseIds.join(", ")}
@@ -446,7 +446,7 @@ const RuleEditor: Component<{
               const rule = props.rule as Extract<RequirementRule, { type: "pattern" }>;
               return (
                 <div class="space-y-1">
-                  <Label class="text-xs">科目IDパターン（正規表現）</Label>
+                  <Label class="text-xs">科目番号パターン（正規表現）</Label>
                   <Input
                     class="h-8"
                     value={rule.courseIdPattern}
