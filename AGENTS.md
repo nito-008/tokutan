@@ -189,6 +189,10 @@ src/
 - Please commit in Japanese at the timing of feature-by-feature, document updates, library updates, etc.
 - Push operations and reset operations are prohibited.
 
+## Task Completion
+
+- After completing a task, run `npm run fix` and `npm run typecheck`. If errors occur, fix them.
+
 ## Shell Operations (Character encoding error instructions for Codex)
 
 **Rule:** In each command, **define → use**. Do **not** escape `$`. Use generic `'path/to/file.ext'`.
