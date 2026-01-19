@@ -1,7 +1,7 @@
 import type { Course, KdbCourse } from "../types";
 import { convertKdbCourse } from "../types";
 import { db } from "./index";
-import { getSetting, SettingKeys, setSetting } from "./settings";
+import { deleteSetting, getSetting, SettingKeys, setSetting } from "./settings";
 
 const KDB_URL = "https://raw.githubusercontent.com/s7tya/kdb-crawler/master/dist/kdb.json";
 const CACHE_DURATION = 24 * 60 * 60 * 1000; // 24時間
@@ -117,4 +117,9 @@ export async function getKdbStats(): Promise<{
     cachedAt: cachedAt || null,
     isValid,
   };
+}
+
+export async function clearKdbCache(): Promise<void> {
+  await db.kdbCache.clear();
+  await deleteSetting(SettingKeys.KDB_CACHED_AT);
 }

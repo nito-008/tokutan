@@ -1,13 +1,8 @@
 import { type Component, createSignal, Show } from "solid-js";
 import { Alert, AlertDescription } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "~/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "~/components/ui/dialog";
+import { clearUserData } from "~/lib/db/cleanup";
 import { exportAndDownload, exportRequirementsAndDownload } from "~/lib/db/export";
 import {
   type ImportResult,
@@ -15,6 +10,7 @@ import {
   importAllDataWithOverwrite,
   importRequirements,
 } from "~/lib/db/import";
+import { clearKdbCache } from "~/lib/db/kdb";
 import { getAllRequirements } from "~/lib/db/requirements";
 import type { GraduationRequirements } from "~/lib/types";
 
@@ -31,6 +27,8 @@ export const SettingsDialog: Component<SettingsDialogProps> = (props) => {
   const [importType, setImportType] = createSignal<"all" | "requirements" | "overwrite">("all");
   const [isExporting, setIsExporting] = createSignal(false);
   const [requirements, setRequirements] = createSignal<GraduationRequirements[]>([]);
+  const [isDeletingUserData, setIsDeletingUserData] = createSignal(false);
+  const [isDeletingKdbCache, setIsDeletingKdbCache] = createSignal(false);
 
   let fileInputRef: HTMLInputElement | undefined;
 
@@ -116,12 +114,43 @@ export const SettingsDialog: Component<SettingsDialogProps> = (props) => {
     }
   };
 
+  const handleDeleteUserData = async () => {
+    const confirmed = window.confirm(
+      "ユーザーデータを削除します。設定は残ります。よろしいですか？",
+    );
+    if (!confirmed) return;
+
+    setIsDeletingUserData(true);
+    try {
+      await clearUserData();
+      await props.onImportComplete();
+    } catch (error) {
+      console.error("Delete user data failed:", error);
+    } finally {
+      setIsDeletingUserData(false);
+    }
+  };
+
+  const handleDeleteKdbCache = async () => {
+    const confirmed = window.confirm("KDBキャッシュを削除します。よろしいですか？");
+    if (!confirmed) return;
+
+    setIsDeletingKdbCache(true);
+    try {
+      await clearKdbCache();
+      await props.onImportComplete();
+    } catch (error) {
+      console.error("Delete KDB cache failed:", error);
+    } finally {
+      setIsDeletingKdbCache(false);
+    }
+  };
+
   return (
     <Dialog open={props.open} onOpenChange={handleOpenChange}>
       <DialogContent class="max-w-2xl max-h-[85vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>設定</DialogTitle>
-          <DialogDescription>データのインポート/エクスポートを行います</DialogDescription>
         </DialogHeader>
 
         <input
@@ -248,6 +277,38 @@ export const SettingsDialog: Component<SettingsDialogProps> = (props) => {
                   ))
                 )}
               </div>
+            </div>
+          </section>
+
+          <section class="space-y-4">
+            <h3 class="text-base font-semibold">ローカルデータ削除</h3>
+
+            <div class="border rounded-lg p-4">
+              <h4 class="font-medium mb-2">ユーザーデータを削除</h4>
+              <p class="text-sm text-muted-foreground mb-3 text-red-500">
+                プロファイル、履修データ、卒業要件、履修計画が削除されます。
+              </p>
+              <Button
+                variant="destructive"
+                onClick={handleDeleteUserData}
+                disabled={isDeletingUserData()}
+              >
+                {isDeletingUserData() ? "削除中..." : "ユーザーデータを削除"}
+              </Button>
+            </div>
+
+            <div class="border rounded-lg p-4">
+              <h4 class="font-medium mb-2">KDBキャッシュを削除</h4>
+              <p class="text-sm text-muted-foreground mb-3">
+                科目検索のキャッシュを削除します。再検索時に再取得されます。
+              </p>
+              <Button
+                variant="outline"
+                onClick={handleDeleteKdbCache}
+                disabled={isDeletingKdbCache()}
+              >
+                {isDeletingKdbCache() ? "削除中..." : "KDBキャッシュを削除"}
+              </Button>
             </div>
           </section>
         </div>
