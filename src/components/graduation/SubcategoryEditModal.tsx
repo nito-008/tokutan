@@ -219,7 +219,7 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
 
           <Show when={type() === "required"}>
             <div class="space-y-2">
-              <Label for="sub-course-ids">必修科目番号（カンマ区切り）</Label>
+              <Label for="sub-course-ids">科目番号</Label>
               <Input
                 id="sub-course-ids"
                 value={courseIds().join(", ")}
