@@ -1,10 +1,9 @@
-import { type Component, Show } from "solid-js";
+import { Settings } from "lucide-solid";
+import type { Component } from "solid-js";
 import { Button } from "~/components/ui/button";
 
 interface HeaderProps {
-  onExport: () => void;
-  onImport: () => void;
-  onSettings?: () => void;
+  onSettings: () => void;
 }
 
 export const Header: Component<HeaderProps> = (props) => {
@@ -19,17 +18,10 @@ export const Header: Component<HeaderProps> = (props) => {
         </div>
 
         <div class="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={props.onImport}>
-            インポート
+          <Button variant="outline" size="sm" class="gap-2" onClick={props.onSettings}>
+            <Settings class="size-4" />
+            設定
           </Button>
-          <Button variant="outline" size="sm" onClick={props.onExport}>
-            エクスポート
-          </Button>
-          <Show when={props.onSettings}>
-            <Button variant="ghost" size="sm" onClick={props.onSettings}>
-              設定
-            </Button>
-          </Show>
         </div>
       </div>
     </header>

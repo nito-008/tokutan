@@ -1,8 +1,7 @@
 import { Loader2 } from "lucide-solid";
 import { type Component, createSignal, onMount, Show } from "solid-js";
 import { CourseManager } from "~/components/course/CourseManager";
-import { ExportDialog } from "~/components/dialogs/ExportDialog";
-import { ImportDialog } from "~/components/dialogs/ImportDialog";
+import { SettingsDialog } from "~/components/dialogs/SettingsDialog";
 import { GraduationChecker } from "~/components/graduation/GraduationChecker";
 import { RequirementsSelector } from "~/components/graduation/RequirementsSelector";
 import { Header } from "~/components/layout/Header";
@@ -15,8 +14,7 @@ const Home: Component = () => {
   const [activeTab, setActiveTab] = createSignal<string>("graduation");
   const [isLoading, setIsLoading] = createSignal(true);
   const [appState, setAppState] = createSignal<AppState | null>(null);
-  const [showExportDialog, setShowExportDialog] = createSignal(false);
-  const [showImportDialog, setShowImportDialog] = createSignal(false);
+  const [showSettingsDialog, setShowSettingsDialog] = createSignal(false);
   const [_showRequirementEditor, setShowRequirementEditor] = createSignal(false);
 
   onMount(async () => {
@@ -71,10 +69,7 @@ const Home: Component = () => {
 
   return (
     <div class="min-h-screen bg-background">
-      <Header
-        onExport={() => setShowExportDialog(true)}
-        onImport={() => setShowImportDialog(true)}
-      />
+      <Header onSettings={() => setShowSettingsDialog(true)} />
 
       <main class="container mx-auto px-4 py-6">
         <Show
@@ -129,11 +124,9 @@ const Home: Component = () => {
         </Show>
       </main>
 
-      <ExportDialog open={showExportDialog()} onClose={() => setShowExportDialog(false)} />
-
-      <ImportDialog
-        open={showImportDialog()}
-        onClose={() => setShowImportDialog(false)}
+      <SettingsDialog
+        open={showSettingsDialog()}
+        onClose={() => setShowSettingsDialog(false)}
         onImportComplete={handleImportComplete}
       />
     </div>
