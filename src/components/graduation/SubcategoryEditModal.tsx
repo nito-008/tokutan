@@ -58,6 +58,14 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
     const name = requiredCourseNames().get(courseId);
     return name ? `${courseId}（${name}）` : courseId;
   };
+  const normalizeCourseIds = (ids: string[]) => {
+    const normalized = ids.map((id) => id.trim());
+    while (normalized.length > 0 && normalized[normalized.length - 1] === "") {
+      normalized.pop();
+    }
+    normalized.push("");
+    return normalized;
+  };
 
   createEffect(() => {
     if (props.subcategory) {
@@ -65,7 +73,9 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
       setType(props.subcategory.type);
       if (props.subcategory.type === "required") {
         setCourseIds(
-          [...(props.subcategory.courseIds ?? [])].map((id) => id.trim()).filter((id) => id),
+          normalizeCourseIds(
+            [...(props.subcategory.courseIds ?? [])].map((id) => id.trim()).filter((id) => id),
+          ),
         );
         setMinCredits(0);
         setMaxCredits(undefined);
@@ -146,17 +156,24 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
 
   const selectedType = () => typeOptions.find((opt) => opt.value === type());
 
-  const addCourseId = () => {
-    setCourseIds((prev) => [...prev, ""]);
+  const handleTypeChange = (
+    val: { value: "required" | "elective" | "free"; label: string } | null,
+  ) => {
+    if (!val) return;
+    setType(val.value);
+    if (val.value === "required") {
+      setCourseIds((prev) => normalizeCourseIds(prev));
+    }
   };
 
   const updateCourseId = (index: number, value: string) => {
-    const trimmed = value.trim();
-    setCourseIds((prev) => prev.map((id, i) => (i === index ? trimmed : id)));
+    setCourseIds((prev) =>
+      normalizeCourseIds(prev.map((id, i) => (i === index ? value.trim() : id))),
+    );
   };
 
   const removeCourseId = (index: number) => {
-    setCourseIds((prev) => prev.filter((_, i) => i !== index));
+    setCourseIds((prev) => normalizeCourseIds(prev.filter((_, i) => i !== index)));
   };
 
   const updateRule = (index: number, updates: Partial<RequirementRule>) => {
@@ -222,7 +239,7 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
             <Label>科目タイプ</Label>
             <Select
               value={selectedType()}
-              onChange={(val) => val && setType(val.value)}
+              onChange={handleTypeChange}
               options={typeOptions}
               optionValue="value"
               optionTextValue="label"
@@ -246,74 +263,70 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
               <Label>科目番号</Label>
               <div class="space-y-2">
                 <Index each={courseIds()}>
-                  {(id, index) => (
-                    <div class="flex items-start gap-2">
-                      <div class="flex-1 space-y-1">
-                        {(() => {
-                          let blurTarget: HTMLDivElement | undefined;
-                          const setBlurTarget = (el: HTMLDivElement) => {
-                            blurTarget = el;
-                          };
-                          const isFocused = () => focusedCourseIndex() === index;
-                          return (
-                            <div class="relative">
-                              <Input
-                                class={isFocused() ? "" : "text-transparent caret-foreground"}
-                                value={id()}
-                                onInput={(e) => updateCourseId(index, e.currentTarget.value)}
-                                onFocus={() => setFocusedCourseIndex(index)}
-                                onBlur={() => {
-                                  if (focusedCourseIndex() === index) {
-                                    setFocusedCourseIndex(null);
+                  {(id, index) => {
+                    const isPlaceholderRow = () => index === courseIds().length - 1;
+                    return (
+                      <div class="flex items-start gap-2">
+                        <div class="flex-1 space-y-1">
+                          {(() => {
+                            let blurTarget: HTMLDivElement | undefined;
+                            const setBlurTarget = (el: HTMLDivElement) => {
+                              blurTarget = el;
+                            };
+                            const isFocused = () => focusedCourseIndex() === index;
+                            return (
+                              <div class="relative">
+                                <Input
+                                  class={isFocused() ? "" : "text-transparent caret-foreground"}
+                                  value={id()}
+                                  onInput={(e) => updateCourseId(index, e.currentTarget.value)}
+                                  onFocus={() => setFocusedCourseIndex(index)}
+                                  onBlur={() => {
+                                    if (focusedCourseIndex() === index) {
+                                      setFocusedCourseIndex(null);
+                                    }
+                                  }}
+                                  onKeyDown={(e) => {
+                                    if (e.key === "Enter") {
+                                      e.preventDefault();
+                                      setFocusedCourseIndex(null);
+                                      blurTarget?.focus();
+                                    }
+                                  }}
+                                  placeholder={
+                                    isPlaceholderRow() ? "科目番号を追加" : "例: FG20204"
                                   }
-                                }}
-                                onKeyDown={(e) => {
-                                  if (e.key === "Enter") {
-                                    e.preventDefault();
-                                    setFocusedCourseIndex(null);
-                                    blurTarget?.focus();
-                                  }
-                                }}
-                                placeholder="例: FG20204"
-                              />
-                              <Show when={id() && !isFocused()}>
-                                <div class="pointer-events-none absolute inset-y-0 left-3 right-3 flex items-center text-sm text-foreground truncate">
-                                  {formatCourseLabel(id())}
-                                </div>
-                              </Show>
-                              <div
-                                ref={setBlurTarget}
-                                tabIndex={-1}
-                                class="sr-only"
-                                aria-hidden="true"
-                              />
-                            </div>
-                          );
-                        })()}
+                                />
+                                <Show when={id() && !isFocused()}>
+                                  <div class="pointer-events-none absolute inset-y-0 left-3 right-3 flex items-center text-sm text-foreground truncate">
+                                    {formatCourseLabel(id())}
+                                  </div>
+                                </Show>
+                                <div
+                                  ref={setBlurTarget}
+                                  tabIndex={-1}
+                                  class="sr-only"
+                                  aria-hidden="true"
+                                />
+                              </div>
+                            );
+                          })()}
+                        </div>
+                        <Show when={!isPlaceholderRow()}>
+                          <Button
+                            type="button"
+                            variant="ghost"
+                            size="icon"
+                            class="mt-1 text-muted-foreground hover:text-foreground"
+                            onClick={() => removeCourseId(index)}
+                          >
+                            <Trash2 class="size-4" />
+                          </Button>
+                        </Show>
                       </div>
-                      <Button
-                        type="button"
-                        variant="ghost"
-                        size="icon"
-                        class="mt-1 text-muted-foreground hover:text-foreground"
-                        onClick={() => removeCourseId(index)}
-                      >
-                        <Trash2 class="size-4" />
-                      </Button>
-                    </div>
-                  )}
+                    );
+                  }}
                 </Index>
-                <Show when={courseIds().length === 0}>
-                  <p class="text-xs text-muted-foreground">科目番号を追加してください。</p>
-                </Show>
-                <button
-                  type="button"
-                  class="flex items-center gap-2 w-full p-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded"
-                  onClick={addCourseId}
-                >
-                  <Plus class="size-4" />
-                  科目番号を追加
-                </button>
               </div>
             </div>
           </Show>
