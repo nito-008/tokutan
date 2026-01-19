@@ -271,7 +271,7 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
                   {(id, index) => {
                     const isPlaceholderRow = () => index === courseIds().length - 1;
                     const isFocused = () => focusedCourseIndex() === index;
-                    const showMissingCourse = () =>
+                    const isMissingCourse = () =>
                       !!id() &&
                       !isFocused() &&
                       !isPlaceholderRow() &&
@@ -288,7 +288,11 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
                             return (
                               <div class="relative">
                                 <Input
-                                  class={isFocused() ? "" : "text-transparent caret-foreground"}
+                                  classList={{
+                                    "text-transparent caret-foreground": !isFocused(),
+                                    "border-destructive focus-visible:ring-destructive":
+                                      isMissingCourse(),
+                                  }}
                                   value={id()}
                                   onInput={(e) => updateCourseId(index, e.currentTarget.value)}
                                   onFocus={() => setFocusedCourseIndex(index)}
@@ -309,8 +313,12 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
                                   }
                                 />
                                 <Show when={id() && !isFocused()}>
-                                  <div class="pointer-events-none absolute inset-y-0 left-3 right-3 flex items-center text-sm text-foreground truncate">
-                                    {formatCourseLabel(id())}
+                                  <div
+                                    class={`pointer-events-none absolute inset-y-0 left-3 right-3 flex items-center text-sm truncate ${isMissingCourse() ? "text-destructive" : "text-foreground"}`}
+                                  >
+                                    {isMissingCourse()
+                                      ? `${id()}（科目が見つかりません）`
+                                      : formatCourseLabel(id())}
                                   </div>
                                 </Show>
                                 <div
@@ -322,9 +330,6 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
                               </div>
                             );
                           })()}
-                          <Show when={showMissingCourse()}>
-                            <p class="text-xs text-destructive">科目が見つかりません。</p>
-                          </Show>
                         </div>
                         <Show when={!isPlaceholderRow()}>
                           <Button
