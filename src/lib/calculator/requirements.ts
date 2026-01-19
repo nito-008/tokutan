@@ -17,8 +17,10 @@ function collectAllRequiredCourseIds(requirements: GraduationRequirements): Set<
   for (const category of requirements.categories) {
     for (const subcategory of category.subcategories) {
       if (subcategory.type !== "required") continue;
-      for (const courseId of subcategory.courseIds ?? []) {
-        requiredCourseIds.add(courseId);
+      for (const course of subcategory.requiredCourses ?? []) {
+        for (const courseId of course.equivalentIds) {
+          requiredCourseIds.add(courseId);
+        }
       }
     }
   }
@@ -27,42 +29,50 @@ function collectAllRequiredCourseIds(requirements: GraduationRequirements): Set<
 }
 
 function matchRequiredCourses(
-  courseIds: string[],
+  requiredCourses: import("../types").RequiredCourse[],
   courses: UserCourseRecord[],
   usedCourseIds: Set<string>,
   kdbMap: Map<string, Course>,
 ): MatchedCourse[] {
   const matches: MatchedCourse[] = [];
-  const courseIdSet = new Set(courseIds);
 
-  for (const course of courses) {
-    if (!courseIdSet.has(course.courseId)) continue;
-    if (usedCourseIds.has(course.id)) continue;
+  for (const requiredCourse of requiredCourses) {
+    const equivalentIds = requiredCourse.equivalentIds;
+    if (equivalentIds.length === 0) continue;
 
-    usedCourseIds.add(course.id);
-    matches.push({
-      courseId: course.courseId,
-      courseName: course.courseName,
-      credits: course.credits,
-      grade: course.grade,
-      isPassed: course.isPassed,
-      isInProgress: course.isInProgress,
-    });
-  }
+    // 各RequiredCourseエントリに対して、equivalentIdsの中から履修済みの科目を探す
+    let matched = false;
+    for (const course of courses) {
+      if (!equivalentIds.includes(course.courseId)) continue;
+      if (usedCourseIds.has(course.id)) continue;
 
-  for (const courseId of courseIds) {
-    if (matches.some((m) => m.courseId === courseId)) continue;
+      usedCourseIds.add(course.id);
+      matches.push({
+        courseId: course.courseId,
+        courseName: course.courseName,
+        credits: course.credits,
+        grade: course.grade,
+        isPassed: course.isPassed,
+        isInProgress: course.isInProgress,
+      });
+      matched = true;
+      break; // 同等科目のうち1つ見つかればOK
+    }
 
-    const kdbCourse = kdbMap.get(courseId);
-    matches.push({
-      courseId,
-      courseName: kdbCourse?.name ?? courseId,
-      credits: kdbCourse?.credits ?? 2,
-      grade: "未履修",
-      isPassed: false,
-      isInProgress: false,
-      isUnregistered: true,
-    });
+    // 履修していない場合、equivalentIdsの最初の科目を未履修として表示
+    if (!matched) {
+      const representativeCourseId = equivalentIds[0];
+      const kdbCourse = kdbMap.get(representativeCourseId);
+      matches.push({
+        courseId: representativeCourseId,
+        courseName: kdbCourse?.name ?? representativeCourseId,
+        credits: kdbCourse?.credits ?? 2,
+        grade: "未履修",
+        isPassed: false,
+        isInProgress: false,
+        isUnregistered: true,
+      });
+    }
   }
 
   return matches;
@@ -92,8 +102,13 @@ export function calculateRequirementStatus(
       const matchedCourses: MatchedCourse[] = [];
 
       if (subcategory.type === "required") {
-        const courseIds = subcategory.courseIds ?? [];
-        const requiredMatches = matchRequiredCourses(courseIds, courses, usedCourseIds, kdbMap);
+        const requiredCourses = subcategory.requiredCourses ?? [];
+        const requiredMatches = matchRequiredCourses(
+          requiredCourses,
+          courses,
+          usedCourseIds,
+          kdbMap,
+        );
         matchedCourses.push(...requiredMatches);
 
         const earnedCredits = matchedCourses
@@ -104,12 +119,18 @@ export function calculateRequirementStatus(
           .filter((m) => m.isInProgress)
           .reduce((sum, m) => sum + m.credits, 0);
 
-        const requiredCredits = courseIds.reduce(
-          (sum, courseId) => sum + (kdbMap.get(courseId)?.credits ?? 2),
-          0,
-        );
-        const isSatisfied = courseIds.every((courseId) =>
-          matchedCourses.some((m) => m.courseId === courseId && (m.isPassed || m.isInProgress)),
+        // 各RequiredCourseエントリの代表科目の単位数を合計
+        const requiredCredits = requiredCourses.reduce((sum, course) => {
+          if (course.equivalentIds.length === 0) return sum;
+          const representativeCourseId = course.equivalentIds[0];
+          return sum + (kdbMap.get(representativeCourseId)?.credits ?? 2);
+        }, 0);
+
+        // 各RequiredCourseエントリにつき、equivalentIdsのいずれか1つが履修済みまたは履修中ならOK
+        const isSatisfied = requiredCourses.every((course) =>
+          course.equivalentIds.some((courseId) =>
+            matchedCourses.some((m) => m.courseId === courseId && (m.isPassed || m.isInProgress)),
+          ),
         );
 
         return {

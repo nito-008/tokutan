@@ -1,5 +1,6 @@
-import { Plus, Trash2 } from "lucide-solid";
+import { Check, Plus, Trash2, X } from "lucide-solid";
 import { type Component, createEffect, createSignal, For, Index, onCleanup, Show } from "solid-js";
+import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
 import {
   Dialog,
@@ -18,7 +19,7 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import { getCoursesByIds, searchKdb } from "~/lib/db/kdb";
-import type { Course, RequirementRule, RequirementSubcategory } from "~/lib/types";
+import type { Course, RequiredCourse, RequirementRule, RequirementSubcategory } from "~/lib/types";
 
 interface SubcategoryEditModalProps {
   open: boolean;
@@ -46,29 +47,30 @@ const ruleTypeOptions: { value: "specific" | "pattern"; label: string }[] = [
 export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props) => {
   const [name, setName] = createSignal("");
   const [type, setType] = createSignal<"required" | "elective" | "free">("required");
-  const [courseIds, setCourseIds] = createSignal<string[]>([]);
+  const [requiredCourses, setRequiredCourses] = createSignal<RequiredCourse[]>([]);
   const [minCredits, setMinCredits] = createSignal(0);
   const [maxCredits, setMaxCredits] = createSignal<number | undefined>(undefined);
   const [rules, setRules] = createSignal<RequirementRule[]>([]);
   const [requiredCourseNames, setRequiredCourseNames] = createSignal<Map<string, string>>(
     new Map(),
   );
-  const [isCourseLookupLoading, setIsCourseLookupLoading] = createSignal(false);
   const [focusedCourseIndex, setFocusedCourseIndex] = createSignal<number | null>(null);
   const [courseSuggestions, setCourseSuggestions] = createSignal<Course[]>([]);
   const [isSuggestionLoading, setIsSuggestionLoading] = createSignal(false);
   const [suggestionIndex, setSuggestionIndex] = createSignal<number | null>(null);
   const [suggestionQuery, setSuggestionQuery] = createSignal("");
+  const [searchQueries, setSearchQueries] = createSignal<string[]>([]);
   const formatCourseLabel = (courseId: string) => {
     const name = requiredCourseNames().get(courseId);
     return name ? `${courseId}（${name}）` : courseId;
   };
-  const normalizeCourseIds = (ids: string[]) => {
-    const normalized = ids.map((id) => id.trim());
-    while (normalized.length > 0 && normalized[normalized.length - 1] === "") {
-      normalized.pop();
-    }
-    normalized.push("");
+  const normalizeRequiredCourses = (courses: RequiredCourse[]) => {
+    // 末尾の空エントリを削除してから1つ追加
+    const normalized = courses.filter((course) => course.equivalentIds.length > 0 || course.label);
+    normalized.push({
+      id: `course-${Date.now()}`,
+      equivalentIds: [],
+    });
     return normalized;
   };
   let suggestionTimeout: number | null = null;
@@ -129,16 +131,15 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
       setName(props.subcategory.name);
       setType(props.subcategory.type);
       if (props.subcategory.type === "required") {
-        setCourseIds(
-          normalizeCourseIds(
-            [...(props.subcategory.courseIds ?? [])].map((id) => id.trim()).filter((id) => id),
-          ),
-        );
+        const courses = props.subcategory.requiredCourses ?? [];
+        setRequiredCourses(normalizeRequiredCourses(courses));
+        setSearchQueries(courses.map(() => ""));
         setMinCredits(0);
         setMaxCredits(undefined);
         setRules([]);
       } else {
-        setCourseIds([]);
+        setRequiredCourses([]);
+        setSearchQueries([]);
         setMinCredits(props.subcategory.minCredits);
         setMaxCredits(props.subcategory.maxCredits);
         setRules(JSON.parse(JSON.stringify(props.subcategory.rules)));
@@ -146,7 +147,8 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
     } else if (props.open) {
       setName("");
       setType("elective");
-      setCourseIds([]);
+      setRequiredCourses([]);
+      setSearchQueries([]);
       setMinCredits(0);
       setMaxCredits(undefined);
       setRules([]);
@@ -156,18 +158,14 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
   createEffect(() => {
     if (type() !== "required") {
       setRequiredCourseNames(new Map());
-      setIsCourseLookupLoading(false);
       setFocusedCourseIndex(null);
       clearSuggestions();
       return;
     }
 
-    const ids = courseIds()
-      .map((id) => id.trim())
-      .filter((id) => id);
+    const ids = requiredCourses().flatMap((course) => course.equivalentIds);
     if (ids.length === 0) {
       setRequiredCourseNames(new Map());
-      setIsCourseLookupLoading(false);
       return;
     }
 
@@ -177,7 +175,6 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
     });
 
     void (async () => {
-      setIsCourseLookupLoading(true);
       const courses = await getCoursesByIds(ids);
       if (cancelled) return;
       const nameMap = new Map<string, string>();
@@ -185,7 +182,6 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
         nameMap.set(course.id, course.name);
       }
       setRequiredCourseNames(nameMap);
-      setIsCourseLookupLoading(false);
     })();
   });
 
@@ -195,9 +191,7 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
         ? {
             name: name(),
             type: type(),
-            courseIds: courseIds()
-              .map((id) => id.trim())
-              .filter((id) => id),
+            requiredCourses: requiredCourses().filter((course) => course.equivalentIds.length > 0),
           }
         : {
             name: name(),
@@ -225,27 +219,49 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
     if (!val) return;
     setType(val.value);
     if (val.value === "required") {
-      setCourseIds((prev) => normalizeCourseIds(prev));
+      setRequiredCourses((prev) => normalizeRequiredCourses(prev));
     }
   };
 
-  const updateCourseId = (index: number, value: string, options?: { skipSuggest?: boolean }) => {
-    const trimmedValue = value.trim();
-    setCourseIds((prev) =>
-      normalizeCourseIds(prev.map((id, i) => (i === index ? trimmedValue : id))),
+  const updateSearchQuery = (index: number, value: string) => {
+    setSearchQueries((prev) => prev.map((q, i) => (i === index ? value : q)));
+    requestSuggestions(index, value);
+  };
+
+  const handleSuggestionToggle = (entryIndex: number, course: Course) => {
+    setRequiredCourses((prev) =>
+      normalizeRequiredCourses(
+        prev.map((entry, i) => {
+          if (i !== entryIndex) return entry;
+          const hasId = entry.equivalentIds.includes(course.id);
+          return {
+            ...entry,
+            equivalentIds: hasId
+              ? entry.equivalentIds.filter((id) => id !== course.id)
+              : [...entry.equivalentIds, course.id],
+          };
+        }),
+      ),
     );
-    if (!options?.skipSuggest) {
-      requestSuggestions(index, trimmedValue);
-    }
   };
 
-  const handleSuggestionSelect = (index: number, course: Course) => {
-    updateCourseId(index, course.id, { skipSuggest: true });
-    clearSuggestions();
+  const removeEquivalentId = (entryIndex: number, courseId: string) => {
+    setRequiredCourses((prev) =>
+      normalizeRequiredCourses(
+        prev.map((entry, i) => {
+          if (i !== entryIndex) return entry;
+          return {
+            ...entry,
+            equivalentIds: entry.equivalentIds.filter((id) => id !== courseId),
+          };
+        }),
+      ),
+    );
   };
 
-  const removeCourseId = (index: number) => {
-    setCourseIds((prev) => normalizeCourseIds(prev.filter((_, i) => i !== index)));
+  const removeRequiredCourse = (index: number) => {
+    setRequiredCourses((prev) => normalizeRequiredCourses(prev.filter((_, i) => i !== index)));
+    setSearchQueries((prev) => prev.filter((_, i) => i !== index));
   };
 
   const updateRule = (index: number, updates: Partial<RequirementRule>) => {
@@ -331,149 +347,178 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
           </div>
 
           <Show when={type() === "required"}>
-            <div class="space-y-2">
-              <Label>科目番号</Label>
-              <div class="space-y-2">
-                <Index each={courseIds()}>
-                  {(id, index) => {
-                    const isPlaceholderRow = () => index === courseIds().length - 1;
+            <div class="space-y-4">
+              <Label>必修科目（同等科目）</Label>
+              <div class="space-y-4">
+                <Index each={requiredCourses()}>
+                  {(entry, index) => {
+                    const isPlaceholderRow = () => index === requiredCourses().length - 1;
                     const isFocused = () => focusedCourseIndex() === index;
-                    const isMissingCourse = () =>
-                      !!id() &&
-                      !isFocused() &&
-                      !isPlaceholderRow() &&
-                      !isCourseLookupLoading() &&
-                      !requiredCourseNames().has(id());
+                    const currentQuery = () => searchQueries()[index] ?? "";
+
                     return (
-                      <div class="flex items-start gap-2">
-                        <div class="flex-1 space-y-1">
-                          {(() => {
-                            let blurTarget: HTMLDivElement | undefined;
-                            const setBlurTarget = (el: HTMLDivElement) => {
-                              blurTarget = el;
-                            };
-                            return (
-                              <div class="relative">
-                                <Input
-                                  classList={{
-                                    "text-transparent caret-foreground": !isFocused(),
-                                    "border-destructive focus-visible:ring-destructive":
-                                      isMissingCourse(),
-                                  }}
-                                  value={id()}
-                                  onInput={(e) => updateCourseId(index, e.currentTarget.value)}
-                                  onFocus={() => {
-                                    setFocusedCourseIndex(index);
-                                    requestSuggestions(index, id());
-                                  }}
-                                  onBlur={() => {
-                                    if (focusedCourseIndex() === index) {
-                                      setFocusedCourseIndex(null);
-                                      clearSuggestions();
+                      <div class="border rounded-lg p-3 space-y-3 bg-muted/30">
+                        <div class="flex items-start gap-2">
+                          <div class="flex-1 space-y-2">
+                            {(() => {
+                              let blurTarget: HTMLDivElement | undefined;
+                              const setBlurTarget = (el: HTMLDivElement) => {
+                                blurTarget = el;
+                              };
+                              return (
+                                <div class="relative">
+                                  <Input
+                                    value={currentQuery()}
+                                    onInput={(e) => updateSearchQuery(index, e.currentTarget.value)}
+                                    onFocus={() => {
+                                      setFocusedCourseIndex(index);
+                                      requestSuggestions(index, currentQuery());
+                                    }}
+                                    onBlur={() => {
+                                      if (focusedCourseIndex() === index) {
+                                        setFocusedCourseIndex(null);
+                                        clearSuggestions();
+                                      }
+                                    }}
+                                    onKeyDown={(e) => {
+                                      if (e.key === "Enter") {
+                                        e.preventDefault();
+                                        setFocusedCourseIndex(null);
+                                        clearSuggestions();
+                                        blurTarget?.focus();
+                                      }
+                                    }}
+                                    placeholder={
+                                      isPlaceholderRow()
+                                        ? "必修科目を追加（科目名または科目番号で検索）"
+                                        : "科目名または科目番号で検索"
                                     }
-                                  }}
-                                  onKeyDown={(e) => {
-                                    if (e.key === "Enter") {
-                                      e.preventDefault();
-                                      setFocusedCourseIndex(null);
-                                      clearSuggestions();
-                                      blurTarget?.focus();
-                                    }
-                                  }}
-                                  placeholder={
-                                    isPlaceholderRow() ? "科目番号を追加" : "例: FG20204"
-                                  }
-                                />
-                                <Show when={id() && !isFocused()}>
+                                  />
                                   <div
-                                    class={`pointer-events-none absolute inset-y-0 left-3 right-3 flex items-center text-sm truncate ${isMissingCourse() ? "text-destructive" : "text-foreground"}`}
+                                    ref={setBlurTarget}
+                                    tabIndex={-1}
+                                    class="sr-only"
+                                    aria-hidden="true"
+                                  />
+                                  <Show
+                                    when={
+                                      isFocused() &&
+                                      suggestionIndex() === index &&
+                                      (isSuggestionLoading() ||
+                                        courseSuggestions().length > 0 ||
+                                        suggestionQuery().length >= 2)
+                                    }
                                   >
-                                    {isMissingCourse()
-                                      ? `${id()}（科目が見つかりません）`
-                                      : formatCourseLabel(id())}
-                                  </div>
-                                </Show>
-                                <div
-                                  ref={setBlurTarget}
-                                  tabIndex={-1}
-                                  class="sr-only"
-                                  aria-hidden="true"
-                                />
-                                <Show
-                                  when={
-                                    isFocused() &&
-                                    suggestionIndex() === index &&
-                                    (isSuggestionLoading() ||
-                                      courseSuggestions().length > 0 ||
-                                      suggestionQuery().length >= 2)
-                                  }
-                                >
-                                  <div class="absolute left-0 right-0 top-full z-20 mt-1 max-h-56 overflow-y-auto rounded-md border bg-background shadow">
-                                    <Show when={isSuggestionLoading()}>
-                                      <div class="px-3 py-2 text-xs text-muted-foreground">
-                                        検索中...
-                                      </div>
-                                    </Show>
-                                    <Show
-                                      when={
-                                        !isSuggestionLoading() && courseSuggestions().length > 0
-                                      }
-                                    >
-                                      <div class="divide-y">
-                                        <For each={courseSuggestions()}>
-                                          {(course) => (
-                                            <button
-                                              type="button"
-                                              class="w-full px-3 py-2 text-left hover:bg-muted"
-                                              onMouseDown={(e) => {
-                                                e.preventDefault();
-                                                handleSuggestionSelect(index, course);
-                                              }}
-                                            >
-                                              <div class="flex items-center justify-between">
-                                                <span class="text-sm font-medium">
-                                                  {course.name}
-                                                </span>
-                                                <span class="text-xs text-muted-foreground">
-                                                  {course.credits}単位
-                                                </span>
-                                              </div>
-                                              <div class="text-xs text-muted-foreground">
-                                                {course.id} / {course.semester} {course.schedule}
-                                              </div>
-                                            </button>
-                                          )}
-                                        </For>
-                                      </div>
-                                    </Show>
-                                    <Show
-                                      when={
-                                        !isSuggestionLoading() &&
-                                        suggestionQuery().length >= 2 &&
-                                        courseSuggestions().length === 0
-                                      }
-                                    >
-                                      <div class="px-3 py-2 text-xs text-muted-foreground">
-                                        該当する科目が見つかりません
-                                      </div>
-                                    </Show>
-                                  </div>
-                                </Show>
+                                    <div class="absolute left-0 right-0 top-full z-20 mt-1 max-h-56 overflow-y-auto rounded-md border bg-background shadow">
+                                      <Show when={isSuggestionLoading()}>
+                                        <div class="px-3 py-2 text-xs text-muted-foreground">
+                                          検索中...
+                                        </div>
+                                      </Show>
+                                      <Show
+                                        when={
+                                          !isSuggestionLoading() && courseSuggestions().length > 0
+                                        }
+                                      >
+                                        <div class="divide-y">
+                                          <For each={courseSuggestions()}>
+                                            {(course) => {
+                                              const isSelected = () =>
+                                                entry().equivalentIds.includes(course.id);
+                                              return (
+                                                <button
+                                                  type="button"
+                                                  classList={{
+                                                    "w-full px-3 py-2 text-left hover:bg-muted": true,
+                                                    "bg-primary/10": isSelected(),
+                                                  }}
+                                                  onMouseDown={(e) => {
+                                                    e.preventDefault();
+                                                    handleSuggestionToggle(index, course);
+                                                  }}
+                                                >
+                                                  <div class="flex items-center gap-2">
+                                                    <Show when={isSelected()}>
+                                                      <Check class="size-4 text-primary" />
+                                                    </Show>
+                                                    <div class="flex-1">
+                                                      <div class="flex items-center justify-between">
+                                                        <span class="text-sm font-medium">
+                                                          {course.name}
+                                                        </span>
+                                                        <span class="text-xs text-muted-foreground">
+                                                          {course.credits}単位
+                                                        </span>
+                                                      </div>
+                                                      <div class="text-xs text-muted-foreground">
+                                                        {course.id} / {course.semester}{" "}
+                                                        {course.schedule}
+                                                      </div>
+                                                    </div>
+                                                  </div>
+                                                </button>
+                                              );
+                                            }}
+                                          </For>
+                                        </div>
+                                      </Show>
+                                      <Show
+                                        when={
+                                          !isSuggestionLoading() &&
+                                          suggestionQuery().length >= 2 &&
+                                          courseSuggestions().length === 0
+                                        }
+                                      >
+                                        <div class="px-3 py-2 text-xs text-muted-foreground">
+                                          該当する科目が見つかりません
+                                        </div>
+                                      </Show>
+                                    </div>
+                                  </Show>
+                                </div>
+                              );
+                            })()}
+
+                            <Show when={entry().equivalentIds.length > 0}>
+                              <div class="space-y-1">
+                                <div class="text-xs text-muted-foreground">
+                                  選択中（いずれか1つを履修）:
+                                </div>
+                                <div class="flex flex-wrap gap-2">
+                                  <For each={entry().equivalentIds}>
+                                    {(courseId) => (
+                                      <Badge
+                                        variant="secondary"
+                                        class="flex items-center gap-1 pr-1"
+                                      >
+                                        <span class="text-xs">{formatCourseLabel(courseId)}</span>
+                                        <button
+                                          type="button"
+                                          class="rounded-full hover:bg-muted p-0.5"
+                                          onClick={() => removeEquivalentId(index, courseId)}
+                                        >
+                                          <X class="size-3" />
+                                        </button>
+                                      </Badge>
+                                    )}
+                                  </For>
+                                </div>
                               </div>
-                            );
-                          })()}
+                            </Show>
+                          </div>
+
+                          <Show when={!isPlaceholderRow()}>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              class="text-muted-foreground hover:text-foreground"
+                              onClick={() => removeRequiredCourse(index)}
+                            >
+                              <Trash2 class="size-4" />
+                            </Button>
+                          </Show>
                         </div>
-                        <Show when={!isPlaceholderRow()}>
-                          <Button
-                            type="button"
-                            variant="ghost"
-                            size="icon"
-                            class="mt-1 text-muted-foreground hover:text-foreground"
-                            onClick={() => removeCourseId(index)}
-                          >
-                            <Trash2 class="size-4" />
-                          </Button>
-                        </Show>
                       </div>
                     );
                   }}

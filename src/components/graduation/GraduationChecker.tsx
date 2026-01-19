@@ -109,7 +109,6 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
     const requirements = props.requirements;
     if (!requirements) return;
 
-    const hasCourseIds = Object.hasOwn(updates, "courseIds");
     const hasMinCredits = Object.hasOwn(updates, "minCredits");
     const hasMaxCredits = Object.hasOwn(updates, "maxCredits");
     const hasRules = Object.hasOwn(updates, "rules");
@@ -120,17 +119,21 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
       const notes = updates.notes ?? existing?.notes;
 
       if (nextType === "required") {
-        type RequiredUpdate = Partial<{ type: "required"; courseIds: string[] }>;
-        const courseIds = hasCourseIds
-          ? ((updates as RequiredUpdate).courseIds ?? [])
-          : existing?.type === "required"
-            ? (existing.courseIds ?? [])
-            : [];
+        type RequiredUpdate = Partial<{
+          type: "required";
+          requiredCourses: import("~/lib/types").RequiredCourse[];
+        }>;
+        const requiredCourses =
+          "requiredCourses" in updates
+            ? ((updates as RequiredUpdate).requiredCourses ?? [])
+            : existing?.type === "required"
+              ? (existing.requiredCourses ?? [])
+              : [];
         return {
           id: existing?.id ?? `subcat-${Date.now()}`,
           name,
           type: "required",
-          courseIds,
+          requiredCourses,
           notes,
         };
       }
