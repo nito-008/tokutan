@@ -203,6 +203,7 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
               optionValue="value"
               optionTextValue="label"
               placeholder="タイプを選択"
+              disabled={props.subcategory !== null}
               itemComponent={(itemProps) => (
                 <SelectItem item={itemProps.item}>{itemProps.item.rawValue.label}</SelectItem>
               )}
