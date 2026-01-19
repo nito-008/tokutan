@@ -59,7 +59,9 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
       setName(props.subcategory.name);
       setType(props.subcategory.type);
       if (props.subcategory.type === "required") {
-        setCourseIds([...(props.subcategory.courseIds ?? [])]);
+        setCourseIds(
+          [...(props.subcategory.courseIds ?? [])].map((id) => id.trim()).filter((id) => id),
+        );
         setMinCredits(0);
         setMaxCredits(undefined);
         setRules([]);
@@ -85,7 +87,9 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
       return;
     }
 
-    const ids = courseIds();
+    const ids = courseIds()
+      .map((id) => id.trim())
+      .filter((id) => id);
     if (ids.length === 0) {
       setRequiredCourseNames(new Map());
       return;
@@ -113,7 +117,9 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
         ? {
             name: name(),
             type: type(),
-            courseIds: courseIds(),
+            courseIds: courseIds()
+              .map((id) => id.trim())
+              .filter((id) => id),
           }
         : {
             name: name(),
@@ -134,6 +140,19 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
   };
 
   const selectedType = () => typeOptions.find((opt) => opt.value === type());
+
+  const addCourseId = () => {
+    setCourseIds((prev) => [...prev, ""]);
+  };
+
+  const updateCourseId = (index: number, value: string) => {
+    const trimmed = value.trim();
+    setCourseIds((prev) => prev.map((id, i) => (i === index ? trimmed : id)));
+  };
+
+  const removeCourseId = (index: number) => {
+    setCourseIds((prev) => prev.filter((_, i) => i !== index));
+  };
 
   const updateRule = (index: number, updates: Partial<RequirementRule>) => {
     setRules((prev) =>
@@ -219,37 +238,47 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
 
           <Show when={type() === "required"}>
             <div class="space-y-2">
-              <Label for="sub-course-ids">科目番号</Label>
-              <Input
-                id="sub-course-ids"
-                value={courseIds().join(", ")}
-                onInput={(e) => {
-                  const ids = e.currentTarget.value
-                    .split(",")
-                    .map((s) => s.trim())
-                    .filter((s) => s);
-                  setCourseIds(ids);
-                }}
-                placeholder="例: FG20204, FG20214"
-              />
-              <Show when={courseIds().length > 0}>
-                <div class="text-xs text-muted-foreground mt-1">
-                  <For each={courseIds()}>
-                    {(id, index) => (
-                      <>
-                        <Show when={index() > 0}>, </Show>
-                        <span>
-                          {id}
-                          <Show when={requiredCourseNames().get(id)}>
-                            {" "}
-                            ({requiredCourseNames().get(id)})
-                          </Show>
-                        </span>
-                      </>
-                    )}
-                  </For>
-                </div>
-              </Show>
+              <Label>科目番号</Label>
+              <div class="space-y-2">
+                <For each={courseIds()}>
+                  {(id, index) => (
+                    <div class="flex items-start gap-2">
+                      <div class="flex-1 space-y-1">
+                        <Input
+                          value={id}
+                          onInput={(e) => updateCourseId(index(), e.currentTarget.value)}
+                          placeholder="例: FG20204"
+                        />
+                        <Show when={id && requiredCourseNames().get(id)}>
+                          <p class="text-xs text-muted-foreground">
+                            {requiredCourseNames().get(id)}
+                          </p>
+                        </Show>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        class="mt-1 text-muted-foreground hover:text-foreground"
+                        onClick={() => removeCourseId(index())}
+                      >
+                        <Trash2 class="size-4" />
+                      </Button>
+                    </div>
+                  )}
+                </For>
+                <Show when={courseIds().length === 0}>
+                  <p class="text-xs text-muted-foreground">科目番号を追加してください。</p>
+                </Show>
+                <button
+                  type="button"
+                  class="flex items-center gap-2 w-full p-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded"
+                  onClick={addCourseId}
+                >
+                  <Plus class="size-4" />
+                  科目番号を追加
+                </button>
+              </div>
             </div>
           </Show>
 
