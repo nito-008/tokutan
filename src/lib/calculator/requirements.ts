@@ -17,7 +17,7 @@ function collectAllRequiredCourseIds(requirements: GraduationRequirements): Set<
   for (const category of requirements.categories) {
     for (const subcategory of category.subcategories) {
       if (subcategory.type !== "required") continue;
-      for (const courseId of subcategory.courseIds) {
+      for (const courseId of subcategory.courseIds ?? []) {
         requiredCourseIds.add(courseId);
       }
     }
@@ -92,8 +92,9 @@ export function calculateRequirementStatus(
       const matchedCourses: MatchedCourse[] = [];
 
       if (subcategory.type === "required") {
+        const courseIds = subcategory.courseIds ?? [];
         const requiredMatches = matchRequiredCourses(
-          subcategory.courseIds,
+          courseIds,
           courses,
           usedCourseIds,
           kdbMap,
@@ -108,11 +109,11 @@ export function calculateRequirementStatus(
           .filter((m) => m.isInProgress)
           .reduce((sum, m) => sum + m.credits, 0);
 
-        const requiredCredits = subcategory.courseIds.reduce(
+        const requiredCredits = courseIds.reduce(
           (sum, courseId) => sum + (kdbMap.get(courseId)?.credits ?? 2),
           0,
         );
-        const isSatisfied = subcategory.courseIds.every((courseId) =>
+        const isSatisfied = courseIds.every((courseId) =>
           matchedCourses.some((m) => m.courseId === courseId && (m.isPassed || m.isInProgress)),
         );
 

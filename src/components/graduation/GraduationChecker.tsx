@@ -12,6 +12,7 @@ import type {
   EnrollmentData,
   GraduationRequirements,
   RequirementCategory,
+  RequirementRule,
   RequirementStatus,
   RequirementSubcategory,
   TwinsCourse,
@@ -121,10 +122,11 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
       const notes = updates.notes ?? existing?.notes;
 
       if (nextType === "required") {
+        type RequiredUpdate = Partial<{ type: "required"; courseIds: string[] }>;
         const courseIds = hasCourseIds
-          ? (updates.courseIds ?? [])
+          ? ((updates as RequiredUpdate).courseIds ?? [])
           : existing?.type === "required"
-            ? existing.courseIds
+            ? (existing.courseIds ?? [])
             : [];
         return {
           id: existing?.id ?? `subcat-${Date.now()}`,
@@ -135,18 +137,24 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
         };
       }
 
+      type ElectiveUpdate = Partial<{
+        type: "elective" | "free";
+        minCredits: number;
+        maxCredits?: number;
+        rules: RequirementRule[];
+      }>;
       const minCredits = hasMinCredits
-        ? (updates.minCredits ?? 0)
+        ? ((updates as ElectiveUpdate).minCredits ?? 0)
         : existing && existing.type !== "required"
           ? existing.minCredits
           : 0;
       const maxCredits = hasMaxCredits
-        ? updates.maxCredits
+        ? (updates as ElectiveUpdate).maxCredits
         : existing && existing.type !== "required"
           ? existing.maxCredits
           : undefined;
       const rules = hasRules
-        ? (updates.rules ?? [])
+        ? ((updates as ElectiveUpdate).rules ?? [])
         : existing && existing.type !== "required"
           ? existing.rules
           : [];

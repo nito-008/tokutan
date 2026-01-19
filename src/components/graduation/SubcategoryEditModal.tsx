@@ -59,7 +59,7 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
       setName(props.subcategory.name);
       setType(props.subcategory.type);
       if (props.subcategory.type === "required") {
-        setCourseIds([...props.subcategory.courseIds]);
+        setCourseIds([...(props.subcategory.courseIds ?? [])]);
         setMinCredits(0);
         setMaxCredits(undefined);
         setRules([]);
@@ -136,7 +136,31 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
   const selectedType = () => typeOptions.find((opt) => opt.value === type());
 
   const updateRule = (index: number, updates: Partial<RequirementRule>) => {
-    setRules((prev) => prev.map((rule, i) => (i === index ? { ...rule, ...updates } : rule)));
+    setRules((prev) =>
+      prev.map((rule, i) => {
+        if (i !== index) return rule;
+        const merged = { ...rule, ...updates };
+        // 型の整合性を保証する
+        if (merged.type === "specific") {
+          return {
+            id: merged.id,
+            description: merged.description,
+            minCredits: merged.minCredits,
+            type: "specific",
+            courseIds: "courseIds" in merged ? (merged.courseIds as string[]) : [],
+          } satisfies RequirementRule;
+        } else {
+          return {
+            id: merged.id,
+            description: merged.description,
+            minCredits: merged.minCredits,
+            type: "pattern",
+            courseIdPattern:
+              "courseIdPattern" in merged ? (merged.courseIdPattern as string) : "",
+          } satisfies RequirementRule;
+        }
+      }),
+    );
   };
 
   const addRule = () => {
@@ -380,48 +404,60 @@ const RuleEditor: Component<{
 
           {/* タイプ別の入力フィールド */}
           <Show when={props.rule.type === "specific"}>
-            <div class="space-y-1">
-              <Label class="text-xs">科目ID（カンマ区切り）</Label>
-              <Input
-                class="h-8"
-                value={props.rule.courseIds.join(", ")}
-                onInput={(e) => {
-                  const ids = e.currentTarget.value
-                    .split(",")
-                    .map((s) => s.trim())
-                    .filter((s) => s);
-                  props.onUpdate({ courseIds: ids });
-                }}
-                placeholder="例: FG20204, FG20214"
-              />
-              <Show when={props.rule.courseIds.length > 0}>
-                <div class="text-xs text-muted-foreground mt-1">
-                  <For each={props.rule.courseIds}>
-                    {(id, index) => (
-                      <>
-                        <Show when={index() > 0}>, </Show>
-                        <span>
-                          {id}
-                          <Show when={courseNames().get(id)}> ({courseNames().get(id)})</Show>
-                        </span>
-                      </>
-                    )}
-                  </For>
+            {(() => {
+              const rule = props.rule as Extract<RequirementRule, { type: "specific" }>;
+              return (
+                <div class="space-y-1">
+                  <Label class="text-xs">科目ID（カンマ区切り）</Label>
+                  <Input
+                    class="h-8"
+                    value={rule.courseIds.join(", ")}
+                    onInput={(e) => {
+                      const ids = e.currentTarget.value
+                        .split(",")
+                        .map((s) => s.trim())
+                        .filter((s) => s);
+                      props.onUpdate({ type: "specific", courseIds: ids });
+                    }}
+                    placeholder="例: FG20204, FG20214"
+                  />
+                  <Show when={rule.courseIds.length > 0}>
+                    <div class="text-xs text-muted-foreground mt-1">
+                      <For each={rule.courseIds}>
+                        {(id, index) => (
+                          <>
+                            <Show when={index() > 0}>, </Show>
+                            <span>
+                              {id}
+                              <Show when={courseNames().get(id)}> ({courseNames().get(id)})</Show>
+                            </span>
+                          </>
+                        )}
+                      </For>
+                    </div>
+                  </Show>
                 </div>
-              </Show>
-            </div>
+              );
+            })()}
           </Show>
 
           <Show when={props.rule.type === "pattern"}>
-            <div class="space-y-1">
-              <Label class="text-xs">科目IDパターン（正規表現）</Label>
-              <Input
-                class="h-8"
-                value={props.rule.courseIdPattern}
-                onInput={(e) => props.onUpdate({ courseIdPattern: e.currentTarget.value })}
-                placeholder="例: ^FG(17|24|25)"
-              />
-            </div>
+            {(() => {
+              const rule = props.rule as Extract<RequirementRule, { type: "pattern" }>;
+              return (
+                <div class="space-y-1">
+                  <Label class="text-xs">科目IDパターン（正規表現）</Label>
+                  <Input
+                    class="h-8"
+                    value={rule.courseIdPattern}
+                    onInput={(e) =>
+                      props.onUpdate({ type: "pattern", courseIdPattern: e.currentTarget.value })
+                    }
+                    placeholder="例: ^FG(17|24|25)"
+                  />
+                </div>
+              );
+            })()}
           </Show>
 
           <div class="grid grid-cols-1 gap-2">
