@@ -10,8 +10,6 @@ interface RequirementsSummaryProps {
 
 export const RequirementsSummary: Component<RequirementsSummaryProps> = (props) => {
   const remaining = () => props.status.totalRequiredCredits - props.status.totalEarnedCredits;
-  const potentialTotal = () =>
-    props.status.totalEarnedCredits + props.status.totalInProgressCredits;
 
   return (
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -60,12 +58,6 @@ export const RequirementsSummary: Component<RequirementsSummaryProps> = (props) 
               %
             </span>
           </div>
-          <Show when={props.status.totalInProgressCredits > 0}>
-            <p class="text-sm text-blue-500 mt-1">
-              履修中の単位を含めると&nbsp;{potentialTotal()}/{props.status.totalRequiredCredits}
-              &nbsp;単位
-            </p>
-          </Show>
         </CardContent>
       </Card>
     </div>

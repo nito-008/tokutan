@@ -89,9 +89,6 @@ export const RequirementTree: Component<RequirementTreeProps> = (props) => {
                   </Show>
                   <span class="text-sm text-muted-foreground ml-auto mr-4">
                     {category.earnedCredits}/{category.requiredCredits}単位
-                    {category.inProgressCredits > 0 && (
-                      <span class="text-blue-500"> (+{category.inProgressCredits}履修中)</span>
-                    )}
                   </span>
                 </div>
               </AccordionTrigger>
