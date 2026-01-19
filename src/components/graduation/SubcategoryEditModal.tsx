@@ -250,6 +250,10 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
                     <div class="flex items-start gap-2">
                       <div class="flex-1 space-y-1">
                         {(() => {
+                          let blurTarget: HTMLDivElement | undefined;
+                          const setBlurTarget = (el: HTMLDivElement) => {
+                            blurTarget = el;
+                          };
                           const isFocused = () => focusedCourseIndex() === index;
                           return (
                             <div class="relative">
@@ -263,6 +267,13 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
                                     setFocusedCourseIndex(null);
                                   }
                                 }}
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter") {
+                                    e.preventDefault();
+                                    setFocusedCourseIndex(null);
+                                    blurTarget?.focus();
+                                  }
+                                }}
                                 placeholder="例: FG20204"
                               />
                               <Show when={id() && !isFocused()}>
@@ -270,6 +281,12 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
                                   {formatCourseLabel(id())}
                                 </div>
                               </Show>
+                              <div
+                                ref={setBlurTarget}
+                                tabIndex={-1}
+                                class="sr-only"
+                                aria-hidden="true"
+                              />
                             </div>
                           );
                         })()}
