@@ -17,8 +17,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
-import { getCoursesByIds } from "~/lib/db/kdb";
-import type { RequirementRule, RequirementSubcategory } from "~/lib/types";
+import { getCoursesByIds, searchKdb } from "~/lib/db/kdb";
+import type { Course, RequirementRule, RequirementSubcategory } from "~/lib/types";
 
 interface SubcategoryEditModalProps {
   open: boolean;
@@ -55,6 +55,10 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
   );
   const [isCourseLookupLoading, setIsCourseLookupLoading] = createSignal(false);
   const [focusedCourseIndex, setFocusedCourseIndex] = createSignal<number | null>(null);
+  const [courseSuggestions, setCourseSuggestions] = createSignal<Course[]>([]);
+  const [isSuggestionLoading, setIsSuggestionLoading] = createSignal(false);
+  const [suggestionIndex, setSuggestionIndex] = createSignal<number | null>(null);
+  const [suggestionQuery, setSuggestionQuery] = createSignal("");
   const formatCourseLabel = (courseId: string) => {
     const name = requiredCourseNames().get(courseId);
     return name ? `${courseId}（${name}）` : courseId;
@@ -67,6 +71,58 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
     normalized.push("");
     return normalized;
   };
+  let suggestionTimeout: number | null = null;
+  let suggestionRequestId = 0;
+
+  const clearSuggestions = () => {
+    if (suggestionTimeout) {
+      clearTimeout(suggestionTimeout);
+      suggestionTimeout = null;
+    }
+    suggestionRequestId += 1;
+    setCourseSuggestions([]);
+    setIsSuggestionLoading(false);
+    setSuggestionIndex(null);
+    setSuggestionQuery("");
+  };
+
+  const requestSuggestions = (index: number, value: string) => {
+    const normalizedValue = value.trim();
+    if (suggestionTimeout) {
+      clearTimeout(suggestionTimeout);
+      suggestionTimeout = null;
+    }
+    setSuggestionIndex(index);
+    setSuggestionQuery(normalizedValue);
+    if (normalizedValue.length < 2) {
+      setCourseSuggestions([]);
+      setIsSuggestionLoading(false);
+      return;
+    }
+    const requestId = ++suggestionRequestId;
+    suggestionTimeout = window.setTimeout(async () => {
+      setIsSuggestionLoading(true);
+      try {
+        const found = await searchKdb(normalizedValue);
+        if (requestId !== suggestionRequestId) return;
+        if (focusedCourseIndex() !== index) return;
+        setCourseSuggestions(found);
+      } catch (error) {
+        console.error("Search error:", error);
+      } finally {
+        if (requestId === suggestionRequestId) {
+          setIsSuggestionLoading(false);
+        }
+      }
+    }, 250);
+  };
+
+  onCleanup(() => {
+    if (suggestionTimeout) {
+      clearTimeout(suggestionTimeout);
+    }
+    suggestionRequestId += 1;
+  });
 
   createEffect(() => {
     if (props.subcategory) {
@@ -101,6 +157,8 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
     if (type() !== "required") {
       setRequiredCourseNames(new Map());
       setIsCourseLookupLoading(false);
+      setFocusedCourseIndex(null);
+      clearSuggestions();
       return;
     }
 
@@ -171,10 +229,19 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
     }
   };
 
-  const updateCourseId = (index: number, value: string) => {
+  const updateCourseId = (index: number, value: string, options?: { skipSuggest?: boolean }) => {
+    const trimmedValue = value.trim();
     setCourseIds((prev) =>
-      normalizeCourseIds(prev.map((id, i) => (i === index ? value.trim() : id))),
+      normalizeCourseIds(prev.map((id, i) => (i === index ? trimmedValue : id))),
     );
+    if (!options?.skipSuggest) {
+      requestSuggestions(index, trimmedValue);
+    }
+  };
+
+  const handleSuggestionSelect = (index: number, course: Course) => {
+    updateCourseId(index, course.id, { skipSuggest: true });
+    clearSuggestions();
   };
 
   const removeCourseId = (index: number) => {
@@ -295,16 +362,21 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
                                   }}
                                   value={id()}
                                   onInput={(e) => updateCourseId(index, e.currentTarget.value)}
-                                  onFocus={() => setFocusedCourseIndex(index)}
+                                  onFocus={() => {
+                                    setFocusedCourseIndex(index);
+                                    requestSuggestions(index, id());
+                                  }}
                                   onBlur={() => {
                                     if (focusedCourseIndex() === index) {
                                       setFocusedCourseIndex(null);
+                                      clearSuggestions();
                                     }
                                   }}
                                   onKeyDown={(e) => {
                                     if (e.key === "Enter") {
                                       e.preventDefault();
                                       setFocusedCourseIndex(null);
+                                      clearSuggestions();
                                       blurTarget?.focus();
                                     }
                                   }}
@@ -327,6 +399,66 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
                                   class="sr-only"
                                   aria-hidden="true"
                                 />
+                                <Show
+                                  when={
+                                    isFocused() &&
+                                    suggestionIndex() === index &&
+                                    (isSuggestionLoading() ||
+                                      courseSuggestions().length > 0 ||
+                                      suggestionQuery().length >= 2)
+                                  }
+                                >
+                                  <div class="absolute left-0 right-0 top-full z-20 mt-1 max-h-56 overflow-y-auto rounded-md border bg-background shadow">
+                                    <Show when={isSuggestionLoading()}>
+                                      <div class="px-3 py-2 text-xs text-muted-foreground">
+                                        検索中...
+                                      </div>
+                                    </Show>
+                                    <Show
+                                      when={
+                                        !isSuggestionLoading() && courseSuggestions().length > 0
+                                      }
+                                    >
+                                      <div class="divide-y">
+                                        <For each={courseSuggestions()}>
+                                          {(course) => (
+                                            <button
+                                              type="button"
+                                              class="w-full px-3 py-2 text-left hover:bg-muted"
+                                              onMouseDown={(e) => {
+                                                e.preventDefault();
+                                                handleSuggestionSelect(index, course);
+                                              }}
+                                            >
+                                              <div class="flex items-center justify-between">
+                                                <span class="text-sm font-medium">
+                                                  {course.name}
+                                                </span>
+                                                <span class="text-xs text-muted-foreground">
+                                                  {course.credits}単位
+                                                </span>
+                                              </div>
+                                              <div class="text-xs text-muted-foreground">
+                                                {course.id} / {course.semester} {course.schedule}
+                                              </div>
+                                            </button>
+                                          )}
+                                        </For>
+                                      </div>
+                                    </Show>
+                                    <Show
+                                      when={
+                                        !isSuggestionLoading() &&
+                                        suggestionQuery().length >= 2 &&
+                                        courseSuggestions().length === 0
+                                      }
+                                    >
+                                      <div class="px-3 py-2 text-xs text-muted-foreground">
+                                        該当する科目が見つかりません
+                                      </div>
+                                    </Show>
+                                  </div>
+                                </Show>
                               </div>
                             );
                           })()}
