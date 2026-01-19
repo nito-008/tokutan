@@ -22,23 +22,40 @@ export interface RequirementCategory {
 }
 
 // サブカテゴリ
-export interface RequirementSubcategory {
+interface RequirementSubcategoryBase {
   id: string;
   name: string;
-  type: "required" | "elective" | "free";
-  minCredits: number;
-  maxCredits?: number;
-  rules: RequirementRule[];
   notes?: string;
 }
 
+export type RequirementSubcategory =
+  | (RequirementSubcategoryBase & {
+      type: "required";
+      courseIds: string[];
+    })
+  | (RequirementSubcategoryBase & {
+      type: "elective" | "free";
+      minCredits: number;
+      maxCredits?: number;
+      rules: RequirementRule[];
+    });
+
 // ルール
-export interface RequirementRule {
+interface RequirementRuleBase {
   id: string;
-  type: "specific" | "pattern";
-  description?: string;
-  courseIds?: string[];
-  courseIdPattern?: string;
+  description: string;
+  minCredits?: number;
+}
+
+export type RequirementRule =
+  | (RequirementRuleBase & {
+      type: "specific";
+      courseIds: string[];
+    })
+  | (RequirementRuleBase & {
+      type: "pattern";
+      courseIdPattern: string;
+    });
   minCredits?: number;
   maxCredits?: number;
   required?: boolean;

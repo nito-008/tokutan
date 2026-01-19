@@ -110,19 +110,63 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
     const requirements = props.requirements;
     if (!requirements) return;
 
+    const hasCourseIds = Object.prototype.hasOwnProperty.call(updates, "courseIds");
+    const hasMinCredits = Object.prototype.hasOwnProperty.call(updates, "minCredits");
+    const hasMaxCredits = Object.prototype.hasOwnProperty.call(updates, "maxCredits");
+    const hasRules = Object.prototype.hasOwnProperty.call(updates, "rules");
+
+    const buildSubcategory = (existing?: RequirementSubcategory): RequirementSubcategory => {
+      const nextType = updates.type ?? existing?.type ?? "elective";
+      const name = updates.name ?? existing?.name ?? "新しいサブカテゴリ";
+      const notes = updates.notes ?? existing?.notes;
+
+      if (nextType === "required") {
+        const courseIds = hasCourseIds
+          ? updates.courseIds ?? []
+          : existing?.type === "required"
+            ? existing.courseIds
+            : [];
+        return {
+          id: existing?.id ?? `subcat-${Date.now()}`,
+          name,
+          type: "required",
+          courseIds,
+          notes,
+        };
+      }
+
+      const minCredits = hasMinCredits
+        ? updates.minCredits ?? 0
+        : existing && existing.type !== "required"
+          ? existing.minCredits
+          : 0;
+      const maxCredits = hasMaxCredits
+        ? updates.maxCredits
+        : existing && existing.type !== "required"
+          ? existing.maxCredits
+          : undefined;
+      const rules = hasRules
+        ? updates.rules ?? []
+        : existing && existing.type !== "required"
+          ? existing.rules
+          : [];
+
+      return {
+        id: existing?.id ?? `subcat-${Date.now()}`,
+        name,
+        type: nextType,
+        minCredits,
+        maxCredits,
+        rules,
+        notes,
+      };
+    };
+
     const updatedCategories = requirements.categories.map((cat) => {
       if (cat.id !== categoryId) return cat;
 
       if (subcategoryId === null) {
-        const newSubcategory: RequirementSubcategory = {
-          id: `subcat-${Date.now()}`,
-          name: updates.name || "新しいサブカテゴリ",
-          type: updates.type || "elective",
-          minCredits: updates.minCredits ?? 0,
-          maxCredits: updates.maxCredits,
-          rules: updates.rules || [],
-          notes: updates.notes,
-        };
+        const newSubcategory = buildSubcategory();
         return {
           ...cat,
           subcategories: [...cat.subcategories, newSubcategory],
@@ -132,7 +176,7 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
       return {
         ...cat,
         subcategories: cat.subcategories.map((sub) =>
-          sub.id === subcategoryId ? { ...sub, ...updates } : sub,
+          sub.id === subcategoryId ? buildSubcategory(sub) : sub,
         ),
       };
     });

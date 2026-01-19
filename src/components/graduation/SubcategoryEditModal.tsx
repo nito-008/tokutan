@@ -46,34 +46,82 @@ const ruleTypeOptions: { value: "specific" | "pattern"; label: string }[] = [
 export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props) => {
   const [name, setName] = createSignal("");
   const [type, setType] = createSignal<"required" | "elective" | "free">("required");
+  const [courseIds, setCourseIds] = createSignal<string[]>([]);
   const [minCredits, setMinCredits] = createSignal(0);
   const [maxCredits, setMaxCredits] = createSignal<number | undefined>(undefined);
   const [rules, setRules] = createSignal<RequirementRule[]>([]);
+  const [requiredCourseNames, setRequiredCourseNames] = createSignal<Map<string, string>>(
+    new Map(),
+  );
 
   createEffect(() => {
     if (props.subcategory) {
       setName(props.subcategory.name);
       setType(props.subcategory.type);
-      setMinCredits(props.subcategory.minCredits);
-      setMaxCredits(props.subcategory.maxCredits);
-      setRules(JSON.parse(JSON.stringify(props.subcategory.rules)));
+      if (props.subcategory.type === "required") {
+        setCourseIds([...props.subcategory.courseIds]);
+        setMinCredits(0);
+        setMaxCredits(undefined);
+        setRules([]);
+      } else {
+        setCourseIds([]);
+        setMinCredits(props.subcategory.minCredits);
+        setMaxCredits(props.subcategory.maxCredits);
+        setRules(JSON.parse(JSON.stringify(props.subcategory.rules)));
+      }
     } else if (props.open) {
       setName("");
       setType("elective");
+      setCourseIds([]);
       setMinCredits(0);
       setMaxCredits(undefined);
       setRules([]);
     }
   });
 
+  createEffect(() => {
+    if (type() !== "required") {
+      setRequiredCourseNames(new Map());
+      return;
+    }
+
+    const ids = courseIds();
+    if (ids.length === 0) {
+      setRequiredCourseNames(new Map());
+      return;
+    }
+
+    let cancelled = false;
+    onCleanup(() => {
+      cancelled = true;
+    });
+
+    void (async () => {
+      const courses = await getCoursesByIds(ids);
+      if (cancelled) return;
+      const nameMap = new Map<string, string>();
+      for (const course of courses) {
+        nameMap.set(course.id, course.name);
+      }
+      setRequiredCourseNames(nameMap);
+    })();
+  });
+
   const handleSave = () => {
-    const updates: Partial<RequirementSubcategory> = {
-      name: name(),
-      type: type(),
-      minCredits: minCredits(),
-      maxCredits: maxCredits(),
-      rules: rules(),
-    };
+    const updates: Partial<RequirementSubcategory> =
+      type() === "required"
+        ? {
+            name: name(),
+            type: type(),
+            courseIds: courseIds(),
+          }
+        : {
+            name: name(),
+            type: type(),
+            minCredits: minCredits(),
+            maxCredits: maxCredits(),
+            rules: rules(),
+          };
 
     props.onSave(props.categoryId, props.subcategory?.id ?? null, updates);
     props.onClose();
@@ -145,62 +193,100 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
             </Select>
           </div>
 
-          <div class="grid grid-cols-2 gap-4">
+          <Show when={type() === "required"}>
             <div class="space-y-2">
-              <Label for="sub-min-credits">最小単位数</Label>
+              <Label for="sub-course-ids">必修科目ID（カンマ区切り）</Label>
               <Input
-                id="sub-min-credits"
-                type="number"
-                min="0"
-                value={minCredits()}
+                id="sub-course-ids"
+                value={courseIds().join(", ")}
                 onInput={(e) => {
-                  const val = e.currentTarget.value;
-                  setMinCredits(val ? Number.parseInt(val, 10) : 0);
+                  const ids = e.currentTarget.value
+                    .split(",")
+                    .map((s) => s.trim())
+                    .filter((s) => s);
+                  setCourseIds(ids);
                 }}
+                placeholder="例: FG20204, FG20214"
               />
+              <Show when={courseIds().length > 0}>
+                <div class="text-xs text-muted-foreground mt-1">
+                  <For each={courseIds()}>
+                    {(id, index) => (
+                      <>
+                        <Show when={index() > 0}>, </Show>
+                        <span>
+                          {id}
+                          <Show when={requiredCourseNames().get(id)}>
+                            {" "}
+                            ({requiredCourseNames().get(id)})
+                          </Show>
+                        </span>
+                      </>
+                    )}
+                  </For>
+                </div>
+              </Show>
             </div>
+          </Show>
 
-            <div class="space-y-2">
-              <Label for="sub-max-credits">最大単位数</Label>
-              <Input
-                id="sub-max-credits"
-                type="number"
-                min="0"
-                value={maxCredits() ?? ""}
-                onInput={(e) => {
-                  const val = e.currentTarget.value;
-                  setMaxCredits(val ? Number.parseInt(val, 10) : undefined);
-                }}
-              />
-            </div>
-          </div>
-
-          {/* ルール編集セクション */}
-          <div class="space-y-3 pt-4 border-t">
-            <div class="flex items-center justify-between">
-              <Label class="text-base font-semibold">条件（ルール）</Label>
-              <Button variant="outline" size="sm" onClick={addRule}>
-                <Plus class="size-4 mr-1" />
-                追加
-              </Button>
-            </div>
-
-            <For each={rules()}>
-              {(rule, index) => (
-                <RuleEditor
-                  rule={rule}
-                  onUpdate={(updates) => updateRule(index(), updates)}
-                  onRemove={() => removeRule(index())}
+          <Show when={type() !== "required"}>
+            <div class="grid grid-cols-2 gap-4">
+              <div class="space-y-2">
+                <Label for="sub-min-credits">最小単位数</Label>
+                <Input
+                  id="sub-min-credits"
+                  type="number"
+                  min="0"
+                  value={minCredits()}
+                  onInput={(e) => {
+                    const val = e.currentTarget.value;
+                    setMinCredits(val ? Number.parseInt(val, 10) : 0);
+                  }}
                 />
-              )}
-            </For>
+              </div>
 
-            <Show when={rules().length === 0}>
-              <p class="text-sm text-muted-foreground text-center py-4">
-                ルールがありません。「追加」ボタンでルールを追加してください。
-              </p>
-            </Show>
-          </div>
+              <div class="space-y-2">
+                <Label for="sub-max-credits">最大単位数</Label>
+                <Input
+                  id="sub-max-credits"
+                  type="number"
+                  min="0"
+                  value={maxCredits() ?? ""}
+                  onInput={(e) => {
+                    const val = e.currentTarget.value;
+                    setMaxCredits(val ? Number.parseInt(val, 10) : undefined);
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* ルール編集セクション */}
+            <div class="space-y-3 pt-4 border-t">
+              <div class="flex items-center justify-between">
+                <Label class="text-base font-semibold">条件</Label>
+                <Button variant="outline" size="sm" onClick={addRule}>
+                  <Plus class="size-4 mr-1" />
+                  追加
+                </Button>
+              </div>
+
+              <For each={rules()}>
+                {(rule, index) => (
+                  <RuleEditor
+                    rule={rule}
+                    onUpdate={(updates) => updateRule(index(), updates)}
+                    onRemove={() => removeRule(index())}
+                  />
+                )}
+              </For>
+
+              <Show when={rules().length === 0}>
+                <p class="text-sm text-muted-foreground text-center py-4">
+                  条件がありません。「追加」ボタンで条件を追加してください。
+                </p>
+              </Show>
+            </div>
+          </Show>
         </div>
 
         <DialogFooter>
@@ -224,7 +310,7 @@ const RuleEditor: Component<{
 
   // 科目IDから科目名を取得
   createEffect(() => {
-    const courseIds = props.rule.type === "specific" ? props.rule.courseIds : undefined;
+    const courseIds = props.rule.type === "specific" ? props.rule.courseIds : [];
 
     if (!courseIds || courseIds.length === 0) {
       setCourseNames(new Map());
@@ -256,7 +342,14 @@ const RuleEditor: Component<{
               <Label class="text-xs">ルールタイプ</Label>
               <Select
                 value={selectedRuleType()}
-                onChange={(val) => val && props.onUpdate({ type: val.value })}
+                onChange={(val) => {
+                  if (!val) return;
+                  if (val.value === "specific") {
+                    props.onUpdate({ type: "specific", courseIds: [] });
+                  } else {
+                    props.onUpdate({ type: "pattern", courseIdPattern: "" });
+                  }
+                }}
                 options={ruleTypeOptions}
                 optionValue="value"
                 optionTextValue="label"
@@ -278,8 +371,8 @@ const RuleEditor: Component<{
               <Label class="text-xs">説明</Label>
               <Input
                 class="h-8"
-                value={props.rule.description ?? ""}
-                onInput={(e) => props.onUpdate({ description: e.currentTarget.value || undefined })}
+                value={props.rule.description}
+                onInput={(e) => props.onUpdate({ description: e.currentTarget.value })}
                 placeholder="例: プログラミング序論"
               />
             </div>
@@ -291,17 +384,17 @@ const RuleEditor: Component<{
               <Label class="text-xs">科目ID（カンマ区切り）</Label>
               <Input
                 class="h-8"
-                value={props.rule.courseIds?.join(", ") ?? ""}
+                value={props.rule.courseIds.join(", ")}
                 onInput={(e) => {
                   const ids = e.currentTarget.value
                     .split(",")
                     .map((s) => s.trim())
                     .filter((s) => s);
-                  props.onUpdate({ courseIds: ids.length > 0 ? ids : undefined });
+                  props.onUpdate({ courseIds: ids });
                 }}
                 placeholder="例: FG20204, FG20214"
               />
-              <Show when={props.rule.courseIds && props.rule.courseIds.length > 0}>
+              <Show when={props.rule.courseIds.length > 0}>
                 <div class="text-xs text-muted-foreground mt-1">
                   <For each={props.rule.courseIds}>
                     {(id, index) => (
@@ -324,16 +417,16 @@ const RuleEditor: Component<{
               <Label class="text-xs">科目IDパターン（正規表現）</Label>
               <Input
                 class="h-8"
-                value={props.rule.courseIdPattern ?? ""}
+                value={props.rule.courseIdPattern}
                 onInput={(e) =>
-                  props.onUpdate({ courseIdPattern: e.currentTarget.value || undefined })
+                  props.onUpdate({ courseIdPattern: e.currentTarget.value })
                 }
                 placeholder="例: ^FG(17|24|25)"
               />
             </div>
           </Show>
 
-          <div class="grid grid-cols-3 gap-2">
+          <div class="grid grid-cols-1 gap-2">
             <div class="space-y-1">
               <Label class="text-xs">最小単位</Label>
               <Input
@@ -346,30 +439,6 @@ const RuleEditor: Component<{
                   props.onUpdate({ minCredits: val ? Number.parseInt(val, 10) : undefined });
                 }}
               />
-            </div>
-            <div class="space-y-1">
-              <Label class="text-xs">最大単位</Label>
-              <Input
-                class="h-8"
-                type="number"
-                min="0"
-                value={props.rule.maxCredits ?? ""}
-                onInput={(e) => {
-                  const val = e.currentTarget.value;
-                  props.onUpdate({ maxCredits: val ? Number.parseInt(val, 10) : undefined });
-                }}
-              />
-            </div>
-            <div class="space-y-1 flex items-end">
-              <label class="flex items-center gap-2 text-xs h-8">
-                <input
-                  type="checkbox"
-                  checked={props.rule.required ?? false}
-                  onChange={(e) => props.onUpdate({ required: e.currentTarget.checked })}
-                  class="rounded"
-                />
-                必須
-              </label>
             </div>
           </div>
         </div>

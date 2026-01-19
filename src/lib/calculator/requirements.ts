@@ -16,17 +16,56 @@ function collectAllRequiredCourseIds(requirements: GraduationRequirements): Set<
 
   for (const category of requirements.categories) {
     for (const subcategory of category.subcategories) {
-      for (const rule of subcategory.rules) {
-        if (rule.required && rule.type === "specific" && rule.courseIds) {
-          for (const courseId of rule.courseIds) {
-            requiredCourseIds.add(courseId);
-          }
-        }
+      if (subcategory.type !== "required") continue;
+      for (const courseId of subcategory.courseIds) {
+        requiredCourseIds.add(courseId);
       }
     }
   }
 
   return requiredCourseIds;
+}
+
+function matchRequiredCourses(
+  courseIds: string[],
+  courses: UserCourseRecord[],
+  usedCourseIds: Set<string>,
+  kdbMap: Map<string, Course>,
+): MatchedCourse[] {
+  const matches: MatchedCourse[] = [];
+  const courseIdSet = new Set(courseIds);
+
+  for (const course of courses) {
+    if (!courseIdSet.has(course.courseId)) continue;
+    if (usedCourseIds.has(course.id)) continue;
+
+    usedCourseIds.add(course.id);
+    matches.push({
+      courseId: course.courseId,
+      courseName: course.courseName,
+      credits: course.credits,
+      grade: course.grade,
+      isPassed: course.isPassed,
+      isInProgress: course.isInProgress,
+    });
+  }
+
+  for (const courseId of courseIds) {
+    if (matches.some((m) => m.courseId === courseId)) continue;
+
+    const kdbCourse = kdbMap.get(courseId);
+    matches.push({
+      courseId,
+      courseName: kdbCourse?.name ?? courseId,
+      credits: kdbCourse?.credits ?? 2,
+      grade: "未履修",
+      isPassed: false,
+      isInProgress: false,
+      isUnregistered: true,
+    });
+  }
+
+  return matches;
 }
 
 // 要件充足状況を計算
@@ -52,6 +91,44 @@ export function calculateRequirementStatus(
       const ruleStatuses: RuleStatus[] = [];
       const matchedCourses: MatchedCourse[] = [];
 
+      if (subcategory.type === "required") {
+        const requiredMatches = matchRequiredCourses(
+          subcategory.courseIds,
+          courses,
+          usedCourseIds,
+          kdbMap,
+        );
+        matchedCourses.push(...requiredMatches);
+
+        const earnedCredits = matchedCourses
+          .filter((m) => m.isPassed)
+          .reduce((sum, m) => sum + m.credits, 0);
+
+        const inProgressCredits = matchedCourses
+          .filter((m) => m.isInProgress)
+          .reduce((sum, m) => sum + m.credits, 0);
+
+        const requiredCredits = subcategory.courseIds.reduce(
+          (sum, courseId) => sum + (kdbMap.get(courseId)?.credits ?? 2),
+          0,
+        );
+        const isSatisfied = subcategory.courseIds.every((courseId) =>
+          matchedCourses.some((m) => m.courseId === courseId && (m.isPassed || m.isInProgress)),
+        );
+
+        return {
+          subcategoryId: subcategory.id,
+          subcategoryName: subcategory.name,
+          earnedCredits,
+          inProgressCredits,
+          requiredCredits,
+          maxCredits: undefined,
+          isSatisfied,
+          ruleStatuses,
+          matchedCourses,
+        };
+      }
+
       for (const rule of subcategory.rules) {
         const ruleMatches = matchCoursesToRule(
           courses,
@@ -69,15 +146,11 @@ export function calculateRequirementStatus(
           .filter((m) => m.isInProgress)
           .reduce((sum, m) => sum + m.credits, 0);
 
-        const isSatisfied = rule.required
-          ? ruleMatches.every((m) => m.isPassed || m.isInProgress)
-          : rule.minCredits
-            ? earnedCredits >= rule.minCredits
-            : true;
+        const isSatisfied = rule.minCredits ? earnedCredits >= rule.minCredits : true;
 
         ruleStatuses.push({
           ruleId: rule.id,
-          description: rule.description || "",
+          description: rule.description,
           isSatisfied,
           earnedCredits,
           inProgressCredits,
@@ -160,23 +233,23 @@ function matchCoursesToRule(
 
     let isMatch = false;
 
-    switch (rule.type) {
-      case "specific":
-        isMatch = rule.courseIds?.includes(course.courseId) || false;
-        break;
+  switch (rule.type) {
+    case "specific":
+      isMatch = rule.courseIds.includes(course.courseId);
+      break;
 
-      case "pattern":
-        if (rule.courseIdPattern) {
-          const regex = new RegExp(rule.courseIdPattern);
-          // 必修科目として定義されているものは除外
-          if (excludedCourseIds.has(course.courseId)) {
-            isMatch = false;
-          } else {
-            isMatch = regex.test(course.courseId);
-          }
+    case "pattern":
+      {
+        const regex = new RegExp(rule.courseIdPattern);
+        // 必修科目として定義されているものは除外
+        if (excludedCourseIds.has(course.courseId)) {
+          isMatch = false;
+        } else {
+          isMatch = regex.test(course.courseId);
         }
-        break;
-    }
+      }
+      break;
+  }
 
     if (isMatch) {
       usedCourseIds.add(course.id);
@@ -187,26 +260,6 @@ function matchCoursesToRule(
         grade: course.grade,
         isPassed: course.isPassed,
         isInProgress: course.isInProgress,
-      });
-    }
-  }
-
-  // 必修科目ルールの場合、未履修科目も追加
-  if (rule.required && rule.type === "specific" && rule.courseIds) {
-    for (const courseId of rule.courseIds) {
-      // 既にマッチした科目はスキップ
-      if (matches.some((m) => m.courseId === courseId)) continue;
-
-      // kdbから科目情報を取得
-      const kdbCourse = kdbMap.get(courseId);
-      matches.push({
-        courseId,
-        courseName: kdbCourse?.name ?? courseId,
-        credits: kdbCourse?.credits ?? 2,
-        grade: "未履修",
-        isPassed: false,
-        isInProgress: false,
-        isUnregistered: true,
       });
     }
   }
