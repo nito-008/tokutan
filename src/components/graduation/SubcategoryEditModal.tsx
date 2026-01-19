@@ -195,14 +195,14 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
           </div>
 
           <div class="space-y-2">
-            <Label>タイプ</Label>
+            <Label>科目タイプ</Label>
             <Select
               value={selectedType()}
               onChange={(val) => val && setType(val.value)}
               options={typeOptions}
               optionValue="value"
               optionTextValue="label"
-              placeholder="タイプを選択"
+              placeholder="科目タイプを選択"
               disabled={props.subcategory !== null}
               itemComponent={(itemProps) => (
                 <SelectItem item={itemProps.item}>{itemProps.item.rawValue.label}</SelectItem>
