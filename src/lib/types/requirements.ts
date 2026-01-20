@@ -26,17 +26,10 @@ interface RequirementSubcategoryBase {
   notes?: string;
 }
 
-// 必修科目（同等科目をサポート）
-export interface RequiredCourse {
-  id: string;
-  label?: string;
-  equivalentIds: string[];
-}
-
 export type RequirementSubcategory =
   | (RequirementSubcategoryBase & {
       type: "required";
-      requiredCourses: RequiredCourse[];
+      courseIds: string[];
     })
   | (RequirementSubcategoryBase & {
       type: "elective" | "free";
