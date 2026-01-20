@@ -60,6 +60,7 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
   const [isSuggestionLoading, setIsSuggestionLoading] = createSignal(false);
   const [suggestionIndex, setSuggestionIndex] = createSignal<number | null>(null);
   const [suggestionQuery, setSuggestionQuery] = createSignal("");
+  const [hasActiveSearch, setHasActiveSearch] = createSignal(false);
   const parseCourseGroup = (value: string) =>
     value
       .split(",")
@@ -81,6 +82,14 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
   const extractSuggestionToken = (value: string) => {
     const parts = value.split(",");
     return (parts[parts.length - 1] ?? "").trim();
+  };
+  const dropSearchToken = (value: string) => {
+    const parts = value.split(",").map((part) => part.trim());
+    const lastToken = parts[parts.length - 1] ?? "";
+    if (lastToken) {
+      parts.pop();
+    }
+    return parts.filter((part) => part);
   };
   const getGroupName = (ids: string[]) => {
     for (const id of ids) {
@@ -116,16 +125,20 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
   let suggestionTimeout: number | null = null;
   let suggestionRequestId = 0;
 
-  const clearSuggestions = () => {
+  const resetSuggestionQuery = () => {
     if (suggestionTimeout) {
       clearTimeout(suggestionTimeout);
       suggestionTimeout = null;
     }
     suggestionRequestId += 1;
-    setCourseSuggestions([]);
     setIsSuggestionLoading(false);
-    setSuggestionIndex(null);
     setSuggestionQuery("");
+  };
+  const clearSuggestions = () => {
+    resetSuggestionQuery();
+    setCourseSuggestions([]);
+    setSuggestionIndex(null);
+    setHasActiveSearch(false);
   };
 
   const requestSuggestions = (index: number, value: string) => {
@@ -278,7 +291,10 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
 
   const toggleSuggestionSelect = (index: number, course: Course) => {
     const currentValue = courseIds()[index] ?? "";
-    const currentIds = uniqueCourseIds(parseCourseGroup(currentValue));
+    const baseIds = hasActiveSearch()
+      ? dropSearchToken(currentValue)
+      : parseCourseGroup(currentValue);
+    const currentIds = uniqueCourseIds(baseIds);
     const currentName = getGroupName(currentIds);
     if (currentName && currentName !== course.name) {
       toast.error("同じ科目名のものしか選択できません");
@@ -293,6 +309,8 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
       return next;
     });
     updateCourseId(index, formatCourseGroup(nextIds), { skipSuggest: true });
+    resetSuggestionQuery();
+    setHasActiveSearch(false);
   };
 
   const removeCourseId = (index: number) => {
@@ -383,7 +401,7 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
 
           <Show when={type() === "required"}>
             <div class="space-y-2">
-              <Label>科目番号</Label>
+              <Label>科目番号（カンマ区切り）</Label>
               <div class="space-y-2">
                 <Index each={courseIds()}>
                   {(id, index) => {
@@ -414,7 +432,10 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
                                       isMissingCourse(),
                                   }}
                                   value={id()}
-                                  onInput={(e) => updateCourseId(index, e.currentTarget.value)}
+                                  onInput={(e) => {
+                                    setHasActiveSearch(true);
+                                    updateCourseId(index, e.currentTarget.value);
+                                  }}
                                   onFocus={() => {
                                     setFocusedCourseIndex(index);
                                     requestSuggestions(index, extractSuggestionToken(id()));
@@ -424,6 +445,7 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
                                       setFocusedCourseIndex(null);
                                       clearSuggestions();
                                     }
+                                    setHasActiveSearch(false);
                                     updateCourseId(index, normalizeCourseGroup(id()), {
                                       skipSuggest: true,
                                     });
