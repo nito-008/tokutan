@@ -1,5 +1,6 @@
-import { Plus, Trash2 } from "lucide-solid";
+import { Check, Plus, Trash2 } from "lucide-solid";
 import { type Component, createEffect, createSignal, For, Index, onCleanup, Show } from "solid-js";
+import { toast } from "solid-sonner";
 import { Button } from "~/components/ui/button";
 import {
   Dialog,
@@ -59,9 +60,50 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
   const [isSuggestionLoading, setIsSuggestionLoading] = createSignal(false);
   const [suggestionIndex, setSuggestionIndex] = createSignal<number | null>(null);
   const [suggestionQuery, setSuggestionQuery] = createSignal("");
+  const parseCourseGroup = (value: string) =>
+    value
+      .split(",")
+      .map((id) => id.trim())
+      .filter((id) => id);
+  const uniqueCourseIds = (ids: string[]) => {
+    const seen = new Set<string>();
+    const result: string[] = [];
+    for (const id of ids) {
+      if (seen.has(id)) continue;
+      seen.add(id);
+      result.push(id);
+    }
+    return result;
+  };
+  const formatCourseGroup = (ids: string[]) => ids.join(", ");
+  const normalizeCourseGroup = (value: string) =>
+    formatCourseGroup(uniqueCourseIds(parseCourseGroup(value)));
+  const extractSuggestionToken = (value: string) => {
+    const parts = value.split(",");
+    return (parts[parts.length - 1] ?? "").trim();
+  };
+  const getGroupName = (ids: string[]) => {
+    for (const id of ids) {
+      const name = requiredCourseNames().get(id);
+      if (name) return name;
+    }
+    return undefined;
+  };
   const formatCourseLabel = (courseId: string) => {
     const name = requiredCourseNames().get(courseId);
     return name ? `${courseId}（${name}）` : courseId;
+  };
+  const formatCourseGroupLabel = (value: string) => {
+    const ids = parseCourseGroup(value);
+    if (ids.length === 0) return "";
+    return ids
+      .map((courseId) => {
+        const label = formatCourseLabel(courseId);
+        if (label !== courseId) return label;
+        if (isCourseLookupLoading()) return courseId;
+        return `${courseId}: 科目が見つかりません`;
+      })
+      .join(", ");
   };
   const normalizeCourseIds = (ids: string[]) => {
     const normalized = ids.map((id) => id.trim());
@@ -162,9 +204,7 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
       return;
     }
 
-    const ids = courseIds()
-      .map((id) => id.trim())
-      .filter((id) => id);
+    const ids = uniqueCourseIds(courseIds().flatMap((value) => parseCourseGroup(value)));
     if (ids.length === 0) {
       setRequiredCourseNames(new Map());
       setIsCourseLookupLoading(false);
@@ -196,8 +236,8 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
             name: name(),
             type: type(),
             courseIds: courseIds()
-              .map((id) => id.trim())
-              .filter((id) => id),
+              .map((value) => normalizeCourseGroup(value))
+              .filter((value) => value),
           }
         : {
             name: name(),
@@ -230,18 +270,29 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
   };
 
   const updateCourseId = (index: number, value: string, options?: { skipSuggest?: boolean }) => {
-    const trimmedValue = value.trim();
-    setCourseIds((prev) =>
-      normalizeCourseIds(prev.map((id, i) => (i === index ? trimmedValue : id))),
-    );
+    setCourseIds((prev) => normalizeCourseIds(prev.map((id, i) => (i === index ? value : id))));
     if (!options?.skipSuggest) {
-      requestSuggestions(index, trimmedValue);
+      requestSuggestions(index, extractSuggestionToken(value));
     }
   };
 
-  const handleSuggestionSelect = (index: number, course: Course) => {
-    updateCourseId(index, course.id, { skipSuggest: true });
-    clearSuggestions();
+  const toggleSuggestionSelect = (index: number, course: Course) => {
+    const currentValue = courseIds()[index] ?? "";
+    const currentIds = uniqueCourseIds(parseCourseGroup(currentValue));
+    const currentName = getGroupName(currentIds);
+    if (currentName && currentName !== course.name) {
+      toast.error("同じ科目名のものしか選択できません");
+      return;
+    }
+    const nextIds = currentIds.includes(course.id)
+      ? currentIds.filter((id) => id !== course.id)
+      : [...currentIds, course.id];
+    setRequiredCourseNames((prev) => {
+      const next = new Map(prev);
+      next.set(course.id, course.name);
+      return next;
+    });
+    updateCourseId(index, formatCourseGroup(nextIds), { skipSuggest: true });
   };
 
   const removeCourseId = (index: number) => {
@@ -338,12 +389,14 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
                   {(id, index) => {
                     const isPlaceholderRow = () => index === courseIds().length - 1;
                     const isFocused = () => focusedCourseIndex() === index;
+                    const groupIds = () => uniqueCourseIds(parseCourseGroup(id()));
+                    const selectedIds = () => new Set(groupIds());
                     const isMissingCourse = () =>
-                      !!id() &&
+                      groupIds().length > 0 &&
                       !isFocused() &&
                       !isPlaceholderRow() &&
                       !isCourseLookupLoading() &&
-                      !requiredCourseNames().has(id());
+                      groupIds().some((courseId) => !requiredCourseNames().has(courseId));
                     return (
                       <div class="flex items-start gap-2">
                         <div class="flex-1 space-y-1">
@@ -364,13 +417,16 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
                                   onInput={(e) => updateCourseId(index, e.currentTarget.value)}
                                   onFocus={() => {
                                     setFocusedCourseIndex(index);
-                                    requestSuggestions(index, id());
+                                    requestSuggestions(index, extractSuggestionToken(id()));
                                   }}
                                   onBlur={() => {
                                     if (focusedCourseIndex() === index) {
                                       setFocusedCourseIndex(null);
                                       clearSuggestions();
                                     }
+                                    updateCourseId(index, normalizeCourseGroup(id()), {
+                                      skipSuggest: true,
+                                    });
                                   }}
                                   onKeyDown={(e) => {
                                     if (e.key === "Enter") {
@@ -384,13 +440,13 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
                                     isPlaceholderRow() ? "科目番号を追加" : "例: FG20204"
                                   }
                                 />
-                                <Show when={id() && !isFocused()}>
+                                <Show when={groupIds().length > 0 && !isFocused()}>
                                   <div
                                     class={`pointer-events-none absolute inset-y-0 left-3 right-3 flex items-center text-sm truncate ${isMissingCourse() ? "text-destructive" : "text-foreground"}`}
                                   >
                                     {isMissingCourse()
                                       ? `${id()}（科目が見つかりません）`
-                                      : formatCourseLabel(id())}
+                                      : formatCourseGroupLabel(id())}
                                   </div>
                                 </Show>
                                 <div
@@ -425,9 +481,12 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
                                             <button
                                               type="button"
                                               class="w-full px-3 py-2 text-left hover:bg-muted"
+                                              classList={{
+                                                "bg-muted": selectedIds().has(course.id),
+                                              }}
                                               onMouseDown={(e) => {
                                                 e.preventDefault();
-                                                handleSuggestionSelect(index, course);
+                                                toggleSuggestionSelect(index, course);
                                               }}
                                             >
                                               <div class="flex items-center justify-between">
@@ -435,6 +494,9 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
                                                   {course.name}
                                                 </span>
                                                 <span class="text-xs text-muted-foreground">
+                                                  <Show when={selectedIds().has(course.id)}>
+                                                    <Check class="mr-1 inline-block size-4 text-primary" />
+                                                  </Show>
                                                   {course.credits}単位
                                                 </span>
                                               </div>

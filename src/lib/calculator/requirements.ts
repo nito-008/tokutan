@@ -10,6 +10,17 @@ import type {
 } from "../types";
 import type { Course } from "../types/course";
 
+function splitRequiredCourseGroup(value: string): string[] {
+  return value
+    .split(",")
+    .map((id) => id.trim())
+    .filter((id) => id);
+}
+
+function parseRequiredCourseGroups(courseIds: string[]): string[][] {
+  return courseIds.map(splitRequiredCourseGroup).filter((group) => group.length > 0);
+}
+
 // 全必修科目番号を収集するヘルパー関数
 function collectAllRequiredCourseIds(requirements: GraduationRequirements): Set<string> {
   const requiredCourseIds = new Set<string>();
@@ -17,8 +28,11 @@ function collectAllRequiredCourseIds(requirements: GraduationRequirements): Set<
   for (const category of requirements.categories) {
     for (const subcategory of category.subcategories) {
       if (subcategory.type !== "required") continue;
-      for (const courseId of subcategory.courseIds ?? []) {
-        requiredCourseIds.add(courseId);
+      const groups = parseRequiredCourseGroups(subcategory.courseIds ?? []);
+      for (const group of groups) {
+        for (const courseId of group) {
+          requiredCourseIds.add(courseId);
+        }
       }
     }
   }
@@ -26,37 +40,56 @@ function collectAllRequiredCourseIds(requirements: GraduationRequirements): Set<
   return requiredCourseIds;
 }
 
-function matchRequiredCourses(
-  courseIds: string[],
+function matchRequiredCourseGroups(
+  courseGroups: string[][],
   courses: UserCourseRecord[],
   usedCourseIds: Set<string>,
   kdbMap: Map<string, Course>,
 ): MatchedCourse[] {
   const matches: MatchedCourse[] = [];
-  const courseIdSet = new Set(courseIds);
+  const coursesById = new Map<string, UserCourseRecord[]>();
 
   for (const course of courses) {
-    if (!courseIdSet.has(course.courseId)) continue;
-    if (usedCourseIds.has(course.id)) continue;
-
-    usedCourseIds.add(course.id);
-    matches.push({
-      courseId: course.courseId,
-      courseName: course.courseName,
-      credits: course.credits,
-      grade: course.grade,
-      isPassed: course.isPassed,
-      isInProgress: course.isInProgress,
-    });
+    const list = coursesById.get(course.courseId);
+    if (list) {
+      list.push(course);
+    } else {
+      coursesById.set(course.courseId, [course]);
+    }
   }
 
-  for (const courseId of courseIds) {
-    if (matches.some((m) => m.courseId === courseId)) continue;
+  for (const group of courseGroups) {
+    const primaryCourseId = group[0];
+    if (!primaryCourseId) continue;
+    let selected: UserCourseRecord | null = null;
 
-    const kdbCourse = kdbMap.get(courseId);
+    for (const courseId of group) {
+      const records = coursesById.get(courseId);
+      if (!records) continue;
+      const record = records.find((item) => !usedCourseIds.has(item.id));
+      if (record) {
+        selected = record;
+        break;
+      }
+    }
+
+    if (selected) {
+      usedCourseIds.add(selected.id);
+      matches.push({
+        courseId: selected.courseId,
+        courseName: selected.courseName,
+        credits: selected.credits,
+        grade: selected.grade,
+        isPassed: selected.isPassed,
+        isInProgress: selected.isInProgress,
+      });
+      continue;
+    }
+
+    const kdbCourse = kdbMap.get(primaryCourseId);
     matches.push({
-      courseId,
-      courseName: kdbCourse?.name ?? courseId,
+      courseId: primaryCourseId,
+      courseName: kdbCourse?.name ?? primaryCourseId,
       credits: kdbCourse?.credits ?? 2,
       grade: "未履修",
       isPassed: false,
@@ -92,8 +125,13 @@ export function calculateRequirementStatus(
       const matchedCourses: MatchedCourse[] = [];
 
       if (subcategory.type === "required") {
-        const courseIds = subcategory.courseIds ?? [];
-        const requiredMatches = matchRequiredCourses(courseIds, courses, usedCourseIds, kdbMap);
+        const courseGroups = parseRequiredCourseGroups(subcategory.courseIds ?? []);
+        const requiredMatches = matchRequiredCourseGroups(
+          courseGroups,
+          courses,
+          usedCourseIds,
+          kdbMap,
+        );
         matchedCourses.push(...requiredMatches);
 
         const earnedCredits = matchedCourses
@@ -104,13 +142,8 @@ export function calculateRequirementStatus(
           .filter((m) => m.isInProgress)
           .reduce((sum, m) => sum + m.credits, 0);
 
-        const requiredCredits = courseIds.reduce(
-          (sum, courseId) => sum + (kdbMap.get(courseId)?.credits ?? 2),
-          0,
-        );
-        const isSatisfied = courseIds.every((courseId) =>
-          matchedCourses.some((m) => m.courseId === courseId && (m.isPassed || m.isInProgress)),
-        );
+        const requiredCredits = requiredMatches.reduce((sum, m) => sum + m.credits, 0);
+        const isSatisfied = requiredMatches.every((m) => m.isPassed || m.isInProgress);
 
         return {
           subcategoryId: subcategory.id,
