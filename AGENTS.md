@@ -184,6 +184,13 @@ src/
 | **Toggle Group**    | `toggle-group`    | A set of two-state buttons that can be toggled on or off.                                          |
 | **Tooltip**         | `tooltip`         | A popup that displays information related to an element when hovered or focused.                   |
 
+## Planning Mode
+
+- When told "Plan mode", do not implement at first; only produce an implementation plan.
+- If anything is unclear while drafting the plan, ask the user with three options plus a custom input.
+- If there are multiple questions, ask them one at a time.
+- Once the plan is complete, follow it faithfully during implementation.
+
 ## Git Operations
 
 - Please commit in Japanese at the timing of feature-by-feature, document updates, library updates, etc.
