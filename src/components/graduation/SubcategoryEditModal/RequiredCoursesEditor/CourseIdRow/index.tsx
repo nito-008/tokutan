@@ -1,17 +1,16 @@
-import { Check, Trash2 } from "lucide-solid";
+import { Trash2 } from "lucide-solid";
 import {
   type Accessor,
   type Component,
   createEffect,
   createSignal,
-  For,
   onCleanup,
   Show,
 } from "solid-js";
 import { toast } from "solid-sonner";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
-import { getCoursesByIds, searchKdb } from "~/lib/db/kdb";
+import { getCoursesByIds } from "~/lib/db/kdb";
 import type { Course } from "~/lib/types";
 import {
   dropSearchToken,
@@ -23,6 +22,8 @@ import {
   parseCourseGroup,
   uniqueCourseIds,
 } from "../../utils/courseGroup";
+import { CourseSuggestionDropdown } from "./CourseSuggestion";
+import { useSuggestionSearch } from "./CourseSuggestion/useSuggestionSearch";
 
 interface CourseIdRowProps {
   id: Accessor<string>;
@@ -38,12 +39,9 @@ export const CourseIdRow: Component<CourseIdRowProps> = (props) => {
   );
   const [isCourseLookupLoading, setIsCourseLookupLoading] = createSignal(false);
   const [isFocused, setIsFocused] = createSignal(false);
-  const [courseSuggestions, setCourseSuggestions] = createSignal<Course[]>([]);
-  const [isSuggestionLoading, setIsSuggestionLoading] = createSignal(false);
-  const [suggestionQuery, setSuggestionQuery] = createSignal("");
   const [hasActiveSearch, setHasActiveSearch] = createSignal(false);
-  let suggestionTimeout: number | null = null;
-  let suggestionRequestId = 0;
+
+  const suggestionSearch = useSuggestionSearch(isFocused);
 
   const isPlaceholderRow = () => props.index === props.totalCount - 1;
   const groupIds = () => uniqueCourseIds(parseCourseGroup(props.id()));
@@ -54,59 +52,6 @@ export const CourseIdRow: Component<CourseIdRowProps> = (props) => {
     !isPlaceholderRow() &&
     !isCourseLookupLoading() &&
     groupIds().some((courseId) => !requiredCourseNames().has(courseId));
-
-  const resetSuggestionQuery = () => {
-    if (suggestionTimeout) {
-      clearTimeout(suggestionTimeout);
-      suggestionTimeout = null;
-    }
-    suggestionRequestId += 1;
-    setIsSuggestionLoading(false);
-    setSuggestionQuery("");
-  };
-
-  const clearSuggestions = () => {
-    resetSuggestionQuery();
-    setCourseSuggestions([]);
-    setHasActiveSearch(false);
-  };
-
-  const requestSuggestions = (value: string) => {
-    const normalizedValue = value.trim();
-    if (suggestionTimeout) {
-      clearTimeout(suggestionTimeout);
-      suggestionTimeout = null;
-    }
-    setSuggestionQuery(normalizedValue);
-    if (normalizedValue.length < 2) {
-      setCourseSuggestions([]);
-      setIsSuggestionLoading(false);
-      return;
-    }
-    const requestId = ++suggestionRequestId;
-    suggestionTimeout = window.setTimeout(async () => {
-      setIsSuggestionLoading(true);
-      try {
-        const found = await searchKdb(normalizedValue);
-        if (requestId !== suggestionRequestId) return;
-        if (!isFocused()) return;
-        setCourseSuggestions(found);
-      } catch (error) {
-        console.error("Search error:", error);
-      } finally {
-        if (requestId === suggestionRequestId) {
-          setIsSuggestionLoading(false);
-        }
-      }
-    }, 250);
-  };
-
-  onCleanup(() => {
-    if (suggestionTimeout) {
-      clearTimeout(suggestionTimeout);
-    }
-    suggestionRequestId += 1;
-  });
 
   createEffect(() => {
     const ids = groupIds();
@@ -137,18 +82,18 @@ export const CourseIdRow: Component<CourseIdRowProps> = (props) => {
   const handleInputChange = (value: string) => {
     setHasActiveSearch(true);
     props.onUpdateCourseId(props.index, value);
-    requestSuggestions(extractSuggestionToken(value));
+    suggestionSearch.search(extractSuggestionToken(value));
   };
 
   const handleFocusInput = (value: string) => {
     setIsFocused(true);
-    requestSuggestions(extractSuggestionToken(value));
+    suggestionSearch.search(extractSuggestionToken(value));
   };
 
   const handleBlurInput = (value: string) => {
     if (isFocused()) {
       setIsFocused(false);
-      clearSuggestions();
+      suggestionSearch.clear();
     }
     setHasActiveSearch(false);
     props.onUpdateCourseId(props.index, normalizeCourseGroup(value));
@@ -174,7 +119,7 @@ export const CourseIdRow: Component<CourseIdRowProps> = (props) => {
       return next;
     });
     props.onUpdateCourseId(props.index, formatCourseGroup(nextIds));
-    resetSuggestionQuery();
+    suggestionSearch.resetQuery();
     setHasActiveSearch(false);
   };
 
@@ -201,7 +146,7 @@ export const CourseIdRow: Component<CourseIdRowProps> = (props) => {
                   if (e.key === "Enter") {
                     e.preventDefault();
                     setIsFocused(false);
-                    clearSuggestions();
+                    suggestionSearch.clear();
                     blurTarget?.focus();
                   }
                 }}
@@ -223,63 +168,14 @@ export const CourseIdRow: Component<CourseIdRowProps> = (props) => {
                 </div>
               </Show>
               <div ref={setBlurTarget} tabIndex={-1} class="sr-only" aria-hidden="true" />
-              <Show
-                when={
-                  isFocused() &&
-                  (isSuggestionLoading() ||
-                    courseSuggestions().length > 0 ||
-                    suggestionQuery().length >= 2)
-                }
-              >
-                <div class="absolute left-0 right-0 top-full z-20 mt-1 max-h-56 overflow-y-auto rounded-md border bg-background shadow">
-                  <Show when={isSuggestionLoading()}>
-                    <div class="px-3 py-2 text-xs text-muted-foreground">検索中...</div>
-                  </Show>
-                  <Show when={!isSuggestionLoading() && courseSuggestions().length > 0}>
-                    <div class="divide-y">
-                      <For each={courseSuggestions()}>
-                        {(course) => (
-                          <button
-                            type="button"
-                            class="w-full px-3 py-2 text-left hover:bg-muted"
-                            classList={{
-                              "bg-muted": selectedIds().has(course.id),
-                            }}
-                            onMouseDown={(e) => {
-                              e.preventDefault();
-                              toggleSuggestionSelect(course);
-                            }}
-                          >
-                            <div class="flex items-center justify-between">
-                              <span class="text-sm font-medium">{course.name}</span>
-                              <span class="text-xs text-muted-foreground">
-                                <Show when={selectedIds().has(course.id)}>
-                                  <Check class="mr-1 inline-block size-4 text-primary" />
-                                </Show>
-                                {course.credits}単位
-                              </span>
-                            </div>
-                            <div class="text-xs text-muted-foreground">
-                              {course.id} / {course.semester} {course.schedule}
-                            </div>
-                          </button>
-                        )}
-                      </For>
-                    </div>
-                  </Show>
-                  <Show
-                    when={
-                      !isSuggestionLoading() &&
-                      suggestionQuery().length >= 2 &&
-                      courseSuggestions().length === 0
-                    }
-                  >
-                    <div class="px-3 py-2 text-xs text-muted-foreground">
-                      該当する科目が見つかりません
-                    </div>
-                  </Show>
-                </div>
-              </Show>
+              <CourseSuggestionDropdown
+                isVisible={isFocused}
+                suggestions={suggestionSearch.suggestions}
+                isLoading={suggestionSearch.isLoading}
+                query={suggestionSearch.query}
+                selectedIds={selectedIds}
+                onSelect={toggleSuggestionSelect}
+              />
             </div>
           );
         })()}
