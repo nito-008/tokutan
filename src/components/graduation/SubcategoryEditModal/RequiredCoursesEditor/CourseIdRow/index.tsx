@@ -7,7 +7,6 @@ import {
   onCleanup,
   Show,
 } from "solid-js";
-import { toast } from "solid-sonner";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { getCoursesByIds } from "~/lib/db/kdb";
@@ -17,7 +16,6 @@ import {
   extractSuggestionToken,
   formatCourseGroup,
   formatCourseGroupLabel,
-  getGroupName,
   normalizeCourseGroup,
   parseCourseGroup,
   uniqueCourseIds,
@@ -46,6 +44,12 @@ export const CourseIdRow: Component<CourseIdRowProps> = (props) => {
   const isPlaceholderRow = () => props.index === props.totalCount - 1;
   const groupIds = () => uniqueCourseIds(parseCourseGroup(props.id()));
   const selectedIds = () => new Set(groupIds());
+  const getRelatedCourseId = (value: string) => {
+    if (!value.includes(",")) return undefined;
+    const [firstToken] = value.split(",");
+    const trimmed = firstToken?.trim();
+    return trimmed || undefined;
+  };
   const isMissingCourse = () =>
     groupIds().length > 0 &&
     !isFocused() &&
@@ -82,12 +86,12 @@ export const CourseIdRow: Component<CourseIdRowProps> = (props) => {
   const handleInputChange = (value: string) => {
     setHasActiveSearch(true);
     props.onUpdateCourseId(props.index, value);
-    suggestionSearch.search(extractSuggestionToken(value));
+    suggestionSearch.search(extractSuggestionToken(value), getRelatedCourseId(value));
   };
 
   const handleFocusInput = (value: string) => {
     setIsFocused(true);
-    suggestionSearch.search(extractSuggestionToken(value));
+    suggestionSearch.search(extractSuggestionToken(value), getRelatedCourseId(value));
   };
 
   const handleBlurInput = (value: string) => {
@@ -105,11 +109,6 @@ export const CourseIdRow: Component<CourseIdRowProps> = (props) => {
       ? dropSearchToken(currentValue)
       : parseCourseGroup(currentValue);
     const currentIds = uniqueCourseIds(baseIds);
-    const currentName = getGroupName(currentIds, requiredCourseNames());
-    if (currentName && currentName !== course.name) {
-      toast.error("既存の科目名と一致しないため追加できません");
-      return;
-    }
     const nextIds = currentIds.includes(course.id)
       ? currentIds.filter((id) => id !== course.id)
       : [...currentIds, course.id];

@@ -65,29 +65,63 @@ export async function ensureKdbCache(): Promise<void> {
 
 // 科目を検索
 export async function searchKdb(query: string): Promise<Course[]> {
+  return searchKdbWithRelatedName(query);
+}
+
+export async function searchKdbWithRelatedName(
+  query: string,
+  relatedCourseId?: string,
+): Promise<Course[]> {
   const normalizedQuery = query.toLowerCase().trim();
 
-  if (!normalizedQuery) return [];
+  if (!normalizedQuery && !relatedCourseId) return [];
 
-  // キャッシュがなければ更新
   await ensureKdbCache();
 
-  // 科目番号で完全一致検索
-  const exactMatch = await db.kdbCache.get(normalizedQuery.toUpperCase());
-  if (exactMatch) {
-    return [exactMatch];
+  let allCourses: Course[] | null = null;
+  let relatedCourses: Course[] = [];
+  if (relatedCourseId) {
+    const relatedCourse = await db.kdbCache.get(relatedCourseId.toUpperCase());
+    if (relatedCourse) {
+      allCourses = await db.kdbCache.toArray();
+      relatedCourses = allCourses.filter((course) => course.name === relatedCourse.name);
+    }
   }
 
-  // 部分一致検索（科目番号または科目名）
-  const allCourses = await db.kdbCache.toArray();
-  const results = allCourses.filter(
-    (course) =>
-      course.id.toLowerCase().includes(normalizedQuery) ||
-      course.name.toLowerCase().includes(normalizedQuery),
-  );
+  let results: Course[] = [];
+  if (normalizedQuery) {
+    const exactMatch = await db.kdbCache.get(normalizedQuery.toUpperCase());
+    if (exactMatch) {
+      results = [exactMatch];
+    } else {
+      if (!allCourses) {
+        allCourses = await db.kdbCache.toArray();
+      }
+      results = allCourses.filter(
+        (course) =>
+          course.id.toLowerCase().includes(normalizedQuery) ||
+          course.name.toLowerCase().includes(normalizedQuery),
+      );
+      results = results.slice(0, 50);
+    }
+  }
 
-  // 最大50件まで返す
-  return results.slice(0, 50);
+  const seen = new Set<string>();
+  const merged: Course[] = [];
+  const pushUnique = (course: Course) => {
+    if (seen.has(course.id)) return;
+    seen.add(course.id);
+    merged.push(course);
+  };
+
+  for (const course of relatedCourses) {
+    pushUnique(course);
+  }
+  for (const course of results) {
+    pushUnique(course);
+  }
+
+  return merged;
 }
 
 // 科目番号で取得

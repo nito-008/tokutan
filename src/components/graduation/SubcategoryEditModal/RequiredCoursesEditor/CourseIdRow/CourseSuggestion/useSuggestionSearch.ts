@@ -1,12 +1,12 @@
 import { type Accessor, createSignal, onCleanup } from "solid-js";
-import { searchKdb } from "~/lib/db/kdb";
+import { searchKdbWithRelatedName } from "~/lib/db/kdb";
 import type { Course } from "~/lib/types";
 
 interface UseSuggestionSearchReturn {
   suggestions: Accessor<Course[]>;
   isLoading: Accessor<boolean>;
   query: Accessor<string>;
-  search: (value: string) => void;
+  search: (value: string, relatedCourseId?: string) => void;
   resetQuery: () => void;
   clear: () => void;
 }
@@ -33,14 +33,14 @@ export const useSuggestionSearch = (isFocused: Accessor<boolean>): UseSuggestion
     setCourseSuggestions([]);
   };
 
-  const requestSuggestions = (value: string) => {
+  const requestSuggestions = (value: string, relatedCourseId?: string) => {
     const normalizedValue = value.trim();
     if (suggestionTimeout) {
       clearTimeout(suggestionTimeout);
       suggestionTimeout = null;
     }
     setSuggestionQuery(normalizedValue);
-    if (normalizedValue.length < 2) {
+    if (normalizedValue.length < 2 && !relatedCourseId) {
       setCourseSuggestions([]);
       setIsSuggestionLoading(false);
       return;
@@ -49,7 +49,7 @@ export const useSuggestionSearch = (isFocused: Accessor<boolean>): UseSuggestion
     suggestionTimeout = window.setTimeout(async () => {
       setIsSuggestionLoading(true);
       try {
-        const found = await searchKdb(normalizedValue);
+        const found = await searchKdbWithRelatedName(normalizedValue, relatedCourseId);
         if (requestId !== suggestionRequestId) return;
         if (!isFocused()) return;
         setCourseSuggestions(found);
