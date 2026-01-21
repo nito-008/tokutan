@@ -63,6 +63,22 @@ export const formatCourseGroupLabel = (
 ) => {
   const ids = parseCourseGroup(value);
   if (ids.length === 0) return "";
+
+  // グループ内の科目名を取得
+  const groupName = getGroupName(ids, courseNames);
+
+  // すべてのIDで科目名が同一かチェック
+  const allSameName = ids.every((id) => {
+    const name = courseNames.get(id);
+    return name === groupName || !name;
+  });
+
+  if (groupName && allSameName) {
+    // 科目名が同一: "FG18102, FG18112（専門英語A）"
+    return `${ids.join(", ")}（${groupName}）`;
+  }
+
+  // 科目名が異なる、または取得できない場合は従来の形式
   return ids
     .map((courseId) => {
       const label = formatCourseLabel(courseId, courseNames);
