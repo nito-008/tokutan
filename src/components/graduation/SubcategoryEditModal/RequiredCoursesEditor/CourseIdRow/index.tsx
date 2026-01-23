@@ -147,11 +147,11 @@ export const CourseIdRow: Component<CourseIdRowProps> = (props) => {
       style={
         !isPlaceholderRow() && sortable.transform
           ? {
-              transform: `translateY(${clampY(
-                sortable.transform.y,
-                props.index,
-                props.totalCount - 1, // プレースホルダーを除いたソート可能アイテム数
-              )}px)`,
+              transform: `translateY(${
+                sortable.isActiveDraggable
+                  ? clampY(sortable.transform.y, props.index, props.totalCount - 1)
+                  : sortable.transform.y
+              }px)`,
             }
           : undefined
       }
