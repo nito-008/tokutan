@@ -19,15 +19,15 @@ export const RequiredCoursesEditor: Component<RequiredCoursesEditorProps> = (pro
   // ソート対象のID（プレースホルダー除外）
   const sortableIds = () => {
     const ids = props.courseIds();
-    return ids.length > 1 ? ids.slice(0, -1).map((_, i) => i) : [];
+    return ids.length > 1 ? ids.slice(0, -1).map((_, i) => String(i)) : [];
   };
 
   // ドラッグ終了時の並べ替え処理
   const handleDragEnd = (event: DragEvent) => {
     const { draggable, droppable } = event;
     if (!draggable || !droppable) return;
-    const fromIndex = draggable.id as number;
-    const toIndex = droppable.id as number;
+    const fromIndex = Number(draggable.id);
+    const toIndex = Number(droppable.id);
     if (fromIndex !== toIndex) {
       props.setCourseIds((prev) => {
         const items = [...prev];

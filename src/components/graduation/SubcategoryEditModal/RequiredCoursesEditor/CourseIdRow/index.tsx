@@ -55,7 +55,7 @@ export const CourseIdRow: Component<CourseIdRowProps> = (props) => {
 
   const isPlaceholderRow = () => props.index === props.totalCount - 1;
   // プレースホルダー以外でSortableを作成
-  const sortable = createSortable(props.index);
+  const sortable = createSortable(String(props.index));
   const groupIds = () => uniqueCourseIds(parseCourseGroup(props.id()));
   const selectedIds = () => new Set(groupIds());
   const getRelatedCourseId = (value: string) => {
