@@ -125,6 +125,7 @@ src/
 
 - UI components adopt SolidUI ([https://www.solid-ui.com/](https://www.solid-ui.com/)).
 - Use `npx solidui-cli@latest add [ID]` to copy any component into the project.
+- Before implementing custom components, check the SolidUI component list for a suitable component and minimize custom implementations whenever possible.
 - The list of components is shown below.
 
 | Component Name      | ID (Install)      | Description                                                                                        |
