@@ -15,7 +15,7 @@ interface CourseSuggestionDropdownProps {
 export const CourseSuggestionDropdown: Component<CourseSuggestionDropdownProps> = (props) => {
   return (
     <PopoverContent
-      class="max-h-56 w-full overflow-y-auto p-0"
+      class="max-h-56 w-[var(--kb-popper-anchor-width)] overflow-y-auto p-0"
       onOpenAutoFocus={(e) => e.preventDefault()}
     >
       <Show when={props.isLoading()}>
