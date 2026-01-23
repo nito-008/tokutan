@@ -10,6 +10,7 @@ import {
 } from "solid-js";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
+import { Popover, PopoverAnchor } from "~/components/ui/popover";
 import { getCoursesByIds } from "~/lib/db/kdb";
 import type { Course } from "~/lib/types";
 import {
@@ -174,42 +175,53 @@ export const CourseIdRow: Component<CourseIdRowProps> = (props) => {
             blurTarget = el;
           };
           return (
-            <div class="relative">
-              <Input
-                classList={{
-                  "text-transparent caret-foreground": !isFocused(),
-                  "border-destructive focus-visible:ring-destructive": isMissingCourse(),
-                }}
-                value={props.id()}
-                onInput={(e) => handleInputChange(e.currentTarget.value)}
-                onFocus={(e) => handleFocusInput(e.currentTarget.value)}
-                onBlur={(e) => handleBlurInput(e.currentTarget.value)}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter") {
-                    e.preventDefault();
-                    setIsFocused(false);
-                    suggestionSearch.clear();
-                    blurTarget?.focus();
-                  }
-                }}
-                placeholder={isPlaceholderRow() ? "科目番号を追加" : "例: FG20204"}
-              />
-              <Show when={groupIds().length > 0 && !isFocused()}>
-                <div
-                  class={`pointer-events-none absolute inset-y-0 left-3 right-3 flex items-center text-sm truncate ${
-                    isMissingCourse() ? "text-destructive" : "text-foreground"
-                  }`}
-                >
-                  {isMissingCourse()
-                    ? `${props.id()}（科目が見つかりません）`
-                    : formatCourseGroupLabel(
-                        props.id(),
-                        requiredCourseNames(),
-                        isCourseLookupLoading(),
-                      )}
+            <Popover
+              open={
+                isFocused() &&
+                (suggestionSearch.isLoading() ||
+                  suggestionSearch.suggestions().length > 0 ||
+                  suggestionSearch.query().length >= 2)
+              }
+            >
+              <PopoverAnchor>
+                <div class="relative">
+                  <Input
+                    classList={{
+                      "text-transparent caret-foreground": !isFocused(),
+                      "border-destructive focus-visible:ring-destructive": isMissingCourse(),
+                    }}
+                    value={props.id()}
+                    onInput={(e) => handleInputChange(e.currentTarget.value)}
+                    onFocus={(e) => handleFocusInput(e.currentTarget.value)}
+                    onBlur={(e) => handleBlurInput(e.currentTarget.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        setIsFocused(false);
+                        suggestionSearch.clear();
+                        blurTarget?.focus();
+                      }
+                    }}
+                    placeholder={isPlaceholderRow() ? "科目番号を追加" : "例: FG20204"}
+                  />
+                  <Show when={groupIds().length > 0 && !isFocused()}>
+                    <div
+                      class={`pointer-events-none absolute inset-y-0 left-3 right-3 flex items-center text-sm truncate ${
+                        isMissingCourse() ? "text-destructive" : "text-foreground"
+                      }`}
+                    >
+                      {isMissingCourse()
+                        ? `${props.id()}（科目が見つかりません）`
+                        : formatCourseGroupLabel(
+                            props.id(),
+                            requiredCourseNames(),
+                            isCourseLookupLoading(),
+                          )}
+                    </div>
+                  </Show>
+                  <div ref={setBlurTarget} tabIndex={-1} class="sr-only" aria-hidden="true" />
                 </div>
-              </Show>
-              <div ref={setBlurTarget} tabIndex={-1} class="sr-only" aria-hidden="true" />
+              </PopoverAnchor>
               <CourseSuggestionDropdown
                 isVisible={isFocused}
                 suggestions={suggestionSearch.suggestions}
@@ -218,7 +230,7 @@ export const CourseIdRow: Component<CourseIdRowProps> = (props) => {
                 selectedIds={selectedIds}
                 onSelect={toggleSuggestionSelect}
               />
-            </div>
+            </Popover>
           );
         })()}
       </div>
