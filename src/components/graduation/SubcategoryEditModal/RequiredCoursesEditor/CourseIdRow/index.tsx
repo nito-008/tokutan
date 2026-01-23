@@ -1,4 +1,4 @@
-import { createSortable, transformStyle } from "@thisbeyond/solid-dnd";
+import { createSortable } from "@thisbeyond/solid-dnd";
 import { GripVertical, Trash2 } from "lucide-solid";
 import {
   type Accessor,
@@ -31,6 +31,17 @@ interface CourseIdRowProps {
   onUpdateCourseId: (index: number, value: string) => void;
   onRemoveCourseId: (index: number) => void;
 }
+
+// 1行の高さ（Input高さ40px + space-y-2ギャップ8px）
+const ROW_HEIGHT = 48;
+
+const clampY = (y: number, currentIndex: number, sortableCount: number): number => {
+  // 上方向の制限: 最上部（index 0）より上には行けない
+  const minY = -currentIndex * ROW_HEIGHT;
+  // 下方向の制限: 最下部（最後のソート可能アイテム）より下には行けない
+  const maxY = (sortableCount - 1 - currentIndex) * ROW_HEIGHT;
+  return Math.max(minY, Math.min(maxY, y));
+};
 
 export const CourseIdRow: Component<CourseIdRowProps> = (props) => {
   const [requiredCourseNames, setRequiredCourseNames] = createSignal<Map<string, string>>(
@@ -135,7 +146,13 @@ export const CourseIdRow: Component<CourseIdRowProps> = (props) => {
       }}
       style={
         !isPlaceholderRow() && sortable.transform
-          ? { transform: `translateY(${sortable.transform.y}px)` }
+          ? {
+              transform: `translateY(${clampY(
+                sortable.transform.y,
+                props.index,
+                props.totalCount - 1, // プレースホルダーを除いたソート可能アイテム数
+              )}px)`,
+            }
           : undefined
       }
     >
