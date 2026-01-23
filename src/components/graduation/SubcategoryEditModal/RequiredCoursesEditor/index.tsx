@@ -40,9 +40,11 @@ export const RequiredCoursesEditor: Component<RequiredCoursesEditorProps> = (pro
   };
 
   const handleUpdateCourseId = (index: number, value: string) => {
-    props.setCourseIds((prev) =>
-      normalizeCourseIds(prev.map((id, i) => (i === index ? value : id))),
-    );
+    props.setCourseIds((prev) => prev.map((id, i) => (i === index ? value : id)));
+  };
+
+  const handleFinishEditing = () => {
+    props.setCourseIds((prev) => normalizeCourseIds(prev));
   };
 
   const handleRemoveCourseId = (index: number) => {
@@ -64,6 +66,7 @@ export const RequiredCoursesEditor: Component<RequiredCoursesEditorProps> = (pro
                   totalCount={props.courseIds().length}
                   onUpdateCourseId={handleUpdateCourseId}
                   onRemoveCourseId={handleRemoveCourseId}
+                  onFinishEditing={handleFinishEditing}
                 />
               )}
             </Index>
