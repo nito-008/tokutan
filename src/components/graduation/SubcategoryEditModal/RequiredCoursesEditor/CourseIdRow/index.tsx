@@ -133,7 +133,11 @@ export const CourseIdRow: Component<CourseIdRowProps> = (props) => {
         "opacity-50": !isPlaceholderRow() && sortable.isActiveDraggable,
         "transition-transform": !isPlaceholderRow() && !sortable.isActiveDraggable,
       }}
-      style={!isPlaceholderRow() ? transformStyle(sortable.transform) : undefined}
+      style={
+        !isPlaceholderRow() && sortable.transform
+          ? { transform: `translateY(${sortable.transform.y}px)` }
+          : undefined
+      }
     >
       {/* ドラッグハンドル */}
       <Show when={!isPlaceholderRow()} fallback={<div class="w-4" />}>
