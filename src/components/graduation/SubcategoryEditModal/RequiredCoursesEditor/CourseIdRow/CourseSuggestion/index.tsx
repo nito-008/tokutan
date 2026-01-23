@@ -26,7 +26,7 @@ export const CourseSuggestionDropdown: Component<CourseSuggestionDropdownProps> 
         <div class="divide-y">
           <For each={props.suggestions()}>
             {(course) => (
-              <Tooltip openDelay={300}>
+              <Tooltip openDelay={500}>
                 <TooltipTrigger as="div" class="block w-full">
                   <button
                     type="button"
