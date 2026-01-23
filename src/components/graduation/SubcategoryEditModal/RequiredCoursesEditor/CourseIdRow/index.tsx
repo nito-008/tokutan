@@ -1,4 +1,5 @@
-import { Trash2 } from "lucide-solid";
+import { createSortable, transformStyle } from "@thisbeyond/solid-dnd";
+import { GripVertical, Trash2 } from "lucide-solid";
 import {
   type Accessor,
   type Component,
@@ -42,6 +43,8 @@ export const CourseIdRow: Component<CourseIdRowProps> = (props) => {
   const suggestionSearch = useSuggestionSearch(isFocused);
 
   const isPlaceholderRow = () => props.index === props.totalCount - 1;
+  // プレースホルダー以外でSortableを作成
+  const sortable = createSortable(props.index);
   const groupIds = () => uniqueCourseIds(parseCourseGroup(props.id()));
   const selectedIds = () => new Set(groupIds());
   const getRelatedCourseId = (value: string) => {
@@ -123,7 +126,26 @@ export const CourseIdRow: Component<CourseIdRowProps> = (props) => {
   };
 
   return (
-    <div class="flex items-start gap-2">
+    <div
+      ref={!isPlaceholderRow() ? sortable.ref : undefined}
+      class="flex items-start gap-2"
+      classList={{
+        "opacity-50": !isPlaceholderRow() && sortable.isActiveDraggable,
+        "transition-transform": !isPlaceholderRow() && !sortable.isActiveDraggable,
+      }}
+      style={!isPlaceholderRow() ? transformStyle(sortable.transform) : undefined}
+    >
+      {/* ドラッグハンドル */}
+      <Show when={!isPlaceholderRow()} fallback={<div class="w-4" />}>
+        <div
+          {...sortable.dragActivators}
+          class="mt-2.5 cursor-grab text-muted-foreground hover:text-foreground active:cursor-grabbing"
+        >
+          <GripVertical class="size-4" />
+        </div>
+      </Show>
+
+      {/* 既存の入力フィールド */}
       <div class="flex-1 space-y-1">
         {(() => {
           let blurTarget: HTMLDivElement | undefined;
@@ -179,6 +201,8 @@ export const CourseIdRow: Component<CourseIdRowProps> = (props) => {
           );
         })()}
       </div>
+
+      {/* 削除ボタン */}
       <Show when={!isPlaceholderRow()}>
         <Button
           type="button"
