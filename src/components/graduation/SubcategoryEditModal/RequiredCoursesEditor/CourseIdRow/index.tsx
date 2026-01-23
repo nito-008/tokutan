@@ -31,7 +31,6 @@ interface CourseIdRowProps {
   totalCount: number;
   onUpdateCourseId: (index: number, value: string) => void;
   onRemoveCourseId: (index: number) => void;
-  onFinishEditing: () => void;
 }
 
 // 1行の高さ（Input高さ40px + space-y-2ギャップ8px）
@@ -117,7 +116,6 @@ export const CourseIdRow: Component<CourseIdRowProps> = (props) => {
     }
     setHasActiveSearch(false);
     props.onUpdateCourseId(props.index, normalizeCourseGroup(value));
-    props.onFinishEditing();
   };
 
   const toggleSuggestionSelect = (course: Course) => {
