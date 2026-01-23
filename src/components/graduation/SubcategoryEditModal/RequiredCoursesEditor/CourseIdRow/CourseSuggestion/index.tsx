@@ -26,7 +26,7 @@ export const CourseSuggestionDropdown: Component<CourseSuggestionDropdownProps> 
         <div class="divide-y">
           <For each={props.suggestions()}>
             {(course) => (
-              <Tooltip openDelay={300}>
+              <Tooltip openDelay={300} placement="right" gutter={8} flip="left" overflowPadding={8}>
                 <TooltipTrigger as="div" class="block w-full">
                   <button
                     type="button"
@@ -53,12 +53,13 @@ export const CourseSuggestionDropdown: Component<CourseSuggestionDropdownProps> 
                     </div>
                   </button>
                 </TooltipTrigger>
-                <TooltipContent class="w-72 space-y-1.5 p-3">
-                  <div>
-                    <span class="text-muted-foreground">担当:</span> {course.instructor}
+                <TooltipContent class="w-72 space-y-2 p-3">
+                  <div class="text-sm font-semibold text-foreground">{course.name}</div>
+                  <div class="text-xs text-muted-foreground">
+                    {course.id} / {course.semester} {course.schedule} / {course.credits}単位
                   </div>
                   <div>
-                    <span class="text-muted-foreground">授業方法:</span> {course.method}
+                    <span class="text-muted-foreground">担当:</span> {course.instructor}
                   </div>
                   <div>
                     <span class="text-muted-foreground">標準履修年次:</span> {course.gradeYear}年
