@@ -60,7 +60,10 @@ export const CourseIdRow: Component<CourseIdRowProps> = (props) => {
   const groupIds = () => uniqueCourseIds(parseCourseGroup(props.id()));
   const selectedIds = () => new Set(groupIds());
   const getRelatedCourseId = (value: string) => {
-    if (!value.includes(",")) return undefined;
+    if (!value.includes(",")) {
+      const trimmed = value.trim();
+      return trimmed || undefined;
+    }
     const [firstToken] = value.split(",");
     const trimmed = firstToken?.trim();
     return trimmed || undefined;
