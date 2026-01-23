@@ -1,6 +1,7 @@
 import { Check } from "lucide-solid";
 import { type Accessor, type Component, For, Show } from "solid-js";
 import { PopoverContent } from "~/components/ui/popover";
+import { Tooltip, TooltipContent, TooltipTrigger } from "~/components/ui/tooltip";
 import type { Course } from "~/lib/types";
 
 interface CourseSuggestionDropdownProps {
@@ -25,30 +26,57 @@ export const CourseSuggestionDropdown: Component<CourseSuggestionDropdownProps> 
         <div class="divide-y">
           <For each={props.suggestions()}>
             {(course) => (
-              <button
-                type="button"
-                class="w-full px-3 py-2 text-left hover:bg-muted"
-                classList={{
-                  "bg-muted": props.selectedIds().has(course.id),
-                }}
-                onMouseDown={(e) => {
-                  e.preventDefault();
-                  props.onSelect(course);
-                }}
-              >
-                <div class="flex items-center justify-between">
-                  <span class="text-sm font-medium">{course.name}</span>
-                  <span class="text-xs text-muted-foreground">
-                    <Show when={props.selectedIds().has(course.id)}>
-                      <Check class="mr-1 inline-block size-4 text-primary" />
-                    </Show>
-                    {course.credits}単位
-                  </span>
-                </div>
-                <div class="text-xs text-muted-foreground">
-                  {course.id} / {course.semester} {course.schedule}
-                </div>
-              </button>
+              <Tooltip openDelay={300}>
+                <TooltipTrigger>
+                  <button
+                    type="button"
+                    class="w-full px-3 py-2 text-left hover:bg-muted"
+                    classList={{
+                      "bg-muted": props.selectedIds().has(course.id),
+                    }}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      props.onSelect(course);
+                    }}
+                  >
+                    <div class="flex items-center justify-between">
+                      <span class="text-sm font-medium">{course.name}</span>
+                      <span class="text-xs text-muted-foreground">
+                        <Show when={props.selectedIds().has(course.id)}>
+                          <Check class="mr-1 inline-block size-4 text-primary" />
+                        </Show>
+                        {course.credits}単位
+                      </span>
+                    </div>
+                    <div class="text-xs text-muted-foreground">
+                      {course.id} / {course.semester} {course.schedule}
+                    </div>
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent class="w-72 space-y-1.5 p-3">
+                  <div>
+                    <span class="text-muted-foreground">担当:</span> {course.instructor}
+                  </div>
+                  <div>
+                    <span class="text-muted-foreground">授業方法:</span> {course.method}
+                  </div>
+                  <div>
+                    <span class="text-muted-foreground">標準履修年次:</span> {course.gradeYear}年
+                  </div>
+                  <Show when={course.description}>
+                    <div>
+                      <span class="text-muted-foreground">概要:</span>
+                      <p class="line-clamp-3">{course.description}</p>
+                    </div>
+                  </Show>
+                  <Show when={course.notes}>
+                    <div>
+                      <span class="text-muted-foreground">備考:</span>
+                      <p class="line-clamp-2">{course.notes}</p>
+                    </div>
+                  </Show>
+                </TooltipContent>
+              </Tooltip>
             )}
           </For>
         </div>
