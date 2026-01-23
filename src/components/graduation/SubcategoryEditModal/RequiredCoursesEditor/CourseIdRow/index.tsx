@@ -239,7 +239,7 @@ export const CourseIdRow: Component<CourseIdRowProps> = (props) => {
       </div>
 
       {/* 削除ボタン */}
-      <Show when={!isPlaceholderRow()}>
+      <Show when={!isPlaceholderRow()} fallback={<div class="w-10" />}>
         <Button
           type="button"
           variant="ghost"
