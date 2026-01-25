@@ -16,10 +16,15 @@ interface RequiredCoursesEditorProps {
 }
 
 export const RequiredCoursesEditor: Component<RequiredCoursesEditorProps> = (props) => {
+  // プレースホルダーを除いたデータ行
+  const dataRows = () => {
+    const ids = props.courseIds();
+    return ids.slice(0, -1); // 最後の空文字列（プレースホルダー）を除外
+  };
+
   // ソート対象のID（プレースホルダー除外）
   const sortableIds = () => {
-    const ids = props.courseIds();
-    return ids.length > 1 ? ids.slice(0, -1).map((_, i) => String(i)) : [];
+    return dataRows().map((_, i) => String(i));
   };
 
   // ドラッグ終了時の並べ替え処理
@@ -56,17 +61,27 @@ export const RequiredCoursesEditor: Component<RequiredCoursesEditorProps> = (pro
         <DragDropSensors />
         <SortableProvider ids={sortableIds()}>
           <div class="space-y-2">
-            <Index each={props.courseIds()}>
+            {/* データ行（ドラッグ可能） */}
+            <Index each={dataRows()}>
               {(id, index) => (
                 <CourseIdRow
                   id={id}
                   index={index}
-                  totalCount={props.courseIds().length}
+                  totalCount={dataRows().length}
                   onUpdateCourseId={handleUpdateCourseId}
                   onRemoveCourseId={handleRemoveCourseId}
                 />
               )}
             </Index>
+            {/* プレースホルダー行（ドラッグ不可） */}
+            <CourseIdRow
+              id={() => ""}
+              index={dataRows().length}
+              totalCount={dataRows().length + 1}
+              isPlaceholder={true}
+              onUpdateCourseId={handleUpdateCourseId}
+              onRemoveCourseId={handleRemoveCourseId}
+            />
           </div>
         </SortableProvider>
       </DragDropProvider>
