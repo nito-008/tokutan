@@ -3,8 +3,8 @@ import { Input } from "~/components/ui/input";
 import { Popover, PopoverAnchor } from "~/components/ui/popover";
 import { getCoursesByIds } from "~/lib/db/kdb";
 import type { Course } from "~/lib/types";
-import { CourseSuggestionDropdown } from "../../../../RequiredCoursesEditor/CourseIdRow/CourseSuggestion";
-import { useSuggestionSearch } from "../../../../RequiredCoursesEditor/CourseIdRow/CourseSuggestion/useSuggestionSearch";
+import { CourseSuggestionDropdown } from "../../../../../RequiredCoursesEditor/CourseIdRow/CourseSuggestion";
+import { useSuggestionSearch } from "../../../../../RequiredCoursesEditor/CourseIdRow/CourseSuggestion/useSuggestionSearch";
 import {
   dropSearchToken,
   extractSuggestionToken,
@@ -13,14 +13,14 @@ import {
   normalizeCourseGroup,
   parseCourseGroup,
   uniqueCourseIds,
-} from "../../../../utils/courseGroup";
+} from "../../../../../utils/courseGroup";
 
-interface SelectionCoursesEditorProps {
+interface CourseIdsInputProps {
   courseIds: string[];
   onUpdate: (courseIds: string[]) => void;
 }
 
-export const SelectionCoursesEditor: Component<SelectionCoursesEditorProps> = (props) => {
+export const CourseIdsInput: Component<CourseIdsInputProps> = (props) => {
   const [courseNames, setCourseNames] = createSignal<Map<string, string>>(new Map());
   const [isCourseLookupLoading, setIsCourseLookupLoading] = createSignal(false);
   const [isFocused, setIsFocused] = createSignal(false);

@@ -17,8 +17,8 @@ import {
   SelectValue,
 } from "~/components/ui/select";
 import type { RequirementGroup, RequirementSubcategory } from "~/lib/types";
-import { GroupsSection } from "./GroupsSection";
 import { RequiredCoursesEditor } from "./RequiredCoursesEditor";
+import { SelectionCoursesEditor } from "./SelectionCoursesEditor";
 import { normalizeCourseGroup, normalizeCourseIds } from "./utils/courseGroup";
 
 interface SubcategoryEditModalProps {
@@ -162,37 +162,14 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
           </Show>
 
           <Show when={type() !== "required"}>
-            <div class="grid grid-cols-2 gap-4">
-              <div class="space-y-2">
-                <Label for="sub-min-credits">最小単位数</Label>
-                <Input
-                  id="sub-min-credits"
-                  type="number"
-                  min="0"
-                  value={minCredits()}
-                  onInput={(e) => {
-                    const val = e.currentTarget.value;
-                    setMinCredits(val ? Number.parseInt(val, 10) : 0);
-                  }}
-                />
-              </div>
-
-              <div class="space-y-2">
-                <Label for="sub-max-credits">最大単位数</Label>
-                <Input
-                  id="sub-max-credits"
-                  type="number"
-                  min="0"
-                  value={maxCredits() ?? ""}
-                  onInput={(e) => {
-                    const val = e.currentTarget.value;
-                    setMaxCredits(val ? Number.parseInt(val, 10) : undefined);
-                  }}
-                />
-              </div>
-            </div>
-
-            <GroupsSection groups={groups} setGroups={setGroups} />
+            <SelectionCoursesEditor
+              minCredits={minCredits}
+              setMinCredits={setMinCredits}
+              maxCredits={maxCredits}
+              setMaxCredits={setMaxCredits}
+              groups={groups}
+              setGroups={setGroups}
+            />
           </Show>
         </div>
 

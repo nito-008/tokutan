@@ -3,7 +3,7 @@ import { type Component, type JSX, Show } from "solid-js";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import type { GroupRule } from "~/lib/types";
-import { SelectionCoursesEditor } from "../SelectionCoursesEditor";
+import { CourseIdsInput } from "../CourseIdsInput";
 
 interface RuleRowProps {
   rule: GroupRule;
@@ -55,7 +55,7 @@ export const RuleRow: Component<RuleRowProps> = (props) => {
             />
           }
         >
-          <SelectionCoursesEditor
+          <CourseIdsInput
             courseIds={(props.rule as Extract<GroupRule, { type: "specific" }>).courseIds}
             onUpdate={(courseIds) => props.onUpdate({ courseIds } satisfies Partial<GroupRule>)}
           />
