@@ -1,4 +1,4 @@
-import { Circle, CircleCheck, Pencil } from "lucide-solid";
+import { Circle, CircleCheck, Pencil, Plus } from "lucide-solid";
 import { type Component, createSignal, For, Show } from "solid-js";
 import {
   Accordion,
@@ -35,6 +35,7 @@ export const RequirementTree: Component<RequirementTreeProps> = (props) => {
     categoryId: string;
     subcategory: RequirementSubcategory;
   } | null>(null);
+  const [addingSubcategoryFor, setAddingSubcategoryFor] = createSignal<string | null>(null);
 
   const findCategory = (categoryId: string): RequirementCategory | undefined => {
     return props.requirements?.categories.find((c) => c.id === categoryId);
@@ -94,6 +95,16 @@ export const RequirementTree: Component<RequirementTreeProps> = (props) => {
                       )}
                     </For>
                   </Accordion>
+                  <Show when={props.editMode && props.requirements && props.onSubcategoryUpdate}>
+                    <button
+                      type="button"
+                      class="flex items-center gap-2 w-full p-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded mt-2"
+                      onClick={() => setAddingSubcategoryFor(category.categoryId)}
+                    >
+                      <Plus class="size-4" />
+                      サブカテゴリを追加
+                    </button>
+                  </Show>
                 </div>
               </AccordionContent>
             </AccordionItem>
@@ -102,11 +113,12 @@ export const RequirementTree: Component<RequirementTreeProps> = (props) => {
       </Accordion>
 
       <SubcategoryEditModal
-        open={!!editingSubcategory()}
+        open={!!editingSubcategory() || !!addingSubcategoryFor()}
         subcategory={editingSubcategory()?.subcategory ?? null}
-        categoryId={editingSubcategory()?.categoryId ?? ""}
+        categoryId={editingSubcategory()?.categoryId ?? addingSubcategoryFor() ?? ""}
         onClose={() => {
           setEditingSubcategory(null);
+          setAddingSubcategoryFor(null);
         }}
         onDelete={props.onSubcategoryDelete}
         onSave={handleSubcategorySave}
