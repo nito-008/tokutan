@@ -82,7 +82,7 @@ export const RuleRow: Component<RuleRowProps> = (props) => {
                   onInput={(e) =>
                     props.onUpdate({ prefix: e.currentTarget.value } satisfies Partial<GroupRule>)
                   }
-                  placeholder="prefix (?: FG)"
+                  placeholder="科目の最初の文字列 (例: FG)"
                 />
               }
             >
@@ -93,7 +93,7 @@ export const RuleRow: Component<RuleRowProps> = (props) => {
                   const value = e.currentTarget.value.trim();
                   props.onUpdate({ courseIds: value ? [value] : [] } satisfies Partial<GroupRule>);
                 }}
-                placeholder="???? (?: FG10101)"
+                placeholder="除外科目 (例: FG10101)"
               />
             </Show>
           }
