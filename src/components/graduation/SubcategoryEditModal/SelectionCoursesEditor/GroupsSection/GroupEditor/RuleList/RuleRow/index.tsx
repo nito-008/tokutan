@@ -9,6 +9,8 @@ interface RuleRowProps {
   rule: GroupRule;
   onUpdate: (updates: Partial<GroupRule>) => void;
   onRemove: () => void;
+  index: number;
+  sortableCount: number;
   sortableRef?: (el: HTMLElement) => void;
   sortableTransform?: { x: number; y: number } | null;
   isActiveDraggable?: boolean;
@@ -16,6 +18,15 @@ interface RuleRowProps {
 }
 
 const ruleTypeLabel = (rule: GroupRule) => (rule.type === "specific" ? "特定科目" : "で始まる科目");
+const ROW_HEIGHT = 56;
+
+const clampY = (y: number, currentIndex: number, sortableCount: number): number => {
+  const minY = -currentIndex * ROW_HEIGHT;
+  const maxY = (sortableCount - 1 - currentIndex) * ROW_HEIGHT;
+  return Math.max(minY, Math.min(maxY, y));
+};
+
+const clampX = (x: number): number => Math.max(0, Math.min(0, x));
 
 export const RuleRow: Component<RuleRowProps> = (props) => {
   return (
@@ -29,7 +40,15 @@ export const RuleRow: Component<RuleRowProps> = (props) => {
       style={
         props.sortableTransform
           ? {
-              transform: `translate3d(${props.sortableTransform.x}px, ${props.sortableTransform.y}px, 0)`,
+              transform: `translate3d(${
+                props.isActiveDraggable
+                  ? clampX(props.sortableTransform.x)
+                  : props.sortableTransform.x
+              }px, ${
+                props.isActiveDraggable
+                  ? clampY(props.sortableTransform.y, props.index, props.sortableCount)
+                  : props.sortableTransform.y
+              }px, 0)`,
             }
           : undefined
       }

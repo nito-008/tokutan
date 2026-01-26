@@ -38,6 +38,7 @@ export const RuleList: Component<RuleListProps> = (props) => {
               <SortableRuleRow
                 rule={rule}
                 index={index()}
+                sortableCount={sortableIds().length}
                 onUpdate={(updates) => props.onUpdateRule(index(), updates)}
                 onRemove={() => props.onRemoveRule(index())}
               />

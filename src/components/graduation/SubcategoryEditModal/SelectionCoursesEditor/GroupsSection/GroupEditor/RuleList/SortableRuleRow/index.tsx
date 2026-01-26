@@ -6,6 +6,7 @@ import { RuleRow } from "../RuleRow";
 interface SortableRuleRowProps {
   rule: GroupRule;
   index: number;
+  sortableCount: number;
   onUpdate: (updates: Partial<GroupRule>) => void;
   onRemove: () => void;
 }
@@ -16,6 +17,8 @@ export const SortableRuleRow: Component<SortableRuleRowProps> = (props) => {
   return (
     <RuleRow
       rule={props.rule}
+      index={props.index}
+      sortableCount={props.sortableCount}
       onUpdate={props.onUpdate}
       onRemove={props.onRemove}
       sortableRef={sortable.ref}
