@@ -268,6 +268,18 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
                     </div>
                   )}
                 </For>
+                {/* 未取得の凡例アイテム */}
+                <Show
+                  when={(status()?.totalRequiredCredits ?? 0) > (status()?.totalEarnedCredits ?? 0)}
+                >
+                  <div class="flex items-center gap-2 text-sm">
+                    <div class="w-3 h-3 rounded" style={{ "background-color": "#e5e7eb" }} />
+                    <span>未取得</span>
+                    <span class="ml-auto text-muted-foreground">
+                      {(status()?.totalRequiredCredits ?? 0) - (status()?.totalEarnedCredits ?? 0)}
+                    </span>
+                  </div>
+                </Show>
               </div>
             </CardContent>
           </Card>

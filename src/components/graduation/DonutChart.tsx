@@ -19,10 +19,10 @@ interface DonutChartProps {
 }
 
 const categoryColors: Record<string, string> = {
-  専門科目: "#3b82f6",
-  専門基礎科目: "#8b5cf6",
-  共通科目: "#22c55e",
-  基礎科目: "#f97316",
+  専門科目: "#0284c7", // sky-600 (濃い水色)
+  専門基礎科目: "#0ea5e9", // sky-500 (水色)
+  共通科目: "#38bdf8", // sky-400 (明るい水色)
+  基礎科目: "#7dd3fc", // sky-300 (薄い水色)
 };
 
 export const DonutChart: Component<DonutChartProps> = (props) => {
@@ -33,6 +33,14 @@ export const DonutChart: Component<DonutChartProps> = (props) => {
     const labels = props.categoryStatuses.map((c) => c.categoryName);
     const data = props.categoryStatuses.map((c) => c.earnedCredits);
     const colors = props.categoryStatuses.map((c) => categoryColors[c.categoryName] || "#94a3b8");
+
+    // 未取得分を計算して追加
+    const remaining = Math.max(0, props.totalRequired - props.totalEarned);
+    if (remaining > 0) {
+      labels.push("未取得");
+      data.push(remaining);
+      colors.push("#e5e7eb"); // gray-200
+    }
 
     return {
       type: "doughnut",
@@ -58,6 +66,10 @@ export const DonutChart: Component<DonutChartProps> = (props) => {
           tooltip: {
             callbacks: {
               label: (context) => {
+                // 未取得セグメントの場合
+                if (context.dataIndex >= props.categoryStatuses.length) {
+                  return `未取得: ${context.raw}単位`;
+                }
                 const category = props.categoryStatuses[context.dataIndex];
                 return `${context.label}: ${category.earnedCredits}/${category.requiredCredits}単位`;
               },
@@ -102,5 +114,5 @@ export const DonutChart: Component<DonutChartProps> = (props) => {
 };
 
 export function getCategoryColor(name: string): string {
-  return categoryColors[name] || "#94a3b8";
+  return categoryColors[name] || "#bae6fd"; // sky-200
 }
