@@ -1,4 +1,4 @@
-import type { GraduationRequirements } from "~/lib/types";
+﻿import type { GraduationRequirements } from "~/lib/types";
 
 export const defaultRequirements: GraduationRequirements = {
   id: "esys-2024",
@@ -8,8 +8,8 @@ export const defaultRequirements: GraduationRequirements = {
   totalCredits: 125,
   version: "1.0.0",
   isDefault: true,
-  createdAt: new Date().toISOString(),
-  updatedAt: new Date().toISOString(),
+  createdAt: "2026-01-26T19:29:51.029Z",
+  updatedAt: "2026-01-26T21:15:50.470Z",
   categories: [
     {
       id: "specialized",
@@ -30,11 +30,122 @@ export const defaultRequirements: GraduationRequirements = {
           groups: [
             {
               id: "fg-ff-gb-group",
+              minCredits: 6,
+              rules: [
+                {
+                  id: "fg-prefix",
+                  type: "prefix",
+                  prefix: "FG11",
+                },
+                {
+                  id: "ff-prefix",
+                  type: "prefix",
+                  prefix: "FG21",
+                },
+              ],
+            },
+            {
+              id: "group-1769460882009",
+              minCredits: 1,
+              rules: [
+                {
+                  id: "rule-1769460893189",
+                  type: "prefix",
+                  prefix: "FG12",
+                },
+                {
+                  id: "rule-1769460893869",
+                  type: "prefix",
+                  prefix: "FG22",
+                },
+              ],
+            },
+            {
+              id: "group-1769460901959",
+              minCredits: 1,
+              rules: [
+                {
+                  id: "rule-1769460906269",
+                  type: "prefix",
+                  prefix: "FG13",
+                },
+                {
+                  id: "rule-1769460910639",
+                  type: "prefix",
+                  prefix: "FG23",
+                },
+              ],
+            },
+            {
+              id: "group-1769460916548",
+              minCredits: 16,
+              rules: [
+                {
+                  id: "rule-1769460922138",
+                  type: "prefix",
+                  prefix: "FG17",
+                },
+                {
+                  id: "rule-1769460925348",
+                  type: "prefix",
+                  prefix: "FG24",
+                },
+                {
+                  id: "rule-1769460928658",
+                  type: "prefix",
+                  prefix: "FG25",
+                },
+              ],
+            },
+            {
+              id: "group-1769460932698",
               minCredits: 0,
               rules: [
-                { id: "fg-prefix", type: "prefix", prefix: "FG" },
-                { id: "ff-prefix", type: "prefix", prefix: "FF" },
-                { id: "gb-prefix", type: "prefix", prefix: "GB" },
+                {
+                  id: "rule-1769460953608",
+                  type: "prefix",
+                  prefix: "FG",
+                },
+                {
+                  id: "rule-1769460957198",
+                  type: "prefix",
+                  prefix: "FF2",
+                },
+                {
+                  id: "rule-1769460960898",
+                  type: "prefix",
+                  prefix: "FF3",
+                },
+                {
+                  id: "rule-1769460964588",
+                  type: "prefix",
+                  prefix: "FF4",
+                },
+                {
+                  id: "rule-1769460968548",
+                  type: "prefix",
+                  prefix: "FF5",
+                },
+                {
+                  id: "rule-1769460971497",
+                  type: "prefix",
+                  prefix: "GB2",
+                },
+                {
+                  id: "rule-1769460980217",
+                  type: "prefix",
+                  prefix: "GB3",
+                },
+                {
+                  id: "rule-1769460984007",
+                  type: "prefix",
+                  prefix: "GB4",
+                },
+                {
+                  id: "rule-1769460987887",
+                  type: "prefix",
+                  prefix: "FA00",
+                },
               ],
             },
           ],
@@ -79,92 +190,50 @@ export const defaultRequirements: GraduationRequirements = {
             "FG10904",
           ],
         },
+        {
+          id: "subcat-1769461527016",
+          name: "選択科目",
+          type: "elective",
+          minCredits: 0,
+          groups: [],
+        },
       ],
     },
     {
       id: "common",
-      name: "共通科目",
+      name: "基礎科目共通科目",
       subcategories: [
         {
-          id: "common-fys",
-          name: "総合科目（FYS、学問への誘い）",
+          id: "subcat-1769461547235",
+          name: "必修科目",
           type: "required",
-          courseIds: ["1116302", "1227491"],
+          courseIds: [],
         },
         {
-          id: "common-bachelor",
-          name: "総合科目（学士基礎科目）",
-          type: "elective",
-          minCredits: 1,
-          maxCredits: 3,
-          groups: [],
-        },
-        {
-          id: "common-pe",
-          name: "体育",
-          type: "elective",
-          minCredits: 3,
-          groups: [
-            {
-              id: "pe-group",
-              minCredits: 0,
-              rules: [{ id: "pe", type: "prefix", prefix: "21" }],
-            },
-          ],
-        },
-        {
-          id: "common-english",
-          name: "第1外国語（英語）",
-          type: "elective",
-          minCredits: 4,
-          groups: [
-            {
-              id: "english-group",
-              minCredits: 0,
-              rules: [{ id: "english", type: "prefix", prefix: "31" }],
-            },
-          ],
-        },
-        {
-          id: "common-second",
-          name: "第2外国語（初修外国語）",
+          id: "subcat-1769461553835",
+          name: "選択科目",
           type: "elective",
           minCredits: 0,
-          maxCredits: 4,
-          groups: [
-            {
-              id: "second-lang-group",
-              minCredits: 0,
-              rules: [{ id: "second-lang", type: "prefix", prefix: "34" }],
-            },
-          ],
+          groups: [],
         },
       ],
     },
     {
       id: "basic",
-      name: "基礎科目",
+      name: "基礎科目関連科目",
       subcategories: [
         {
-          id: "basic-other",
-          name: "他学群又は他学類の授業科目",
+          id: "subcat-1769461564785",
+          name: "必修科目",
+          type: "required",
+          courseIds: [],
+        },
+        {
+          id: "subcat-1769461571505",
+          name: "選択科目",
           type: "elective",
-          minCredits: 6,
-          maxCredits: 15,
-          groups: [
-            {
-              id: "other-dept-group",
-              minCredits: 0,
-              rules: [
-                { id: "gb-prefix", type: "prefix", prefix: "GB" },
-                { id: "gc-prefix", type: "prefix", prefix: "GC" },
-                { id: "ga-prefix", type: "prefix", prefix: "GA" },
-                { id: "ge-prefix", type: "prefix", prefix: "GE" },
-                { id: "bc-prefix", type: "prefix", prefix: "BC" },
-              ],
-            },
-          ],
-          notes: "情報学群、他学類の科目",
+          minCredits: 0,
+          groups: [],
         },
       ],
     },
