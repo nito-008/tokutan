@@ -5,7 +5,7 @@ import {
   type DragEvent,
   SortableProvider,
 } from "@thisbeyond/solid-dnd";
-import { type Accessor, type Component, Index, type Setter, Show } from "solid-js";
+import { type Accessor, type Component, For, type Setter, Show } from "solid-js";
 import { Label } from "~/components/ui/label";
 import { normalizeCourseIds } from "../utils/courseGroup";
 import { CourseIdRowContent } from "./CourseIdRow/CourseIdRowContent";
@@ -20,15 +20,17 @@ export const RequiredCoursesEditor: Component<RequiredCoursesEditorProps> = (pro
   // ソート対象のID（プレースホルダー除外）
   const sortableIds = () => {
     const ids = props.courseIds();
-    return ids.length > 1 ? ids.slice(0, -1).map((_, i) => String(i)) : [];
+    return ids.length > 1 ? ids.slice(0, -1) : [];
   };
 
   // ドラッグ終了時の並べ替え処理
   const handleDragEnd = (event: DragEvent) => {
     const { draggable, droppable } = event;
     if (!draggable || !droppable) return;
-    const fromIndex = Number(draggable.id);
-    const toIndex = Number(droppable.id);
+    const ids = props.courseIds();
+    const fromIndex = ids.findIndex((id) => id === String(draggable.id));
+    const toIndex = ids.findIndex((id) => id === String(droppable.id));
+    if (fromIndex < 0 || toIndex < 0) return;
     if (fromIndex !== toIndex) {
       props.setCourseIds((prev) => {
         const items = [...prev];
@@ -57,16 +59,16 @@ export const RequiredCoursesEditor: Component<RequiredCoursesEditorProps> = (pro
         <DragDropSensors />
         <SortableProvider ids={sortableIds()}>
           <div class="space-y-2">
-            <Index each={props.courseIds()}>
+            <For each={props.courseIds()}>
               {(id, index) => {
-                const isPlaceholder = () => index === props.courseIds().length - 1;
+                const isPlaceholder = () => index() === props.courseIds().length - 1;
                 return (
                   <Show
                     when={!isPlaceholder()}
                     fallback={
                       <CourseIdRowContent
                         id={id}
-                        index={index}
+                        index={index()}
                         isPlaceholder={true}
                         onUpdateCourseId={handleUpdateCourseId}
                         onRemoveCourseId={handleRemoveCourseId}
@@ -75,7 +77,7 @@ export const RequiredCoursesEditor: Component<RequiredCoursesEditorProps> = (pro
                   >
                     <SortableCourseIdRow
                       id={id}
-                      index={index}
+                      index={index()}
                       sortableCount={sortableIds().length}
                       onUpdateCourseId={handleUpdateCourseId}
                       onRemoveCourseId={handleRemoveCourseId}
@@ -83,7 +85,7 @@ export const RequiredCoursesEditor: Component<RequiredCoursesEditorProps> = (pro
                   </Show>
                 );
               }}
-            </Index>
+            </For>
           </div>
         </SortableProvider>
       </DragDropProvider>

@@ -1,9 +1,9 @@
 import { createSortable } from "@thisbeyond/solid-dnd";
-import type { Accessor, Component } from "solid-js";
+import type { Component } from "solid-js";
 import { CourseIdRowContent } from "../CourseIdRowContent";
 
 interface SortableCourseIdRowProps {
-  id: Accessor<string>;
+  id: string;
   index: number;
   sortableCount: number;
   onUpdateCourseId: (index: number, value: string) => void;
@@ -11,7 +11,7 @@ interface SortableCourseIdRowProps {
 }
 
 export const SortableCourseIdRow: Component<SortableCourseIdRowProps> = (props) => {
-  const sortable = createSortable(String(props.index));
+  const sortable = createSortable(props.id);
 
   return (
     <CourseIdRowContent

@@ -26,7 +26,7 @@ import { CourseSuggestionDropdown } from "../CourseSuggestion";
 import { useSuggestionSearch } from "../CourseSuggestion/useSuggestionSearch";
 
 export interface CourseIdRowContentProps {
-  id: Accessor<string>;
+  id: string;
   index: number;
   isPlaceholder: boolean;
   onUpdateCourseId: (index: number, value: string) => void;
@@ -57,12 +57,12 @@ export const CourseIdRowContent: Component<CourseIdRowContentProps> = (props) =>
   const [isCourseLookupLoading, setIsCourseLookupLoading] = createSignal(false);
   const [isFocused, setIsFocused] = createSignal(false);
   const [hasActiveSearch, setHasActiveSearch] = createSignal(false);
-  const [localValue, setLocalValue] = createSignal(props.id());
+  const [localValue, setLocalValue] = createSignal(props.id);
 
   // フォーカス外の時のみ親の値をローカルに同期
   createEffect(() => {
     if (!isFocused()) {
-      setLocalValue(props.id());
+      setLocalValue(props.id);
     }
   });
 
@@ -229,9 +229,9 @@ export const CourseIdRowContent: Component<CourseIdRowContentProps> = (props) =>
                       }`}
                     >
                       {isMissingCourse()
-                        ? `${props.id()}（科目が見つかりません）`
+                        ? `${props.id}（科目が見つかりません）`
                         : formatCourseGroupLabel(
-                            props.id(),
+                            props.id,
                             requiredCourseNames(),
                             isCourseLookupLoading(),
                           )}
