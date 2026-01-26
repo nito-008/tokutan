@@ -1,10 +1,10 @@
 import { Plus, Trash2 } from "lucide-solid";
-import { type Component, For } from "solid-js";
+import type { Component } from "solid-js";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import type { GroupRule, RequirementGroup } from "~/lib/types";
-import { RuleEditor } from "./RuleEditor";
+import { RuleList } from "./RuleList";
 
 interface GroupEditorProps {
   group: RequirementGroup;
@@ -17,24 +17,32 @@ export const GroupEditor: Component<GroupEditorProps> = (props) => {
     const newRules = props.group.rules.map((rule, i) => {
       if (i !== index) return rule;
       const merged = { ...rule, ...updates };
-      // 型の整合性を保証する
-      if (merged.type === "specific") {
+      if (rule.type === "specific") {
         return {
-          id: merged.id,
+          id: rule.id,
           type: "specific",
-          courseIds: "courseIds" in merged ? (merged.courseIds as string[]) : [],
+          courseIds: "courseIds" in merged ? (merged.courseIds as string[]) : rule.courseIds,
         } satisfies GroupRule;
       }
       return {
-        id: merged.id,
+        id: rule.id,
         type: "prefix",
-        prefix: "prefix" in merged ? (merged.prefix as string) : "",
+        prefix: "prefix" in merged ? (merged.prefix as string) : rule.prefix,
       } satisfies GroupRule;
     });
     props.onUpdate({ rules: newRules });
   };
 
-  const addRule = () => {
+  const addSpecificRule = () => {
+    const newRule: GroupRule = {
+      id: `rule-${Date.now()}`,
+      type: "specific",
+      courseIds: [],
+    };
+    props.onUpdate({ rules: [...props.group.rules, newRule] });
+  };
+
+  const addPrefixRule = () => {
     const newRule: GroupRule = {
       id: `rule-${Date.now()}`,
       type: "prefix",
@@ -45,6 +53,14 @@ export const GroupEditor: Component<GroupEditorProps> = (props) => {
 
   const removeRule = (index: number) => {
     props.onUpdate({ rules: props.group.rules.filter((_, i) => i !== index) });
+  };
+
+  const moveRule = (fromIndex: number, toIndex: number) => {
+    if (fromIndex === toIndex) return;
+    const nextRules = [...props.group.rules];
+    const [moved] = nextRules.splice(fromIndex, 1);
+    nextRules.splice(toIndex, 0, moved);
+    props.onUpdate({ rules: nextRules });
   };
 
   return (
@@ -88,21 +104,24 @@ export const GroupEditor: Component<GroupEditorProps> = (props) => {
         </Button>
       </div>
 
-      <div class="space-y-2">
-        <For each={props.group.rules}>
-          {(rule, index) => (
-            <RuleEditor
-              rule={rule}
-              onUpdate={(updates) => updateRule(index(), updates)}
-              onRemove={() => removeRule(index())}
-            />
-          )}
-        </For>
+      <div class="space-y-3">
+        <RuleList
+          rules={props.group.rules}
+          onUpdateRule={updateRule}
+          onRemoveRule={removeRule}
+          onMoveRule={moveRule}
+        />
 
-        <Button variant="ghost" size="sm" onClick={addRule} class="w-full h-8">
-          <Plus class="size-4 mr-1" />
-          ルールを追加
-        </Button>
+        <div class="grid grid-cols-2 gap-2">
+          <Button variant="ghost" size="sm" onClick={addSpecificRule} class="h-8">
+            <Plus class="size-4 mr-1" />
+            特定科目の追加
+          </Button>
+          <Button variant="ghost" size="sm" onClick={addPrefixRule} class="h-8">
+            <Plus class="size-4 mr-1" />
+            ～で始まる科目の追加
+          </Button>
+        </div>
       </div>
     </div>
   );
