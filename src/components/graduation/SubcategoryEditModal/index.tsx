@@ -116,7 +116,10 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
 
   return (
     <Dialog open={props.open} onOpenChange={handleOpenChange}>
-      <DialogContent class="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent
+        class="max-w-2xl max-h-[90vh] overflow-y-auto"
+        onOpenAutoFocus={(e) => e.preventDefault()}
+      >
         <DialogHeader>
           <DialogTitle>
             {props.subcategory
