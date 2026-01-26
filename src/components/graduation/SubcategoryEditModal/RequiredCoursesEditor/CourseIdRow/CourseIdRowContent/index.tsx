@@ -1,10 +1,10 @@
-import { createSortable } from "@thisbeyond/solid-dnd";
 import { GripVertical, Trash2 } from "lucide-solid";
 import {
   type Accessor,
   type Component,
   createEffect,
   createSignal,
+  type JSX,
   onCleanup,
   Show,
 } from "solid-js";
@@ -21,16 +21,22 @@ import {
   normalizeCourseGroup,
   parseCourseGroup,
   uniqueCourseIds,
-} from "../../utils/courseGroup";
-import { CourseSuggestionDropdown } from "./CourseSuggestion";
-import { useSuggestionSearch } from "./CourseSuggestion/useSuggestionSearch";
+} from "../../../utils/courseGroup";
+import { CourseSuggestionDropdown } from "../CourseSuggestion";
+import { useSuggestionSearch } from "../CourseSuggestion/useSuggestionSearch";
 
-interface CourseIdRowProps {
+export interface CourseIdRowContentProps {
   id: Accessor<string>;
   index: number;
-  totalCount: number;
+  isPlaceholder: boolean;
   onUpdateCourseId: (index: number, value: string) => void;
   onRemoveCourseId: (index: number) => void;
+  // sortable関連（非プレースホルダーのみ）
+  sortableRef?: (el: HTMLElement) => void;
+  sortableTransform?: { x: number; y: number } | null;
+  isActiveDraggable?: boolean;
+  dragActivators?: JSX.HTMLAttributes<HTMLElement>;
+  sortableCount?: number;
 }
 
 // 1行の高さ（Input高さ40px + space-y-2ギャップ8px）
@@ -44,7 +50,7 @@ const clampY = (y: number, currentIndex: number, sortableCount: number): number 
   return Math.max(minY, Math.min(maxY, y));
 };
 
-export const CourseIdRow: Component<CourseIdRowProps> = (props) => {
+export const CourseIdRowContent: Component<CourseIdRowContentProps> = (props) => {
   const [requiredCourseNames, setRequiredCourseNames] = createSignal<Map<string, string>>(
     new Map(),
   );
@@ -54,9 +60,6 @@ export const CourseIdRow: Component<CourseIdRowProps> = (props) => {
 
   const suggestionSearch = useSuggestionSearch(isFocused);
 
-  const isPlaceholderRow = () => props.index === props.totalCount - 1;
-  // プレースホルダー以外でSortableを作成
-  const sortable = createSortable(String(props.index));
   const groupIds = () => uniqueCourseIds(parseCourseGroup(props.id()));
   const selectedIds = () => new Set(groupIds());
   const getRelatedCourseId = (value: string) => {
@@ -71,7 +74,7 @@ export const CourseIdRow: Component<CourseIdRowProps> = (props) => {
   const isMissingCourse = () =>
     groupIds().length > 0 &&
     !isFocused() &&
-    !isPlaceholderRow() &&
+    !props.isPlaceholder &&
     !isCourseLookupLoading() &&
     groupIds().some((courseId) => !requiredCourseNames().has(courseId));
 
@@ -142,28 +145,28 @@ export const CourseIdRow: Component<CourseIdRowProps> = (props) => {
 
   return (
     <div
-      ref={!isPlaceholderRow() ? sortable.ref : undefined}
+      ref={props.sortableRef}
       class="flex items-start gap-2"
       classList={{
-        "opacity-50": !isPlaceholderRow() && sortable.isActiveDraggable,
-        "transition-transform": !isPlaceholderRow() && !sortable.isActiveDraggable,
+        "opacity-50": !props.isPlaceholder && props.isActiveDraggable,
+        "transition-transform": !props.isPlaceholder && !props.isActiveDraggable,
       }}
       style={
-        !isPlaceholderRow() && sortable.transform
+        !props.isPlaceholder && props.sortableTransform
           ? {
               transform: `translateY(${
-                sortable.isActiveDraggable
-                  ? clampY(sortable.transform.y, props.index, props.totalCount - 1)
-                  : sortable.transform.y
+                props.isActiveDraggable
+                  ? clampY(props.sortableTransform.y, props.index, props.sortableCount ?? 0)
+                  : props.sortableTransform.y
               }px)`,
             }
           : undefined
       }
     >
       {/* ドラッグハンドル */}
-      <Show when={!isPlaceholderRow()} fallback={<div class="w-4" />}>
+      <Show when={!props.isPlaceholder} fallback={<div class="w-4" />}>
         <div
-          {...sortable.dragActivators}
+          {...(props.dragActivators as unknown as JSX.HTMLAttributes<HTMLDivElement>)}
           class="mt-2.5 cursor-grab text-muted-foreground hover:text-foreground active:cursor-grabbing"
         >
           <GripVertical class="size-4" />
@@ -205,7 +208,7 @@ export const CourseIdRow: Component<CourseIdRowProps> = (props) => {
                         blurTarget?.focus();
                       }
                     }}
-                    placeholder={isPlaceholderRow() ? "科目番号を追加" : "例: FG20204"}
+                    placeholder={props.isPlaceholder ? "科目番号を追加" : "例: FG20204"}
                   />
                   <Show when={groupIds().length > 0 && !isFocused()}>
                     <div
@@ -239,7 +242,7 @@ export const CourseIdRow: Component<CourseIdRowProps> = (props) => {
       </div>
 
       {/* 削除ボタン */}
-      <Show when={!isPlaceholderRow()} fallback={<div class="w-10" />}>
+      <Show when={!props.isPlaceholder} fallback={<div class="w-10" />}>
         <Button
           type="button"
           variant="ghost"

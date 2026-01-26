@@ -5,10 +5,11 @@ import {
   type DragEvent,
   SortableProvider,
 } from "@thisbeyond/solid-dnd";
-import { type Accessor, type Component, Index, type Setter } from "solid-js";
+import { type Accessor, type Component, Index, type Setter, Show } from "solid-js";
 import { Label } from "~/components/ui/label";
 import { normalizeCourseIds } from "../utils/courseGroup";
-import { CourseIdRow } from "./CourseIdRow";
+import { CourseIdRowContent } from "./CourseIdRow/CourseIdRowContent";
+import { SortableCourseIdRow } from "./CourseIdRow/SortableCourseIdRow";
 
 interface RequiredCoursesEditorProps {
   courseIds: Accessor<string[]>;
@@ -57,15 +58,31 @@ export const RequiredCoursesEditor: Component<RequiredCoursesEditorProps> = (pro
         <SortableProvider ids={sortableIds()}>
           <div class="space-y-2">
             <Index each={props.courseIds()}>
-              {(id, index) => (
-                <CourseIdRow
-                  id={id}
-                  index={index}
-                  totalCount={props.courseIds().length}
-                  onUpdateCourseId={handleUpdateCourseId}
-                  onRemoveCourseId={handleRemoveCourseId}
-                />
-              )}
+              {(id, index) => {
+                const isPlaceholder = () => index === props.courseIds().length - 1;
+                return (
+                  <Show
+                    when={!isPlaceholder()}
+                    fallback={
+                      <CourseIdRowContent
+                        id={id}
+                        index={index}
+                        isPlaceholder={true}
+                        onUpdateCourseId={handleUpdateCourseId}
+                        onRemoveCourseId={handleRemoveCourseId}
+                      />
+                    }
+                  >
+                    <SortableCourseIdRow
+                      id={id}
+                      index={index}
+                      sortableCount={sortableIds().length}
+                      onUpdateCourseId={handleUpdateCourseId}
+                      onRemoveCourseId={handleRemoveCourseId}
+                    />
+                  </Show>
+                );
+              }}
             </Index>
           </div>
         </SortableProvider>
