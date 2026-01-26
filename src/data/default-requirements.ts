@@ -146,6 +146,11 @@ export const defaultRequirements: GraduationRequirements = {
                   type: "prefix",
                   prefix: "FA00",
                 },
+                {
+                  id: "rule-1769460999999",
+                  type: "exclude",
+                  courseIds: [],
+                },
               ],
             },
           ],

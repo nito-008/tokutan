@@ -17,7 +17,16 @@ interface RuleRowProps {
   dragActivators?: JSX.HTMLAttributes<HTMLElement>;
 }
 
-const ruleTypeLabel = (rule: GroupRule) => (rule.type === "specific" ? "特定科目" : "で始まる科目");
+const ruleTypeLabel = (rule: GroupRule) => {
+  switch (rule.type) {
+    case "specific":
+      return "特定科目";
+    case "prefix":
+      return "で始まる科目";
+    case "exclude":
+      return "を除外";
+  }
+};
 const ROW_HEIGHT = 56;
 
 const clampY = (y: number, currentIndex: number, sortableCount: number): number => {
@@ -64,14 +73,29 @@ export const RuleRow: Component<RuleRowProps> = (props) => {
         <Show
           when={props.rule.type === "specific"}
           fallback={
-            <Input
-              class="h-8"
-              value={(props.rule as Extract<GroupRule, { type: "prefix" }>).prefix}
-              onInput={(e) =>
-                props.onUpdate({ prefix: e.currentTarget.value } satisfies Partial<GroupRule>)
+            <Show
+              when={props.rule.type === "exclude"}
+              fallback={
+                <Input
+                  class="h-8"
+                  value={(props.rule as Extract<GroupRule, { type: "prefix" }>).prefix}
+                  onInput={(e) =>
+                    props.onUpdate({ prefix: e.currentTarget.value } satisfies Partial<GroupRule>)
+                  }
+                  placeholder="prefix (?: FG)"
+                />
               }
-              placeholder="プレフィックス（例: FG）"
-            />
+            >
+              <Input
+                class="h-8"
+                value={(props.rule as Extract<GroupRule, { type: "exclude" }>).courseIds[0] ?? ""}
+                onInput={(e) => {
+                  const value = e.currentTarget.value.trim();
+                  props.onUpdate({ courseIds: value ? [value] : [] } satisfies Partial<GroupRule>);
+                }}
+                placeholder="???? (?: FG10101)"
+              />
+            </Show>
           }
         >
           <CourseIdsInput

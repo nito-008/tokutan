@@ -51,6 +51,10 @@ export type GroupRule =
   | (GroupRuleBase & {
       type: "prefix";
       prefix: string;
+    })
+  | (GroupRuleBase & {
+      type: "exclude";
+      courseIds: string[];
     });
 
 // 要件グループ

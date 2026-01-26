@@ -24,6 +24,13 @@ export const GroupEditor: Component<GroupEditorProps> = (props) => {
           courseIds: "courseIds" in merged ? (merged.courseIds as string[]) : rule.courseIds,
         } satisfies GroupRule;
       }
+      if (rule.type === "exclude") {
+        return {
+          id: rule.id,
+          type: "exclude",
+          courseIds: "courseIds" in merged ? (merged.courseIds as string[]) : rule.courseIds,
+        } satisfies GroupRule;
+      }
       return {
         id: rule.id,
         type: "prefix",
@@ -47,6 +54,15 @@ export const GroupEditor: Component<GroupEditorProps> = (props) => {
       id: `rule-${Date.now()}`,
       type: "prefix",
       prefix: "",
+    };
+    props.onUpdate({ rules: [...props.group.rules, newRule] });
+  };
+
+  const addExcludeRule = () => {
+    const newRule: GroupRule = {
+      id: `rule-${Date.now()}`,
+      type: "exclude",
+      courseIds: [],
     };
     props.onUpdate({ rules: [...props.group.rules, newRule] });
   };
@@ -111,7 +127,7 @@ export const GroupEditor: Component<GroupEditorProps> = (props) => {
         onMoveRule={moveRule}
       />
 
-      <div class="grid grid-cols-2 gap-2">
+      <div class="grid grid-cols-1 gap-2 sm:grid-cols-3">
         <Button variant="ghost" size="sm" onClick={addSpecificRule} class="h-8">
           <Plus class="size-4 mr-1" />
           特定科目の追加
@@ -119,6 +135,10 @@ export const GroupEditor: Component<GroupEditorProps> = (props) => {
         <Button variant="ghost" size="sm" onClick={addPrefixRule} class="h-8">
           <Plus class="size-4 mr-1" />
           ～で始まる科目の追加
+        </Button>
+        <Button variant="ghost" size="sm" onClick={addExcludeRule} class="h-8">
+          <Plus class="size-4 mr-1" />
+          除外科目の追加
         </Button>
       </div>
     </div>

@@ -261,15 +261,25 @@ function matchCoursesToGroup(
   excludedCourseIds: Set<string>,
 ): MatchedCourse[] {
   const matches: MatchedCourse[] = [];
+  const groupExcludedCourseIds = new Set<string>();
+  for (const rule of group.rules) {
+    if (rule.type !== "exclude") continue;
+    for (const courseId of rule.courseIds) {
+      if (!courseId) continue;
+      groupExcludedCourseIds.add(courseId);
+    }
+  }
 
   for (const course of courses) {
     // 既に使用済みの科目はスキップ
     if (usedCourseIds.has(course.id)) continue;
+    if (groupExcludedCourseIds.has(course.courseId)) continue;
 
     let isMatch = false;
 
     // グループ内のいずれかのルールにマッチするかチェック
     for (const rule of group.rules) {
+      if (rule.type === "exclude") continue;
       if (matchCourseToRule(course, rule, excludedCourseIds)) {
         isMatch = true;
         break;
@@ -299,6 +309,8 @@ function matchCourseToRule(
   excludedCourseIds: Set<string>,
 ): boolean {
   switch (rule.type) {
+    case "exclude":
+      return false;
     case "specific":
       return rule.courseIds.includes(course.courseId);
 
