@@ -116,7 +116,7 @@ export const RequirementTree: Component<RequirementTreeProps> = (props) => {
                   <AccordionTrigger class="hover:no-underline">
                     <div class="flex items-center gap-3 w-full">
                       <Circle class="size-4 text-gray-300" />
-                      <span class="font-medium">{category.categoryName}（該当しない科目）</span>
+                      <span class="font-medium">該当しない科目</span>
                       <span class="text-sm text-muted-foreground ml-auto mr-4">
                         {(category.unmatchedCourses ?? []).length}件
                       </span>
