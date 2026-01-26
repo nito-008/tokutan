@@ -27,18 +27,15 @@ export const defaultRequirements: GraduationRequirements = {
           type: "elective",
           minCredits: 40,
           maxCredits: 49,
-          rules: [
+          groups: [
             {
-              id: "fg-ff-gb",
-              type: "pattern",
-              courseIdPattern: "^(FG|FF|GB)",
-              description: "FG, FF, GBで始まる専門選択科目",
-            },
-            {
-              id: "fg17-24-25",
-              type: "pattern",
-              courseIdPattern: "^FG(17|24|25)",
-              description: "FG17, FG24, FG25で始まる授業科目",
+              id: "fg-ff-gb-group",
+              minCredits: 0,
+              rules: [
+                { id: "fg-prefix", type: "prefix", prefix: "FG" },
+                { id: "ff-prefix", type: "prefix", prefix: "FF" },
+                { id: "gb-prefix", type: "prefix", prefix: "GB" },
+              ],
             },
           ],
         },
@@ -100,19 +97,18 @@ export const defaultRequirements: GraduationRequirements = {
           type: "elective",
           minCredits: 1,
           maxCredits: 3,
-          rules: [],
+          groups: [],
         },
         {
           id: "common-pe",
           name: "体育",
           type: "elective",
           minCredits: 3,
-          rules: [
+          groups: [
             {
-              id: "pe",
-              type: "pattern",
-              courseIdPattern: "^21[0-9]{5}",
-              description: "体育科目",
+              id: "pe-group",
+              minCredits: 0,
+              rules: [{ id: "pe", type: "prefix", prefix: "21" }],
             },
           ],
         },
@@ -121,12 +117,11 @@ export const defaultRequirements: GraduationRequirements = {
           name: "第1外国語（英語）",
           type: "elective",
           minCredits: 4,
-          rules: [
+          groups: [
             {
-              id: "english",
-              type: "pattern",
-              courseIdPattern: "^31[A-Z]{2}",
-              description: "英語科目",
+              id: "english-group",
+              minCredits: 0,
+              rules: [{ id: "english", type: "prefix", prefix: "31" }],
             },
           ],
         },
@@ -136,12 +131,11 @@ export const defaultRequirements: GraduationRequirements = {
           type: "elective",
           minCredits: 0,
           maxCredits: 4,
-          rules: [
+          groups: [
             {
-              id: "second-lang",
-              type: "pattern",
-              courseIdPattern: "^34[A-Z0-9]{2}",
-              description: "初修外国語",
+              id: "second-lang-group",
+              minCredits: 0,
+              rules: [{ id: "second-lang", type: "prefix", prefix: "34" }],
             },
           ],
         },
@@ -157,12 +151,17 @@ export const defaultRequirements: GraduationRequirements = {
           type: "elective",
           minCredits: 6,
           maxCredits: 15,
-          rules: [
+          groups: [
             {
-              id: "other-dept",
-              type: "pattern",
-              courseIdPattern: "^(GB|GC|GA|GE|BC)",
-              description: "他学類の科目",
+              id: "other-dept-group",
+              minCredits: 0,
+              rules: [
+                { id: "gb-prefix", type: "prefix", prefix: "GB" },
+                { id: "gc-prefix", type: "prefix", prefix: "GC" },
+                { id: "ga-prefix", type: "prefix", prefix: "GA" },
+                { id: "ge-prefix", type: "prefix", prefix: "GE" },
+                { id: "bc-prefix", type: "prefix", prefix: "BC" },
+              ],
             },
           ],
           notes: "情報学群、他学類の科目",

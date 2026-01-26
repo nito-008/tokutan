@@ -35,25 +35,31 @@ export type RequirementSubcategory =
       type: "elective" | "free";
       minCredits: number;
       maxCredits?: number;
-      rules: RequirementRule[];
+      groups: RequirementGroup[];
     });
 
-// ルール
-interface RequirementRuleBase {
+// グループ内ルール
+interface GroupRuleBase {
   id: string;
-  description: string;
-  minCredits?: number;
 }
 
-export type RequirementRule =
-  | (RequirementRuleBase & {
+export type GroupRule =
+  | (GroupRuleBase & {
       type: "specific";
       courseIds: string[];
     })
-  | (RequirementRuleBase & {
-      type: "pattern";
-      courseIdPattern: string;
+  | (GroupRuleBase & {
+      type: "prefix";
+      prefix: string;
     });
+
+// 要件グループ
+export interface RequirementGroup {
+  id: string;
+  minCredits: number;
+  maxCredits?: number;
+  rules: GroupRule[];
+}
 
 // 要件充足状況
 export interface RequirementStatus {
@@ -84,17 +90,17 @@ export interface SubcategoryStatus {
   requiredCredits: number;
   maxCredits?: number;
   isSatisfied: boolean;
-  ruleStatuses: RuleStatus[];
+  groupStatuses: GroupStatus[];
   matchedCourses: MatchedCourse[];
 }
 
-export interface RuleStatus {
-  ruleId: string;
-  description: string;
+export interface GroupStatus {
+  groupId: string;
   isSatisfied: boolean;
   earnedCredits: number;
   inProgressCredits: number;
-  requiredCredits?: number;
+  requiredCredits: number;
+  maxCredits?: number;
   matchedCourses: MatchedCourse[];
 }
 

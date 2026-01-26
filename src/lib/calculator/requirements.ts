@@ -1,10 +1,11 @@
 import type {
   CategoryStatus,
   GraduationRequirements,
+  GroupRule,
+  GroupStatus,
   MatchedCourse,
-  RequirementRule,
+  RequirementGroup,
   RequirementStatus,
-  RuleStatus,
   SubcategoryStatus,
   UserCourseRecord,
 } from "../types";
@@ -121,7 +122,7 @@ export function calculateRequirementStatus(
 
   const categoryStatuses: CategoryStatus[] = requirements.categories.map((category) => {
     const subcategoryStatuses: SubcategoryStatus[] = category.subcategories.map((subcategory) => {
-      const ruleStatuses: RuleStatus[] = [];
+      const groupStatuses: GroupStatus[] = [];
       const matchedCourses: MatchedCourse[] = [];
 
       if (subcategory.type === "required") {
@@ -153,35 +154,37 @@ export function calculateRequirementStatus(
           requiredCredits,
           maxCredits: undefined,
           isSatisfied,
-          ruleStatuses,
+          groupStatuses,
           matchedCourses,
         };
       }
 
-      for (const rule of subcategory.rules) {
-        const ruleMatches = matchCoursesToRule(courses, rule, usedCourseIds, excludedCourseIds);
+      for (const group of subcategory.groups) {
+        const groupMatches = matchCoursesToGroup(courses, group, usedCourseIds, excludedCourseIds);
 
-        const earnedCredits = ruleMatches
+        const earnedCredits = groupMatches
           .filter((m) => m.isPassed)
           .reduce((sum, m) => sum + m.credits, 0);
 
-        const inProgressCredits = ruleMatches
+        const inProgressCredits = groupMatches
           .filter((m) => m.isInProgress)
           .reduce((sum, m) => sum + m.credits, 0);
 
-        const isSatisfied = rule.minCredits ? earnedCredits >= rule.minCredits : true;
+        const isSatisfied =
+          earnedCredits >= group.minCredits &&
+          (group.maxCredits === undefined || earnedCredits <= group.maxCredits);
 
-        ruleStatuses.push({
-          ruleId: rule.id,
-          description: rule.description,
+        groupStatuses.push({
+          groupId: group.id,
           isSatisfied,
           earnedCredits,
           inProgressCredits,
-          requiredCredits: rule.minCredits,
-          matchedCourses: ruleMatches,
+          requiredCredits: group.minCredits,
+          maxCredits: group.maxCredits,
+          matchedCourses: groupMatches,
         });
 
-        matchedCourses.push(...ruleMatches);
+        matchedCourses.push(...groupMatches);
       }
 
       const earnedCredits = matchedCourses
@@ -202,7 +205,7 @@ export function calculateRequirementStatus(
         requiredCredits: subcategory.minCredits,
         maxCredits: subcategory.maxCredits,
         isSatisfied,
-        ruleStatuses,
+        groupStatuses,
         matchedCourses,
       };
     });
@@ -238,10 +241,10 @@ export function calculateRequirementStatus(
   };
 }
 
-// 科目をルールにマッチング
-function matchCoursesToRule(
+// 科目をグループにマッチング
+function matchCoursesToGroup(
   courses: UserCourseRecord[],
-  rule: RequirementRule,
+  group: RequirementGroup,
   usedCourseIds: Set<string>,
   excludedCourseIds: Set<string>,
 ): MatchedCourse[] {
@@ -253,22 +256,12 @@ function matchCoursesToRule(
 
     let isMatch = false;
 
-    switch (rule.type) {
-      case "specific":
-        isMatch = rule.courseIds.includes(course.courseId);
+    // グループ内のいずれかのルールにマッチするかチェック
+    for (const rule of group.rules) {
+      if (matchCourseToRule(course, rule, excludedCourseIds)) {
+        isMatch = true;
         break;
-
-      case "pattern":
-        {
-          const regex = new RegExp(rule.courseIdPattern);
-          // 必修科目として定義されているものは除外
-          if (excludedCourseIds.has(course.courseId)) {
-            isMatch = false;
-          } else {
-            isMatch = regex.test(course.courseId);
-          }
-        }
-        break;
+      }
     }
 
     if (isMatch) {
@@ -285,4 +278,23 @@ function matchCoursesToRule(
   }
 
   return matches;
+}
+
+// 科目が単一ルールにマッチするかチェック
+function matchCourseToRule(
+  course: UserCourseRecord,
+  rule: GroupRule,
+  excludedCourseIds: Set<string>,
+): boolean {
+  switch (rule.type) {
+    case "specific":
+      return rule.courseIds.includes(course.courseId);
+
+    case "prefix":
+      // 必修科目として定義されているものは除外
+      if (excludedCourseIds.has(course.courseId)) {
+        return false;
+      }
+      return course.courseId.startsWith(rule.prefix);
+  }
 }

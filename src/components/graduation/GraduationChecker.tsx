@@ -12,7 +12,7 @@ import type {
   EnrollmentData,
   GraduationRequirements,
   RequirementCategory,
-  RequirementRule,
+  RequirementGroup,
   RequirementStatus,
   RequirementSubcategory,
   TwinsCourse,
@@ -112,7 +112,7 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
     const hasCourseIds = Object.hasOwn(updates, "courseIds");
     const hasMinCredits = Object.hasOwn(updates, "minCredits");
     const hasMaxCredits = Object.hasOwn(updates, "maxCredits");
-    const hasRules = Object.hasOwn(updates, "rules");
+    const hasGroups = Object.hasOwn(updates, "groups");
 
     const buildSubcategory = (existing?: RequirementSubcategory): RequirementSubcategory => {
       const nextType = updates.type ?? existing?.type ?? "elective";
@@ -139,7 +139,7 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
         type: "elective" | "free";
         minCredits: number;
         maxCredits?: number;
-        rules: RequirementRule[];
+        groups: RequirementGroup[];
       }>;
       const minCredits = hasMinCredits
         ? ((updates as ElectiveUpdate).minCredits ?? 0)
@@ -151,10 +151,10 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
         : existing && existing.type !== "required"
           ? existing.maxCredits
           : undefined;
-      const rules = hasRules
-        ? ((updates as ElectiveUpdate).rules ?? [])
+      const groups = hasGroups
+        ? ((updates as ElectiveUpdate).groups ?? [])
         : existing && existing.type !== "required"
-          ? existing.rules
+          ? existing.groups
           : [];
 
       return {
@@ -163,7 +163,7 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
         type: nextType,
         minCredits,
         maxCredits,
-        rules,
+        groups,
         notes,
       };
     };

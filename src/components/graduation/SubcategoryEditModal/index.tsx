@@ -16,9 +16,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
-import type { RequirementRule, RequirementSubcategory } from "~/lib/types";
+import type { RequirementGroup, RequirementSubcategory } from "~/lib/types";
+import { GroupsSection } from "./GroupsSection";
 import { RequiredCoursesEditor } from "./RequiredCoursesEditor";
-import { RulesSection } from "./RulesSection";
 import { normalizeCourseGroup, normalizeCourseIds } from "./utils/courseGroup";
 
 interface SubcategoryEditModalProps {
@@ -47,7 +47,7 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
   const [courseIds, setCourseIds] = createSignal<string[]>([]);
   const [minCredits, setMinCredits] = createSignal(0);
   const [maxCredits, setMaxCredits] = createSignal<number | undefined>(undefined);
-  const [rules, setRules] = createSignal<RequirementRule[]>([]);
+  const [groups, setGroups] = createSignal<RequirementGroup[]>([]);
 
   createEffect(() => {
     if (props.subcategory) {
@@ -61,12 +61,12 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
         );
         setMinCredits(0);
         setMaxCredits(undefined);
-        setRules([]);
+        setGroups([]);
       } else {
         setCourseIds([]);
         setMinCredits(props.subcategory.minCredits);
         setMaxCredits(props.subcategory.maxCredits);
-        setRules(JSON.parse(JSON.stringify(props.subcategory.rules)));
+        setGroups(JSON.parse(JSON.stringify(props.subcategory.groups)));
       }
     } else if (props.open) {
       setName("");
@@ -74,7 +74,7 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
       setCourseIds([]);
       setMinCredits(0);
       setMaxCredits(undefined);
-      setRules([]);
+      setGroups([]);
     }
   });
 
@@ -93,7 +93,7 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
             type: type(),
             minCredits: minCredits(),
             maxCredits: maxCredits(),
-            rules: rules(),
+            groups: groups(),
           };
 
     props.onSave(props.categoryId, props.subcategory?.id ?? null, updates);
@@ -192,7 +192,7 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
               </div>
             </div>
 
-            <RulesSection rules={rules} setRules={setRules} />
+            <GroupsSection groups={groups} setGroups={setGroups} />
           </Show>
         </div>
 
