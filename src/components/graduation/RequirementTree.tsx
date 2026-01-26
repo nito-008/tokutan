@@ -1,4 +1,4 @@
-import { Circle, CircleCheck, Pencil, Plus } from "lucide-solid";
+import { Circle, CircleCheck, Pencil } from "lucide-solid";
 import { type Component, createSignal, For, Show } from "solid-js";
 import {
   Accordion,
@@ -32,12 +32,10 @@ interface RequirementTreeProps {
 
 export const RequirementTree: Component<RequirementTreeProps> = (props) => {
   const [editingCategory, setEditingCategory] = createSignal<RequirementCategory | null>(null);
-  const [addingCategory, setAddingCategory] = createSignal(false);
   const [editingSubcategory, setEditingSubcategory] = createSignal<{
     categoryId: string;
     subcategory: RequirementSubcategory;
   } | null>(null);
-  const [addingSubcategoryFor, setAddingSubcategoryFor] = createSignal<string | null>(null);
 
   const findCategory = (categoryId: string): RequirementCategory | undefined => {
     return props.requirements?.categories.find((c) => c.id === categoryId);
@@ -114,16 +112,6 @@ export const RequirementTree: Component<RequirementTreeProps> = (props) => {
                       )}
                     </For>
                   </Accordion>
-                  <Show when={props.editMode && props.requirements && props.onSubcategoryUpdate}>
-                    <button
-                      type="button"
-                      class="flex items-center gap-2 w-full p-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded mt-2"
-                      onClick={() => setAddingSubcategoryFor(category.categoryId)}
-                    >
-                      <Plus class="size-4" />
-                      サブカテゴリを追加
-                    </button>
-                  </Show>
                 </div>
               </AccordionContent>
             </AccordionItem>
@@ -131,34 +119,21 @@ export const RequirementTree: Component<RequirementTreeProps> = (props) => {
         </For>
       </Accordion>
 
-      <Show when={props.editMode && props.requirements && props.onCategoryUpdate}>
-        <button
-          type="button"
-          class="flex items-center gap-2 w-full p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded mt-2"
-          onClick={() => setAddingCategory(true)}
-        >
-          <Plus class="size-4" />
-          カテゴリを追加
-        </button>
-      </Show>
-
       <CategoryEditModal
-        open={!!editingCategory() || addingCategory()}
+        open={!!editingCategory()}
         category={editingCategory()}
         onClose={() => {
           setEditingCategory(null);
-          setAddingCategory(false);
         }}
         onSave={handleCategorySave}
       />
 
       <SubcategoryEditModal
-        open={!!editingSubcategory() || !!addingSubcategoryFor()}
+        open={!!editingSubcategory()}
         subcategory={editingSubcategory()?.subcategory ?? null}
-        categoryId={editingSubcategory()?.categoryId ?? addingSubcategoryFor() ?? ""}
+        categoryId={editingSubcategory()?.categoryId ?? ""}
         onClose={() => {
           setEditingSubcategory(null);
-          setAddingSubcategoryFor(null);
         }}
         onSave={handleSubcategorySave}
       />
