@@ -1,17 +1,14 @@
 import { Loader2 } from "lucide-solid";
 import { type Component, createSignal, onMount, Show } from "solid-js";
-import { CourseManager } from "~/components/course/CourseManager";
 import { SettingsDialog } from "~/components/dialogs/SettingsDialog";
 import { GraduationChecker } from "~/components/graduation/GraduationChecker";
 import { RequirementsSelector } from "~/components/graduation/RequirementsSelector";
 import { Header } from "~/components/layout/Header";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "~/components/ui/tabs";
 import { getRequirements } from "~/lib/db/requirements";
 import { type AppState, initializeApp } from "~/lib/init";
 import type { EnrollmentData, GraduationRequirements } from "~/lib/types";
 
 const Home: Component = () => {
-  const [activeTab, setActiveTab] = createSignal<string>("graduation");
   const [isLoading, setIsLoading] = createSignal(true);
   const [appState, setAppState] = createSignal<AppState | null>(null);
   const [showSettingsDialog, setShowSettingsDialog] = createSignal(false);
@@ -51,11 +48,6 @@ const Home: Component = () => {
     setAppState(state);
   };
 
-  const handleSyncTwins = () => {
-    // CSVアップローダーを表示するためにタブを切り替え
-    setActiveTab("graduation");
-  };
-
   const handleEditRequirements = () => {
     setShowRequirementEditor(true);
   };
@@ -87,38 +79,22 @@ const Home: Component = () => {
         >
           <Show when={appState()}>
             {(state) => (
-              <Tabs value={activeTab()} onChange={setActiveTab} class="w-full">
-                <TabsList class="grid w-full grid-cols-2 max-w-md mx-auto mb-9">
-                  <TabsTrigger value="graduation">卒業要件チェック</TabsTrigger>
-                  <TabsTrigger value="course">履修管理</TabsTrigger>
-                </TabsList>
-
-                <TabsContent value="graduation">
-                  <div class="flex justify-center mb-6">
-                    <RequirementsSelector
-                      profileId={state().profile.id}
-                      selectedRequirementsId={state().profile.selectedRequirementsId}
-                      onRequirementsChange={handleRequirementsChange}
-                    />
-                  </div>
-                  <GraduationChecker
-                    requirements={state().requirements}
-                    enrollment={state().enrollment}
-                    onEnrollmentUpdate={handleEnrollmentUpdate}
-                    onEditRequirements={handleEditRequirements}
-                    onRequirementsUpdate={handleRequirementsUpdate}
-                  />
-                </TabsContent>
-
-                <TabsContent value="course">
-                  <CourseManager
+              <>
+                <div class="flex justify-center mb-6">
+                  <RequirementsSelector
                     profileId={state().profile.id}
-                    enrollmentYear={state().profile.enrollmentYear}
-                    enrollment={state().enrollment}
-                    onSyncTwins={handleSyncTwins}
+                    selectedRequirementsId={state().profile.selectedRequirementsId}
+                    onRequirementsChange={handleRequirementsChange}
                   />
-                </TabsContent>
-              </Tabs>
+                </div>
+                <GraduationChecker
+                  requirements={state().requirements}
+                  enrollment={state().enrollment}
+                  onEnrollmentUpdate={handleEnrollmentUpdate}
+                  onEditRequirements={handleEditRequirements}
+                  onRequirementsUpdate={handleRequirementsUpdate}
+                />
+              </>
             )}
           </Show>
         </Show>
