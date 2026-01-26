@@ -29,7 +29,7 @@ export interface CourseIdRowContentProps {
   id: string;
   index: number;
   isPlaceholder: boolean;
-  onUpdateCourseId: (index: number, value: string) => void;
+  onUpdateCourseId: (index: number, value: string, skipNormalize?: boolean) => void;
   onRemoveCourseId: (index: number) => void;
   // sortable関連（非プレースホルダーのみ）
   sortableRef?: (el: HTMLElement) => void;
@@ -150,7 +150,7 @@ export const CourseIdRowContent: Component<CourseIdRowContentProps> = (props) =>
     });
     const newValue = formatCourseGroup(nextIds);
     setLocalValue(newValue);
-    props.onUpdateCourseId(props.index, newValue);
+    props.onUpdateCourseId(props.index, newValue, true);
     suggestionSearch.resetQuery();
     setHasActiveSearch(false);
   };
