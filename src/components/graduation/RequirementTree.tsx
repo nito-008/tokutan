@@ -1,4 +1,4 @@
-import { Circle, CircleCheck, Pencil, Plus } from "lucide-solid";
+﻿import { Circle, CircleCheck, Pencil, Plus } from "lucide-solid";
 import { type Component, createSignal, For, Show } from "solid-js";
 import {
   Accordion,
@@ -63,51 +63,78 @@ export const RequirementTree: Component<RequirementTreeProps> = (props) => {
       <Accordion multiple={true} collapsible class="w-full">
         <For each={props.categoryStatuses}>
           {(category) => (
-            <AccordionItem value={category.categoryId}>
-              <AccordionTrigger class="hover:no-underline">
-                <div class="flex items-center gap-3 w-full">
-                  <StatusIcon isSatisfied={category.isSatisfied} />
-                  <span class="font-medium">{category.categoryName}</span>
-                  <span class="text-sm text-muted-foreground ml-auto mr-4">
-                    {category.earnedCredits}/{category.requiredCredits}単位
-                  </span>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent>
-                <div class="pl-6">
-                  <Accordion multiple={true} collapsible class="space-y-2">
-                    <For each={category.subcategoryStatuses}>
-                      {(subcategory) => (
-                        <SubcategoryItem
-                          subcategory={subcategory}
-                          categoryId={category.categoryId}
-                          editable={
-                            !!props.editMode && !!props.requirements && !!props.onSubcategoryUpdate
-                          }
-                          onEdit={() => {
-                            const sub = findSubcategory(
-                              category.categoryId,
-                              subcategory.subcategoryId,
-                            );
-                            if (sub) setEditingSubcategory(sub);
-                          }}
-                        />
-                      )}
-                    </For>
-                  </Accordion>
-                  <Show when={props.editMode && props.requirements && props.onSubcategoryUpdate}>
-                    <button
-                      type="button"
-                      class="flex items-center gap-2 w-full p-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded mt-2"
-                      onClick={() => setAddingSubcategoryFor(category.categoryId)}
-                    >
-                      <Plus class="size-4" />
-                      サブカテゴリを追加
-                    </button>
-                  </Show>
-                </div>
-              </AccordionContent>
-            </AccordionItem>
+            <>
+              <AccordionItem value={category.categoryId}>
+                <AccordionTrigger class="hover:no-underline">
+                  <div class="flex items-center gap-3 w-full">
+                    <StatusIcon isSatisfied={category.isSatisfied} />
+                    <span class="font-medium">{category.categoryName}</span>
+                    <span class="text-sm text-muted-foreground ml-auto mr-4">
+                      {category.earnedCredits}/{category.requiredCredits}単位{" "}
+                    </span>
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div class="pl-6">
+                    <Accordion multiple={true} collapsible class="space-y-2">
+                      <For each={category.subcategoryStatuses}>
+                        {(subcategory) => (
+                          <SubcategoryItem
+                            subcategory={subcategory}
+                            categoryId={category.categoryId}
+                            editable={
+                              !!props.editMode &&
+                              !!props.requirements &&
+                              !!props.onSubcategoryUpdate
+                            }
+                            onEdit={() => {
+                              const sub = findSubcategory(
+                                category.categoryId,
+                                subcategory.subcategoryId,
+                              );
+                              if (sub) setEditingSubcategory(sub);
+                            }}
+                          />
+                        )}
+                      </For>
+                    </Accordion>
+                    <Show when={props.editMode && props.requirements && props.onSubcategoryUpdate}>
+                      <button
+                        type="button"
+                        class="flex items-center gap-2 w-full p-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded mt-2"
+                        onClick={() => setAddingSubcategoryFor(category.categoryId)}
+                      >
+                        <Plus class="size-4" />
+                        サブカテゴリを追加
+                      </button>
+                    </Show>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+              <Show when={category.unmatchedCourses}>
+                <AccordionItem value={`${category.categoryId}-unmatched`}>
+                  <AccordionTrigger class="hover:no-underline">
+                    <div class="flex items-center gap-3 w-full">
+                      <Circle class="size-4 text-gray-300" />
+                      <span class="font-medium">{category.categoryName}（該当しない科目）</span>
+                      <span class="text-sm text-muted-foreground ml-auto mr-4">
+                        {(category.unmatchedCourses ?? []).length}件
+                      </span>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent>
+                    <div class="pl-6 space-y-1">
+                      <For each={category.unmatchedCourses}>
+                        {(course) => <CourseItem course={course} />}
+                      </For>
+                      <Show when={(category.unmatchedCourses ?? []).length === 0}>
+                        <p class="text-sm text-muted-foreground">該当しない科目はありません</p>
+                      </Show>
+                    </div>
+                  </AccordionContent>
+                </AccordionItem>
+              </Show>
+            </>
           )}
         </For>
       </Accordion>

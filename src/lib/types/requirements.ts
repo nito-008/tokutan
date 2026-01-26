@@ -80,6 +80,7 @@ export interface CategoryStatus {
   requiredCredits: number;
   isSatisfied: boolean;
   subcategoryStatuses: SubcategoryStatus[];
+  unmatchedCourses?: MatchedCourse[];
 }
 
 export interface SubcategoryStatus {
