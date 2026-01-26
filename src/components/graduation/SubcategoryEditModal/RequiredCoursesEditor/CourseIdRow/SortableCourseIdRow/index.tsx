@@ -6,7 +6,7 @@ interface SortableCourseIdRowProps {
   id: string;
   index: number;
   sortableCount: number;
-  onUpdateCourseId: (index: number, value: string) => void;
+  onUpdateCourseId: (index: number, value: string, skipNormalize?: boolean) => void;
   onRemoveCourseId: (index: number) => void;
 }
 
