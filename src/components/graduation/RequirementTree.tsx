@@ -225,6 +225,7 @@ const CourseItem: Component<{ course: MatchedCourse }> = (props) => {
       <span class={props.course.isUnregistered ? "text-muted-foreground" : ""}>
         {props.course.courseName}
       </span>
+      <span class="text-xs text-muted-foreground">{props.course.courseId}</span>
       <span class="text-muted-foreground">({props.course.credits}単位)</span>
       <GradeBadge grade={props.course.grade} />
     </div>
