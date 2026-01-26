@@ -27,6 +27,7 @@ interface SubcategoryEditModalProps {
   subcategory: RequirementSubcategory | null;
   categoryId: string;
   onClose: () => void;
+  onDelete?: (categoryId: string, subcategoryId: string) => void;
   onSave: (
     categoryId: string,
     subcategoryId: string | null,
@@ -182,6 +183,18 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
           <Button variant="outline" onClick={props.onClose}>
             キャンセル
           </Button>
+          <Show when={props.subcategory && props.onDelete}>
+            <Button
+              variant="destructive"
+              onClick={() => {
+                if (!props.subcategory) return;
+                props.onDelete?.(props.categoryId, props.subcategory.id);
+                props.onClose();
+              }}
+            >
+              削除
+            </Button>
+          </Show>
           <Button onClick={handleSave}>保存</Button>
         </DialogFooter>
       </DialogContent>

@@ -26,6 +26,7 @@ interface RequirementTreeProps {
     subcategoryId: string | null,
     updates: Partial<RequirementSubcategory>,
   ) => void;
+  onSubcategoryDelete?: (categoryId: string, subcategoryId: string) => void;
   editMode?: boolean;
 }
 
@@ -107,6 +108,7 @@ export const RequirementTree: Component<RequirementTreeProps> = (props) => {
         onClose={() => {
           setEditingSubcategory(null);
         }}
+        onDelete={props.onSubcategoryDelete}
         onSave={handleSubcategorySave}
       />
     </>

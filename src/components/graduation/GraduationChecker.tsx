@@ -196,6 +196,28 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
     props.onRequirementsUpdate?.(updatedRequirements);
   };
 
+  const handleSubcategoryDelete = async (categoryId: string, subcategoryId: string) => {
+    const requirements = props.requirements;
+    if (!requirements) return;
+
+    const updatedCategories = requirements.categories.map((cat) =>
+      cat.id === categoryId
+        ? {
+            ...cat,
+            subcategories: cat.subcategories.filter((sub) => sub.id !== subcategoryId),
+          }
+        : cat,
+    );
+
+    const updatedRequirements: GraduationRequirements = {
+      ...requirements,
+      categories: updatedCategories,
+    };
+
+    await saveRequirements(updatedRequirements);
+    props.onRequirementsUpdate?.(updatedRequirements);
+  };
+
   return (
     <div class="space-y-6">
       <Show when={showUploader()}>
@@ -269,6 +291,7 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
                 requirements={props.requirements ?? undefined}
                 onCategoryUpdate={handleCategoryUpdate}
                 onSubcategoryUpdate={handleSubcategoryUpdate}
+                onSubcategoryDelete={handleSubcategoryDelete}
                 editMode={editMode()}
               />
             </CardContent>
