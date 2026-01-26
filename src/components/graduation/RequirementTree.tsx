@@ -62,29 +62,6 @@ export const RequirementTree: Component<RequirementTreeProps> = (props) => {
   return (
     <>
       <Accordion multiple={true} collapsible class="w-full">
-        <Show when={props.unmatchedCourses}>
-          <AccordionItem value="unmatched-courses">
-            <AccordionTrigger class="hover:no-underline">
-              <div class="flex items-center gap-3 w-full">
-                <Circle class="size-4 text-gray-300" />
-                <span class="font-medium">該当しない科目</span>
-                <span class="text-sm text-muted-foreground ml-auto mr-4">
-                  {(props.unmatchedCourses ?? []).length}件
-                </span>
-              </div>
-            </AccordionTrigger>
-            <AccordionContent>
-              <div class="pl-6 space-y-1">
-                <For each={props.unmatchedCourses}>
-                  {(course) => <CourseItem course={course} />}
-                </For>
-                <Show when={(props.unmatchedCourses ?? []).length === 0}>
-                  <p class="text-sm text-muted-foreground">該当しない科目はありません</p>
-                </Show>
-              </div>
-            </AccordionContent>
-          </AccordionItem>
-        </Show>
         <For each={props.categoryStatuses}>
           {(category) => (
             <>
@@ -138,6 +115,29 @@ export const RequirementTree: Component<RequirementTreeProps> = (props) => {
             </>
           )}
         </For>
+        <Show when={props.unmatchedCourses}>
+          <AccordionItem value="unmatched-courses">
+            <AccordionTrigger class="hover:no-underline">
+              <div class="flex items-center gap-3 w-full">
+                <Circle class="size-4 text-gray-300" />
+                <span class="font-medium">該当しない科目</span>
+                <span class="text-sm text-muted-foreground ml-auto mr-4">
+                  {(props.unmatchedCourses ?? []).length}件
+                </span>
+              </div>
+            </AccordionTrigger>
+            <AccordionContent>
+              <div class="pl-6 space-y-1">
+                <For each={props.unmatchedCourses}>
+                  {(course) => <CourseItem course={course} />}
+                </For>
+                <Show when={(props.unmatchedCourses ?? []).length === 0}>
+                  <p class="text-sm text-muted-foreground">該当しない科目はありません</p>
+                </Show>
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        </Show>
       </Accordion>
 
       <SubcategoryEditModal
