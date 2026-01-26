@@ -57,10 +57,18 @@ export const CourseIdRowContent: Component<CourseIdRowContentProps> = (props) =>
   const [isCourseLookupLoading, setIsCourseLookupLoading] = createSignal(false);
   const [isFocused, setIsFocused] = createSignal(false);
   const [hasActiveSearch, setHasActiveSearch] = createSignal(false);
+  const [localValue, setLocalValue] = createSignal(props.id());
+
+  // フォーカス外の時のみ親の値をローカルに同期
+  createEffect(() => {
+    if (!isFocused()) {
+      setLocalValue(props.id());
+    }
+  });
 
   const suggestionSearch = useSuggestionSearch(isFocused);
 
-  const groupIds = () => uniqueCourseIds(parseCourseGroup(props.id()));
+  const groupIds = () => uniqueCourseIds(parseCourseGroup(localValue()));
   const selectedIds = () => new Set(groupIds());
   const getRelatedCourseId = (value: string) => {
     if (!value.includes(",")) {
@@ -105,8 +113,8 @@ export const CourseIdRowContent: Component<CourseIdRowContentProps> = (props) =>
   });
 
   const handleInputChange = (value: string) => {
+    setLocalValue(value);
     setHasActiveSearch(true);
-    props.onUpdateCourseId(props.index, value);
     suggestionSearch.search(extractSuggestionToken(value), getRelatedCourseId(value));
   };
 
@@ -115,17 +123,19 @@ export const CourseIdRowContent: Component<CourseIdRowContentProps> = (props) =>
     suggestionSearch.search(extractSuggestionToken(value), getRelatedCourseId(value));
   };
 
-  const handleBlurInput = (value: string) => {
+  const handleBlurInput = () => {
     if (isFocused()) {
       setIsFocused(false);
       suggestionSearch.clear();
     }
     setHasActiveSearch(false);
-    props.onUpdateCourseId(props.index, normalizeCourseGroup(value));
+    const normalized = normalizeCourseGroup(localValue());
+    setLocalValue(normalized);
+    props.onUpdateCourseId(props.index, normalized);
   };
 
   const toggleSuggestionSelect = (course: Course) => {
-    const currentValue = props.id() ?? "";
+    const currentValue = localValue() ?? "";
     const baseIds = hasActiveSearch()
       ? dropSearchToken(currentValue)
       : parseCourseGroup(currentValue);
@@ -138,7 +148,9 @@ export const CourseIdRowContent: Component<CourseIdRowContentProps> = (props) =>
       next.set(course.id, course.name);
       return next;
     });
-    props.onUpdateCourseId(props.index, formatCourseGroup(nextIds));
+    const newValue = formatCourseGroup(nextIds);
+    setLocalValue(newValue);
+    props.onUpdateCourseId(props.index, newValue);
     suggestionSearch.resetQuery();
     setHasActiveSearch(false);
   };
@@ -196,10 +208,10 @@ export const CourseIdRowContent: Component<CourseIdRowContentProps> = (props) =>
                       "text-transparent caret-foreground": !isFocused(),
                       "border-destructive focus-visible:ring-destructive": isMissingCourse(),
                     }}
-                    value={props.id()}
+                    value={localValue()}
                     onInput={(e) => handleInputChange(e.currentTarget.value)}
                     onFocus={(e) => handleFocusInput(e.currentTarget.value)}
-                    onBlur={(e) => handleBlurInput(e.currentTarget.value)}
+                    onBlur={() => handleBlurInput()}
                     onKeyDown={(e) => {
                       if (e.key === "Enter") {
                         e.preventDefault();
