@@ -116,7 +116,6 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
 
     const buildSubcategory = (existing?: RequirementSubcategory): RequirementSubcategory => {
       const nextType = updates.type ?? existing?.type ?? "elective";
-      const name = updates.name ?? existing?.name ?? "新しいサブカテゴリ";
       const notes = updates.notes ?? existing?.notes;
 
       if (nextType === "required") {
@@ -128,7 +127,6 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
             : [];
         return {
           id: existing?.id ?? `subcat-${Date.now()}`,
-          name,
           type: "required",
           courseIds,
           notes,
@@ -159,7 +157,6 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
 
       return {
         id: existing?.id ?? `subcat-${Date.now()}`,
-        name,
         type: nextType,
         minCredits,
         maxCredits,

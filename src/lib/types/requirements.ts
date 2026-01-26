@@ -19,10 +19,11 @@ export interface RequirementCategory {
   subcategories: RequirementSubcategory[];
 }
 
+export type SubcategoryType = "required" | "elective" | "free";
+
 // サブカテゴリ
 interface RequirementSubcategoryBase {
   id: string;
-  name: string;
   notes?: string;
 }
 
@@ -89,7 +90,7 @@ export interface CategoryStatus {
 
 export interface SubcategoryStatus {
   subcategoryId: string;
-  subcategoryName: string;
+  subcategoryType: SubcategoryType;
   earnedCredits: number;
   inProgressCredits: number;
   requiredCredits: number;

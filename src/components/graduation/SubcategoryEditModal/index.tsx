@@ -8,7 +8,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from "~/components/ui/dialog";
-import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import {
   Select,
@@ -17,6 +16,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "~/components/ui/select";
+import {
+  getSubcategoryLabel,
+  type SubcategoryTypeOption,
+  subcategoryTypeOptions,
+} from "~/lib/requirements/subcategory";
 import type { RequirementGroup, RequirementSubcategory } from "~/lib/types";
 import { RequiredCoursesEditor } from "./RequiredCoursesEditor";
 import { SelectionCoursesEditor } from "./SelectionCoursesEditor";
@@ -26,6 +30,7 @@ interface SubcategoryEditModalProps {
   open: boolean;
   subcategory: RequirementSubcategory | null;
   categoryId: string;
+  categoryName: string;
   onClose: () => void;
   onDelete?: (categoryId: string, subcategoryId: string) => void;
   onSave: (
@@ -35,16 +40,7 @@ interface SubcategoryEditModalProps {
   ) => void;
 }
 
-type SubcategoryTypeOption = { value: "required" | "elective" | "free"; label: string };
-
-const typeOptions: SubcategoryTypeOption[] = [
-  { value: "required", label: "必修" },
-  { value: "elective", label: "選択" },
-  { value: "free", label: "自由" },
-];
-
 export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props) => {
-  const [name, setName] = createSignal("");
   const [type, setType] = createSignal<"required" | "elective" | "free">("required");
   const [courseIds, setCourseIds] = createSignal<string[]>([]);
   const [minCredits, setMinCredits] = createSignal(0);
@@ -53,7 +49,6 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
 
   createEffect(() => {
     if (props.subcategory) {
-      setName(props.subcategory.name);
       setType(props.subcategory.type);
       if (props.subcategory.type === "required") {
         setCourseIds(
@@ -75,7 +70,6 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
         );
       }
     } else if (props.open) {
-      setName("");
       setType("elective");
       setCourseIds([]);
       setMinCredits(0);
@@ -88,14 +82,12 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
     const updates: Partial<RequirementSubcategory> =
       type() === "required"
         ? {
-            name: name(),
             type: type(),
             courseIds: courseIds()
               .map((value) => normalizeCourseGroup(value))
               .filter((value) => value),
           }
         : {
-            name: name(),
             type: type(),
             minCredits: minCredits(),
             maxCredits: maxCredits(),
@@ -112,7 +104,7 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
     }
   };
 
-  const selectedType = () => typeOptions.find((opt) => opt.value === type());
+  const selectedType = () => subcategoryTypeOptions.find((opt) => opt.value === type());
 
   const handleTypeChange = (val: SubcategoryTypeOption | null) => {
     if (!val) return;
@@ -127,25 +119,18 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
       <DialogContent class="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>
-            {props.subcategory ? "サブカテゴリを編集" : "サブカテゴリを追加"}
+            {props.subcategory
+              ? `${props.categoryName} > ${getSubcategoryLabel(props.subcategory.type)}`
+              : "サブカテゴリを追加"}
           </DialogTitle>
         </DialogHeader>
         <div class="space-y-4 py-4">
-          <div class="space-y-2">
-            <Label for="subcategory-name">名前</Label>
-            <Input
-              id="subcategory-name"
-              value={name()}
-              onInput={(e) => setName(e.currentTarget.value)}
-            />
-          </div>
-
           <div class="space-y-2">
             <Label>科目タイプ</Label>
             <Select
               value={selectedType()}
               onChange={handleTypeChange}
-              options={typeOptions}
+              options={subcategoryTypeOptions}
               optionValue="value"
               optionTextValue="label"
               placeholder="科目タイプを選択"

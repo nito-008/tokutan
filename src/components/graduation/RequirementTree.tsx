@@ -7,6 +7,7 @@ import {
   AccordionTrigger,
 } from "~/components/ui/accordion";
 import { Badge } from "~/components/ui/badge";
+import { getSubcategoryLabel } from "~/lib/requirements/subcategory";
 import type {
   CategoryStatus,
   GraduationRequirements,
@@ -57,6 +58,18 @@ export const RequirementTree: Component<RequirementTreeProps> = (props) => {
     updates: Partial<RequirementSubcategory>,
   ) => {
     props.onSubcategoryUpdate?.(categoryId, subcategoryId, updates);
+  };
+
+  const currentCategoryName = () => {
+    const editing = editingSubcategory();
+    if (editing) {
+      return findCategory(editing.categoryId)?.name ?? "";
+    }
+    const adding = addingSubcategoryFor();
+    if (adding) {
+      return findCategory(adding)?.name ?? "";
+    }
+    return "";
   };
 
   return (
@@ -144,6 +157,7 @@ export const RequirementTree: Component<RequirementTreeProps> = (props) => {
         open={!!editingSubcategory() || !!addingSubcategoryFor()}
         subcategory={editingSubcategory()?.subcategory ?? null}
         categoryId={editingSubcategory()?.categoryId ?? addingSubcategoryFor() ?? ""}
+        categoryName={currentCategoryName()}
         onClose={() => {
           setEditingSubcategory(null);
           setAddingSubcategoryFor(null);
@@ -166,7 +180,9 @@ const SubcategoryItem: Component<{
       <AccordionTrigger class="hover:no-underline">
         <div class="flex items-center gap-3 w-full">
           <StatusIcon isSatisfied={props.subcategory.isSatisfied} />
-          <span class="font-medium text-sm">{props.subcategory.subcategoryName}</span>
+          <span class="font-medium text-sm">
+            {getSubcategoryLabel(props.subcategory.subcategoryType)}
+          </span>
           <Show when={props.editable}>
             <button
               type="button"

@@ -148,7 +148,7 @@ export function calculateRequirementStatus(
 
         return {
           subcategoryId: subcategory.id,
-          subcategoryName: subcategory.name,
+          subcategoryType: subcategory.type,
           earnedCredits,
           inProgressCredits,
           requiredCredits,
@@ -199,7 +199,7 @@ export function calculateRequirementStatus(
 
       return {
         subcategoryId: subcategory.id,
-        subcategoryName: subcategory.name,
+        subcategoryType: subcategory.type,
         earnedCredits,
         inProgressCredits,
         requiredCredits: subcategory.minCredits,

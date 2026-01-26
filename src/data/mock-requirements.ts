@@ -18,13 +18,11 @@ export const mockRequirements: GraduationRequirements[] = [
         subcategories: [
           {
             id: "specialized-required",
-            name: "必修科目",
             type: "required",
             courseIds: [],
           },
           {
             id: "specialized-elective",
-            name: "選択科目",
             type: "elective",
             minCredits: 40,
             groups: [],
@@ -37,7 +35,6 @@ export const mockRequirements: GraduationRequirements[] = [
         subcategories: [
           {
             id: "foundation-required",
-            name: "必修科目",
             type: "required",
             courseIds: [],
           },
@@ -49,19 +46,16 @@ export const mockRequirements: GraduationRequirements[] = [
         subcategories: [
           {
             id: "common-fys",
-            name: "総合科目（FYS、学問への誘い）",
             type: "required",
             courseIds: [],
           },
           {
             id: "common-pe",
-            name: "体育",
             type: "required",
             courseIds: [],
           },
           {
             id: "common-english",
-            name: "第1外国語（英語）",
             type: "required",
             courseIds: [],
           },
@@ -73,7 +67,6 @@ export const mockRequirements: GraduationRequirements[] = [
         subcategories: [
           {
             id: "basic-other",
-            name: "他学群又は他学類の授業科目",
             type: "elective",
             minCredits: 15,
             groups: [],
@@ -99,13 +92,11 @@ export const mockRequirements: GraduationRequirements[] = [
         subcategories: [
           {
             id: "specialized-required",
-            name: "必修科目",
             type: "required",
             courseIds: [],
           },
           {
             id: "specialized-elective",
-            name: "選択科目",
             type: "elective",
             minCredits: 40,
             groups: [],
@@ -118,7 +109,6 @@ export const mockRequirements: GraduationRequirements[] = [
         subcategories: [
           {
             id: "foundation-required",
-            name: "必修科目",
             type: "required",
             courseIds: [],
           },
@@ -130,19 +120,16 @@ export const mockRequirements: GraduationRequirements[] = [
         subcategories: [
           {
             id: "common-fys",
-            name: "総合科目（FYS、学問への誘い）",
             type: "required",
             courseIds: [],
           },
           {
             id: "common-pe",
-            name: "体育",
             type: "required",
             courseIds: [],
           },
           {
             id: "common-english",
-            name: "第1外国語（英語）",
             type: "required",
             courseIds: [],
           },
@@ -154,7 +141,6 @@ export const mockRequirements: GraduationRequirements[] = [
         subcategories: [
           {
             id: "basic-other",
-            name: "他学群又は他学類の授業科目",
             type: "elective",
             minCredits: 15,
             groups: [],
@@ -180,13 +166,11 @@ export const mockRequirements: GraduationRequirements[] = [
         subcategories: [
           {
             id: "specialized-required",
-            name: "必修科目",
             type: "required",
             courseIds: [],
           },
           {
             id: "specialized-elective",
-            name: "選択科目",
             type: "elective",
             minCredits: 40,
             groups: [],
@@ -199,7 +183,6 @@ export const mockRequirements: GraduationRequirements[] = [
         subcategories: [
           {
             id: "foundation-required",
-            name: "必修科目",
             type: "required",
             courseIds: [],
           },
@@ -211,19 +194,16 @@ export const mockRequirements: GraduationRequirements[] = [
         subcategories: [
           {
             id: "common-fys",
-            name: "総合科目（FYS、学問への誘い）",
             type: "required",
             courseIds: [],
           },
           {
             id: "common-pe",
-            name: "体育",
             type: "required",
             courseIds: [],
           },
           {
             id: "common-english",
-            name: "第1外国語（英語）",
             type: "required",
             courseIds: [],
           },
@@ -235,7 +215,6 @@ export const mockRequirements: GraduationRequirements[] = [
         subcategories: [
           {
             id: "basic-other",
-            name: "他学群又は他学類の授業科目",
             type: "elective",
             minCredits: 15,
             groups: [],

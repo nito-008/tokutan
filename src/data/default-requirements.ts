@@ -17,13 +17,11 @@ export const defaultRequirements: GraduationRequirements = {
       subcategories: [
         {
           id: "specialized-required",
-          name: "必修科目",
           type: "required",
           courseIds: ["FG20204", "FG20214", "FG19103", "FG19113", "FG18112", "FG20222"],
         },
         {
           id: "specialized-elective",
-          name: "選択科目",
           type: "elective",
           minCredits: 40,
           maxCredits: 49,
@@ -163,7 +161,6 @@ export const defaultRequirements: GraduationRequirements = {
       subcategories: [
         {
           id: "foundation-required",
-          name: "必修科目",
           type: "required",
           courseIds: [
             "FA01141",
@@ -197,7 +194,6 @@ export const defaultRequirements: GraduationRequirements = {
         },
         {
           id: "subcat-1769461527016",
-          name: "選択科目",
           type: "elective",
           minCredits: 0,
           groups: [],
@@ -210,13 +206,11 @@ export const defaultRequirements: GraduationRequirements = {
       subcategories: [
         {
           id: "subcat-1769461547235",
-          name: "必修科目",
           type: "required",
           courseIds: [],
         },
         {
           id: "subcat-1769461553835",
-          name: "選択科目",
           type: "elective",
           minCredits: 0,
           groups: [],
@@ -229,13 +223,11 @@ export const defaultRequirements: GraduationRequirements = {
       subcategories: [
         {
           id: "subcat-1769461564785",
-          name: "必修科目",
           type: "required",
           courseIds: [],
         },
         {
           id: "subcat-1769461571505",
-          name: "選択科目",
           type: "elective",
           minCredits: 0,
           groups: [],
