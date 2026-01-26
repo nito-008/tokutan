@@ -1,10 +1,9 @@
-import type {
+﻿import type {
   CategoryStatus,
   GraduationRequirements,
   GroupRule,
   GroupStatus,
   MatchedCourse,
-  RequirementCategory,
   RequirementGroup,
   RequirementStatus,
   SubcategoryStatus,
@@ -40,10 +39,6 @@ function collectAllRequiredCourseIds(requirements: GraduationRequirements): Set<
   }
 
   return requiredCourseIds;
-}
-
-function isBasicRelatedCategory(category: RequirementCategory): boolean {
-  return category.id === "basic" || category.name.includes("基礎科目関連科目");
 }
 
 function matchRequiredCourseGroups(
@@ -231,8 +226,8 @@ export function calculateRequirementStatus(
     };
   });
 
-  const unmatchedBasicCourses: MatchedCourse[] = courses
-    .filter((course) => course.category === "B" && !usedCourseIds.has(course.id))
+  const unmatchedCourses: MatchedCourse[] = courses
+    .filter((course) => !usedCourseIds.has(course.id))
     .map((course) => ({
       courseId: course.courseId,
       courseName: course.courseName,
@@ -241,17 +236,6 @@ export function calculateRequirementStatus(
       isPassed: course.isPassed,
       isInProgress: course.isInProgress,
     }));
-
-  const categoryStatusesWithUnmatched = categoryStatuses.map((categoryStatus) => {
-    const category = requirements.categories.find((item) => item.id === categoryStatus.categoryId);
-    if (!category || !isBasicRelatedCategory(category)) {
-      return categoryStatus;
-    }
-    return {
-      ...categoryStatus,
-      unmatchedCourses: unmatchedBasicCourses,
-    };
-  });
 
   const totalEarnedCredits = categoryStatuses.reduce((sum, c) => sum + c.earnedCredits, 0);
   const totalInProgressCredits = categoryStatuses.reduce((sum, c) => sum + c.inProgressCredits, 0);
@@ -263,7 +247,8 @@ export function calculateRequirementStatus(
     totalInProgressCredits,
     totalRequiredCredits: requirements.totalCredits,
     isGraduationEligible,
-    categoryStatuses: categoryStatusesWithUnmatched,
+    categoryStatuses,
+    unmatchedCourses,
     calculatedAt: new Date().toISOString(),
   };
 }

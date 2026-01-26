@@ -1,4 +1,4 @@
-// 卒業要件全体
+﻿// 卒業要件全体
 export interface GraduationRequirements {
   id: string;
   name: string;
@@ -69,6 +69,7 @@ export interface RequirementStatus {
   totalRequiredCredits: number;
   isGraduationEligible: boolean;
   categoryStatuses: CategoryStatus[];
+  unmatchedCourses?: MatchedCourse[];
   calculatedAt: string;
 }
 
@@ -80,7 +81,6 @@ export interface CategoryStatus {
   requiredCredits: number;
   isSatisfied: boolean;
   subcategoryStatuses: SubcategoryStatus[];
-  unmatchedCourses?: MatchedCourse[];
 }
 
 export interface SubcategoryStatus {

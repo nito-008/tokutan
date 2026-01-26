@@ -1,4 +1,4 @@
-import { type Component, createEffect, createSignal, For, onCleanup, Show } from "solid-js";
+﻿import { type Component, createEffect, createSignal, For, onCleanup, Show } from "solid-js";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Switch, SwitchControl, SwitchLabel } from "~/components/ui/switch";
@@ -241,7 +241,7 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <Card class="lg:col-span-1">
             <CardHeader>
-              <CardTitle class="text-lg">進捗状況</CardTitle>
+              <CardTitle class="text-lg">詳細達成状況</CardTitle>
             </CardHeader>
             <CardContent>
               <DonutChart
@@ -286,10 +286,10 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
 
           <Card class="lg:col-span-2">
             <CardHeader class="flex flex-row items-center justify-between">
-              <CardTitle class="text-lg">卒業要件</CardTitle>
+              <CardTitle class="text-lg">詳細達成状況</CardTitle>
               <div class="flex gap-2">
                 <Button variant="outline" size="sm" onClick={handleReupload}>
-                  データ更新
+                  データ再読み込み
                 </Button>
                 <Switch checked={editMode()} onChange={setEditMode} class="flex items-center gap-2">
                   <SwitchLabel>編集モード</SwitchLabel>
@@ -300,6 +300,7 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
             <CardContent>
               <RequirementTree
                 categoryStatuses={status()?.categoryStatuses ?? []}
+                unmatchedCourses={status()?.unmatchedCourses ?? []}
                 requirements={props.requirements ?? undefined}
                 onCategoryUpdate={handleCategoryUpdate}
                 onSubcategoryUpdate={handleSubcategoryUpdate}
@@ -314,8 +315,8 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
       <Show when={!showUploader() && !props.requirements}>
         <Card>
           <CardContent class="py-12 text-center">
-            <p class="text-muted-foreground mb-4">卒業要件が設定されていません</p>
-            <Button onClick={props.onEditRequirements}>卒業要件を設定</Button>
+            <p class="text-muted-foreground mb-4">達成状況が設定されていません</p>
+            <Button onClick={props.onEditRequirements}>達成状況を設定</Button>
           </CardContent>
         </Card>
       </Show>
