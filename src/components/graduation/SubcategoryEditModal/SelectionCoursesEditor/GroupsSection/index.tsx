@@ -1,22 +1,33 @@
 import { Plus } from "lucide-solid";
-import { type Accessor, type Component, For, type Setter, Show } from "solid-js";
+import { type Component, For, Show } from "solid-js";
+import type { SetStoreFunction } from "solid-js/store";
+import { reconcile } from "solid-js/store";
 import { Button } from "~/components/ui/button";
 import type { RequirementGroup } from "~/lib/types";
 import { GroupEditor } from "./GroupEditor";
 
 interface GroupsSectionProps {
-  groups: Accessor<RequirementGroup[]>;
-  setGroups: Setter<RequirementGroup[]>;
+  groups: RequirementGroup[];
+  setGroups: SetStoreFunction<RequirementGroup[]>;
 }
 
 export const GroupsSection: Component<GroupsSectionProps> = (props) => {
   const updateGroup = (index: number, updates: Partial<RequirementGroup>) => {
-    props.setGroups((prev) =>
-      prev.map((group, i) => {
-        if (i !== index) return group;
-        return { ...group, ...updates };
-      }),
-    );
+    if ("minCredits" in updates) {
+      props.setGroups(index, "minCredits", updates.minCredits ?? 0);
+    }
+    if ("maxCredits" in updates) {
+      props.setGroups(index, "maxCredits", updates.maxCredits);
+    }
+    if ("rules" in updates) {
+      props.setGroups(
+        index,
+        "rules",
+        reconcile(updates.rules ?? [], {
+          key: "id",
+        }),
+      );
+    }
   };
 
   const addGroup = () => {
@@ -34,7 +45,7 @@ export const GroupsSection: Component<GroupsSectionProps> = (props) => {
 
   return (
     <div class="space-y-3 pt-4 border-t">
-      <For each={props.groups()}>
+      <For each={props.groups}>
         {(group, index) => (
           <GroupEditor
             group={group}
@@ -44,7 +55,7 @@ export const GroupsSection: Component<GroupsSectionProps> = (props) => {
         )}
       </For>
 
-      <Show when={props.groups().length === 0}>
+      <Show when={props.groups.length === 0}>
         <p class="text-sm text-muted-foreground text-center py-4">
           条件グループがありません。「グループを追加」ボタンで条件を追加してください。
         </p>

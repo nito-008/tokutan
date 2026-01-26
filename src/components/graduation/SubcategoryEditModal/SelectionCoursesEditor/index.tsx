@@ -1,4 +1,5 @@
 import type { Accessor, Component, Setter } from "solid-js";
+import type { SetStoreFunction } from "solid-js/store";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import type { RequirementGroup } from "~/lib/types";
@@ -9,8 +10,8 @@ interface SelectionCoursesEditorProps {
   setMinCredits: Setter<number>;
   maxCredits: Accessor<number | undefined>;
   setMaxCredits: Setter<number | undefined>;
-  groups: Accessor<RequirementGroup[]>;
-  setGroups: Setter<RequirementGroup[]>;
+  groups: RequirementGroup[];
+  setGroups: SetStoreFunction<RequirementGroup[]>;
 }
 
 export const SelectionCoursesEditor: Component<SelectionCoursesEditorProps> = (props) => {

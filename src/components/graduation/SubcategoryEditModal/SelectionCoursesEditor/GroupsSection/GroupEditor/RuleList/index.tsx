@@ -32,7 +32,7 @@ export const RuleList: Component<RuleListProps> = (props) => {
     <DragDropProvider collisionDetector={closestCenter} onDragEnd={handleDragEnd}>
       <DragDropSensors />
       <SortableProvider ids={sortableIds()}>
-        <div class="space-y-2">
+        <div class="space-y-4">
           <For each={props.rules}>
             {(rule, index) => (
               <SortableRuleRow

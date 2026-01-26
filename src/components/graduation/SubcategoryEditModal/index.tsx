@@ -1,4 +1,5 @@
 import { type Component, createEffect, createSignal, Show } from "solid-js";
+import { createStore, reconcile, unwrap } from "solid-js/store";
 import { Button } from "~/components/ui/button";
 import {
   Dialog,
@@ -47,7 +48,7 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
   const [courseIds, setCourseIds] = createSignal<string[]>([]);
   const [minCredits, setMinCredits] = createSignal(0);
   const [maxCredits, setMaxCredits] = createSignal<number | undefined>(undefined);
-  const [groups, setGroups] = createSignal<RequirementGroup[]>([]);
+  const [groups, setGroups] = createStore<RequirementGroup[]>([]);
 
   createEffect(() => {
     if (props.subcategory) {
@@ -66,7 +67,11 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
         setCourseIds([]);
         setMinCredits(props.subcategory.minCredits);
         setMaxCredits(props.subcategory.maxCredits);
-        setGroups(JSON.parse(JSON.stringify(props.subcategory.groups)));
+        setGroups(
+          reconcile(JSON.parse(JSON.stringify(props.subcategory.groups)), {
+            key: "id",
+          }),
+        );
       }
     } else if (props.open) {
       setName("");
@@ -93,7 +98,7 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
             type: type(),
             minCredits: minCredits(),
             maxCredits: maxCredits(),
-            groups: groups(),
+            groups: JSON.parse(JSON.stringify(unwrap(groups))),
           };
 
     props.onSave(props.categoryId, props.subcategory?.id ?? null, updates);

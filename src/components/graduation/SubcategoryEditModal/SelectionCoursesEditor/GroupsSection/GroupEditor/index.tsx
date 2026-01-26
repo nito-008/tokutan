@@ -64,7 +64,7 @@ export const GroupEditor: Component<GroupEditorProps> = (props) => {
   };
 
   return (
-    <div class="border rounded-lg p-4 space-y-4 bg-muted/30">
+    <div class="border rounded-lg p-4 space-y-6">
       <div class="flex items-start gap-2">
         <div class="flex-1 grid grid-cols-2 gap-3">
           <div class="space-y-1">
@@ -104,24 +104,22 @@ export const GroupEditor: Component<GroupEditorProps> = (props) => {
         </Button>
       </div>
 
-      <div class="space-y-3">
-        <RuleList
-          rules={props.group.rules}
-          onUpdateRule={updateRule}
-          onRemoveRule={removeRule}
-          onMoveRule={moveRule}
-        />
+      <RuleList
+        rules={props.group.rules}
+        onUpdateRule={updateRule}
+        onRemoveRule={removeRule}
+        onMoveRule={moveRule}
+      />
 
-        <div class="grid grid-cols-2 gap-2">
-          <Button variant="ghost" size="sm" onClick={addSpecificRule} class="h-8">
-            <Plus class="size-4 mr-1" />
-            特定科目の追加
-          </Button>
-          <Button variant="ghost" size="sm" onClick={addPrefixRule} class="h-8">
-            <Plus class="size-4 mr-1" />
-            ～で始まる科目の追加
-          </Button>
-        </div>
+      <div class="grid grid-cols-2 gap-2">
+        <Button variant="ghost" size="sm" onClick={addSpecificRule} class="h-8">
+          <Plus class="size-4 mr-1" />
+          特定科目の追加
+        </Button>
+        <Button variant="ghost" size="sm" onClick={addPrefixRule} class="h-8">
+          <Plus class="size-4 mr-1" />
+          ～で始まる科目の追加
+        </Button>
       </div>
     </div>
   );

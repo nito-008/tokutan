@@ -32,7 +32,7 @@ export const RuleRow: Component<RuleRowProps> = (props) => {
   return (
     <div
       ref={props.sortableRef}
-      class="flex items-start gap-2 rounded border bg-background p-2"
+      class="flex items-start gap-2 bg-background"
       classList={{
         "opacity-50": props.isActiveDraggable,
         "transition-transform": !props.isActiveDraggable,
