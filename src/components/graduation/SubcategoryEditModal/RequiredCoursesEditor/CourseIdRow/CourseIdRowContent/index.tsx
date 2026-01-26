@@ -151,7 +151,7 @@ export const CourseIdRowContent: Component<CourseIdRowContentProps> = (props) =>
     const newValue = formatCourseGroup(nextIds);
     setLocalValue(newValue);
     props.onUpdateCourseId(props.index, newValue, true);
-    suggestionSearch.resetQuery();
+    suggestionSearch.search("", getRelatedCourseId(newValue));
     setHasActiveSearch(false);
   };
 
