@@ -113,8 +113,9 @@ export const CategoryRuleEditor: Component<CategoryRuleEditorProps> = (props) =>
             <Select
               value={props.middleCategory}
               onChange={(value) => {
+                const normalizedMiddle = value === "すべて" ? undefined : value || undefined;
                 props.onUpdate({
-                  middleCategory: value || undefined,
+                  middleCategory: normalizedMiddle,
                   minorCategory: undefined,
                 });
               }}
