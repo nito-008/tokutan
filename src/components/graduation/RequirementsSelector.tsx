@@ -1,3 +1,5 @@
+import { Button } from "@kobalte/core";
+import { FilePlusCorner } from "lucide-solid";
 import { type Component, createEffect, createSignal, onMount, Show } from "solid-js";
 import {
   Select,
@@ -49,31 +51,29 @@ export const RequirementsSelector: Component = () => {
   };
 
   return (
-    <div>
-      <Show when={!isLoading()} fallback={<div class="h-10 animate-pulse bg-muted rounded-md" />}>
-        <div class="flex items-center gap-3">
-          <span class="text-sm font-medium text-foreground whitespace-nowrap">卒業要件:</span>
-          <Select
-            value={selectedReq()}
-            onChange={handleChange}
-            options={requirements()}
-            optionValue="id"
-            placeholder="卒業要件を選択"
-            itemComponent={(selectProps) => (
-              <SelectItem item={selectProps.item}>
-                {getRequirementLabel(selectProps.item.rawValue)}
-              </SelectItem>
-            )}
-          >
-            <SelectTrigger>
-              <SelectValue<GraduationRequirements>>
-                {(state) => getRequirementLabel(state.selectedOption()) || "卒業要件を選択"}
-              </SelectValue>
-            </SelectTrigger>
-            <SelectContent />
-          </Select>
-        </div>
-      </Show>
-    </div>
+    <Show when={!isLoading()} fallback={<div class="h-10 animate-pulse bg-muted rounded-md" />}>
+      <div class="flex items-center gap-3">
+        <span class="text-sm font-medium text-foreground whitespace-nowrap">卒業要件:</span>
+        <Select
+          value={selectedReq()}
+          onChange={handleChange}
+          options={requirements()}
+          optionValue="id"
+          placeholder="卒業要件を選択"
+          itemComponent={(selectProps) => (
+            <SelectItem item={selectProps.item}>
+              {getRequirementLabel(selectProps.item.rawValue)}
+            </SelectItem>
+          )}
+        >
+          <SelectTrigger>
+            <SelectValue<GraduationRequirements>>
+              {(state) => getRequirementLabel(state.selectedOption()) || "卒業要件を選択"}
+            </SelectValue>
+          </SelectTrigger>
+          <SelectContent />
+        </Select>
+      </div>
+    </Show>
   );
 };

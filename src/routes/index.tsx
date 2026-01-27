@@ -1,6 +1,7 @@
 import { Loader } from "lucide-solid";
 import { type Component, createSignal, onMount, Show } from "solid-js";
 import { SettingsDialog } from "~/components/dialogs/SettingsDialog";
+import { CsvUploadDialog } from "~/components/graduation/CsvUploadDialog";
 import { GraduationChecker } from "~/components/graduation/GraduationChecker";
 import { RequirementsSelector } from "~/components/graduation/RequirementsSelector";
 import { Header } from "~/components/layout/Header";
@@ -43,14 +44,15 @@ const Home: Component = () => {
                   <div class="mb-4">
                     <Loader class="size-12 mx-auto text-muted-foreground animate-spin" />
                   </div>
-                  <p class="text-muted-foreground">Loading application data...</p>
+                  <p class="text-muted-foreground">読み込み中...</p>
                 </div>
               </div>
             }
           >
             <Show when={appState()}>
-              <div class="flex justify-center mb-6">
+              <div class="flex justify-center items-center gap-4 mb-6">
                 <RequirementsSelector />
+                <CsvUploadDialog />
               </div>
               <GraduationChecker />
             </Show>

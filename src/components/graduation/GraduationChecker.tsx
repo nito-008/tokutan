@@ -1,39 +1,24 @@
-﻿import { CircleCheck, FilePlusCorner } from "lucide-solid";
+﻿import { CircleCheck } from "lucide-solid";
 import { type Component, createEffect, createSignal, For, onCleanup, Show } from "solid-js";
-import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "~/components/ui/dialog";
 import { Switch, SwitchControl, SwitchLabel } from "~/components/ui/switch";
 import { calculateRequirementStatus } from "~/lib/calculator/requirements";
-import { importTwinsData } from "~/lib/db/enrollment";
 import { getCachedKdb } from "~/lib/db/kdb";
-import { getActiveProfile } from "~/lib/db/profiles";
 import { saveRequirements } from "~/lib/db/requirements";
-import type { ValidationResult } from "~/lib/parsers/twins-csv";
-import { getRequirementLabel } from "~/lib/requirements/label";
 import type {
   GraduationRequirements,
   RequirementCategory,
   RequirementGroup,
   RequirementStatus,
   RequirementSubcategory,
-  TwinsCourse,
 } from "~/lib/types";
 import { useAppState, useAppStateActions } from "~/stores/appState";
-import { CsvUploader } from "./CsvUploader";
 import { DonutChart, getCategoryColor } from "./DonutChart";
 import { RequirementTree } from "./RequirementTree";
 
 export const GraduationChecker: Component = () => {
   const appState = useAppState();
-  const { updateEnrollment, updateRequirements } = useAppStateActions();
+  const { updateRequirements } = useAppStateActions();
   const [status, setStatus] = createSignal<RequirementStatus>({
     requirementsId: "",
     totalEarnedCredits: 0,
@@ -43,14 +28,7 @@ export const GraduationChecker: Component = () => {
     categoryStatuses: [],
     calculatedAt: "",
   });
-  const [isUploaderOpen, setIsUploaderOpen] = createSignal(!appState()?.enrollment);
   const [editMode, setEditMode] = createSignal(false);
-
-  createEffect(() => {
-    if (!appState()?.enrollment) {
-      setIsUploaderOpen(true);
-    }
-  });
 
   // 要件充足状況を計算
   createEffect(() => {
@@ -79,27 +57,6 @@ export const GraduationChecker: Component = () => {
       setStatus(calculated);
     })();
   });
-
-  const handleDataLoaded = async (courses: TwinsCourse[], _validation: ValidationResult) => {
-    const profile = await getActiveProfile();
-    if (!profile) return;
-
-    const enrollment = await importTwinsData(profile.id, courses);
-    updateEnrollment(enrollment);
-    setIsUploaderOpen(false);
-  };
-
-  const handleReupload = () => {
-    setIsUploaderOpen(true);
-  };
-
-  const handleUploaderOpenChange = (open: boolean) => {
-    if (!open && !appState()?.enrollment) {
-      return;
-    }
-
-    setIsUploaderOpen(open);
-  };
 
   const handleCategoryUpdate = async (
     categoryId: string | null,
@@ -259,23 +216,6 @@ export const GraduationChecker: Component = () => {
 
   return (
     <div class="space-y-6">
-      <Dialog open={isUploaderOpen()} onOpenChange={handleUploaderOpenChange}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>成績データをアップロード</DialogTitle>
-            <DialogDescription>
-              TWINSからダウンロードしたCSVファイルをアップロードしてください
-            </DialogDescription>
-          </DialogHeader>
-          <CsvUploader onDataLoaded={handleDataLoaded} />
-          <DialogFooter class="sm:justify-start">
-            <Button variant="secondary" onClick={() => setIsUploaderOpen(false)}>
-              戻る
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
       <Show when={appState()?.requirements}>
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <Card class="lg:col-span-1">
@@ -333,17 +273,10 @@ export const GraduationChecker: Component = () => {
 
           <Card class="lg:col-span-2">
             <CardHeader class="flex flex-row items-center justify-between">
-              <CardTitle class="text-lg">{}</CardTitle>
-              <div class="flex justify-between w-full">
-                <Button variant="outline" size="sm" onClick={handleReupload}>
-                  <FilePlusCorner />
-                  <span>成績データを選択</span>
-                </Button>
-                <Switch checked={editMode()} onChange={setEditMode} class="flex items-center gap-2">
-                  <SwitchLabel>編集モード</SwitchLabel>
-                  <SwitchControl />
-                </Switch>
-              </div>
+              <Switch checked={editMode()} onChange={setEditMode} class="flex items-center gap-2">
+                <SwitchLabel>編集モード</SwitchLabel>
+                <SwitchControl />
+              </Switch>
             </CardHeader>
             <CardContent>
               <RequirementTree
