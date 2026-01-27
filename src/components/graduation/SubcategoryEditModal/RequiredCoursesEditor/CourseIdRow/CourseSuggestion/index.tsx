@@ -32,7 +32,7 @@ export const CourseSuggestionDropdown: Component<CourseSuggestionDropdownProps> 
                     type="button"
                     class="w-full px-3 py-2 text-left hover:bg-muted"
                     classList={{
-                      "bg-muted": props.selectedIds().has(course.id),
+                      "bg-muted": props.selectedIds().has(course.name),
                     }}
                     onMouseDown={(e) => {
                       e.preventDefault();
@@ -42,7 +42,7 @@ export const CourseSuggestionDropdown: Component<CourseSuggestionDropdownProps> 
                     <div class="flex items-center justify-between">
                       <span class="text-sm font-medium">{course.name}</span>
                       <span class="text-xs text-muted-foreground">
-                        <Show when={props.selectedIds().has(course.id)}>
+                        <Show when={props.selectedIds().has(course.name)}>
                           <Check class="mr-1 inline-block size-4 text-primary" />
                         </Show>
                         {course.credits}単位

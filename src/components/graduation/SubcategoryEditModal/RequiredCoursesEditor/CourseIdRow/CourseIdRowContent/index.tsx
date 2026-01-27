@@ -11,17 +11,7 @@ import {
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Popover, PopoverAnchor } from "~/components/ui/popover";
-import { getCoursesByIds } from "~/lib/db/kdb";
 import type { Course } from "~/lib/types";
-import {
-  dropSearchToken,
-  extractSuggestionToken,
-  formatCourseGroup,
-  formatCourseGroupLabel,
-  normalizeCourseGroup,
-  parseCourseGroup,
-  uniqueCourseIds,
-} from "../../../utils/courseGroup";
 import { CourseSuggestionDropdown } from "../CourseSuggestion";
 import { useSuggestionSearch } from "../CourseSuggestion/useSuggestionSearch";
 
@@ -51,12 +41,7 @@ const clampY = (y: number, currentIndex: number, sortableCount: number): number 
 };
 
 export const CourseIdRowContent: Component<CourseIdRowContentProps> = (props) => {
-  const [requiredCourseNames, setRequiredCourseNames] = createSignal<Map<string, string>>(
-    new Map(),
-  );
-  const [isCourseLookupLoading, setIsCourseLookupLoading] = createSignal(false);
   const [isFocused, setIsFocused] = createSignal(false);
-  const [hasActiveSearch, setHasActiveSearch] = createSignal(false);
   const [localValue, setLocalValue] = createSignal(props.id);
 
   // フォーカス外の時のみ親の値をローカルに同期
@@ -68,59 +53,20 @@ export const CourseIdRowContent: Component<CourseIdRowContentProps> = (props) =>
 
   const suggestionSearch = useSuggestionSearch(isFocused);
 
-  const groupIds = () => uniqueCourseIds(parseCourseGroup(localValue()));
-  const selectedIds = () => new Set(groupIds());
-  const getRelatedCourseId = (value: string) => {
-    if (!value.includes(",")) {
-      const trimmed = value.trim();
-      return trimmed || undefined;
-    }
-    const [firstToken] = value.split(",");
-    const trimmed = firstToken?.trim();
-    return trimmed || undefined;
+  // 入力値が科目名そのものなので、selectedIdsは単一値のSetに
+  const selectedIds = () => {
+    const trimmedValue = localValue().trim();
+    return trimmedValue ? new Set([trimmedValue]) : new Set<string>();
   };
-  const isMissingCourse = () =>
-    groupIds().length > 0 &&
-    !isFocused() &&
-    !props.isPlaceholder &&
-    !isCourseLookupLoading() &&
-    groupIds().some((courseId) => !requiredCourseNames().has(courseId));
-
-  createEffect(() => {
-    const ids = groupIds();
-    if (ids.length === 0) {
-      setRequiredCourseNames(new Map());
-      setIsCourseLookupLoading(false);
-      return;
-    }
-
-    let cancelled = false;
-    onCleanup(() => {
-      cancelled = true;
-    });
-
-    void (async () => {
-      setIsCourseLookupLoading(true);
-      const courses = await getCoursesByIds(ids);
-      if (cancelled) return;
-      const nameMap = new Map<string, string>();
-      for (const course of courses) {
-        nameMap.set(course.id, course.name);
-      }
-      setRequiredCourseNames(nameMap);
-      setIsCourseLookupLoading(false);
-    })();
-  });
 
   const handleInputChange = (value: string) => {
     setLocalValue(value);
-    setHasActiveSearch(true);
-    suggestionSearch.search(extractSuggestionToken(value), getRelatedCourseId(value));
+    suggestionSearch.search(value.trim(), undefined);
   };
 
   const handleFocusInput = (value: string) => {
     setIsFocused(true);
-    suggestionSearch.search(extractSuggestionToken(value), getRelatedCourseId(value));
+    suggestionSearch.search(value.trim(), undefined);
   };
 
   const handleBlurInput = () => {
@@ -128,31 +74,19 @@ export const CourseIdRowContent: Component<CourseIdRowContentProps> = (props) =>
       setIsFocused(false);
       suggestionSearch.clear();
     }
-    setHasActiveSearch(false);
-    const normalized = normalizeCourseGroup(localValue());
-    setLocalValue(normalized);
-    props.onUpdateCourseId(props.index, normalized);
+    const trimmedValue = localValue().trim();
+    setLocalValue(trimmedValue);
+    props.onUpdateCourseId(props.index, trimmedValue);
   };
 
   const toggleSuggestionSelect = (course: Course) => {
-    const currentValue = localValue() ?? "";
-    const baseIds = hasActiveSearch()
-      ? dropSearchToken(currentValue)
-      : parseCourseGroup(currentValue);
-    const currentIds = uniqueCourseIds(baseIds);
-    const nextIds = currentIds.includes(course.id)
-      ? currentIds.filter((id) => id !== course.id)
-      : [...currentIds, course.id];
-    setRequiredCourseNames((prev) => {
-      const next = new Map(prev);
-      next.set(course.id, course.name);
-      return next;
-    });
-    const newValue = formatCourseGroup(nextIds);
+    // 科目名を保存
+    const newValue = course.name;
     setLocalValue(newValue);
     props.onUpdateCourseId(props.index, newValue, true);
-    suggestionSearch.search("", getRelatedCourseId(newValue));
-    setHasActiveSearch(false);
+    // フォーカスを外してポップオーバーを閉じる
+    setIsFocused(false);
+    suggestionSearch.clear();
   };
 
   return (
@@ -204,10 +138,6 @@ export const CourseIdRowContent: Component<CourseIdRowContentProps> = (props) =>
               <PopoverAnchor>
                 <div class="relative">
                   <Input
-                    classList={{
-                      "text-transparent caret-foreground": !isFocused(),
-                      "border-destructive focus-visible:ring-destructive": isMissingCourse(),
-                    }}
                     value={localValue()}
                     onInput={(e) => handleInputChange(e.currentTarget.value)}
                     onFocus={(e) => handleFocusInput(e.currentTarget.value)}
@@ -222,21 +152,6 @@ export const CourseIdRowContent: Component<CourseIdRowContentProps> = (props) =>
                     }}
                     placeholder={props.isPlaceholder ? "科目名を追加" : "例: 工学システム概論"}
                   />
-                  <Show when={groupIds().length > 0 && !isFocused()}>
-                    <div
-                      class={`pointer-events-none absolute inset-y-0 left-3 right-3 flex items-center text-sm truncate ${
-                        isMissingCourse() ? "text-destructive" : "text-foreground"
-                      }`}
-                    >
-                      {isMissingCourse()
-                        ? `${props.id}（科目が見つかりません）`
-                        : formatCourseGroupLabel(
-                            props.id,
-                            requiredCourseNames(),
-                            isCourseLookupLoading(),
-                          )}
-                    </div>
-                  </Show>
                   <div ref={setBlurTarget} tabIndex={-1} class="sr-only" aria-hidden="true" />
                 </div>
               </PopoverAnchor>

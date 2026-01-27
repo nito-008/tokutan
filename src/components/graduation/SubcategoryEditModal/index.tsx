@@ -24,7 +24,7 @@ import {
 import type { RequirementGroup, RequirementSubcategory } from "~/lib/types";
 import { RequiredCoursesEditor } from "./RequiredCoursesEditor";
 import { SelectionCoursesEditor } from "./SelectionCoursesEditor";
-import { normalizeCourseGroup, normalizeCourseIds } from "./utils/courseGroup";
+import { normalizeCourseIds } from "./utils/courseGroup";
 
 interface SubcategoryEditModalProps {
   open: boolean;
@@ -84,7 +84,7 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
         ? {
             type: type(),
             courseIds: courseIds()
-              .map((value) => normalizeCourseGroup(value))
+              .map((value) => value.trim())
               .filter((value) => value),
           }
         : {
