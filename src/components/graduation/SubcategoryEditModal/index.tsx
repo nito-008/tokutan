@@ -58,15 +58,21 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
         );
         setMinCredits(0);
         setMaxCredits(undefined);
-        setGroups(reconcile(props.subcategory.groups ?? [], { key: "id" }));
+        setGroups(
+          reconcile(
+            props.subcategory.groups ? JSON.parse(JSON.stringify(props.subcategory.groups)) : [],
+            { key: "id" },
+          ),
+        );
       } else {
         setCourseIds([]);
         setMinCredits(props.subcategory.minCredits);
         setMaxCredits(props.subcategory.maxCredits);
         setGroups(
-          reconcile(JSON.parse(JSON.stringify(props.subcategory.groups)), {
-            key: "id",
-          }),
+          reconcile(
+            props.subcategory.groups ? JSON.parse(JSON.stringify(props.subcategory.groups)) : [],
+            { key: "id" },
+          ),
         );
       }
     } else if (props.open) {
