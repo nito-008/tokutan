@@ -1,6 +1,7 @@
 ﻿import { type Component, createEffect, createSignal, For, onCleanup, Show } from "solid-js";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
+import { Dialog, DialogContent } from "~/components/ui/dialog";
 import { Switch, SwitchControl, SwitchLabel } from "~/components/ui/switch";
 import { calculateRequirementStatus } from "~/lib/calculator/requirements";
 import { importTwinsData } from "~/lib/db/enrollment";
@@ -33,7 +34,7 @@ interface GraduationCheckerProps {
 
 export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
   const [status, setStatus] = createSignal<RequirementStatus | null>(null);
-  const [showUploader, setShowUploader] = createSignal(!props.enrollment);
+  const [isUploaderOpen, setIsUploaderOpen] = createSignal(!props.enrollment);
   const [editMode, setEditMode] = createSignal(false);
 
   // 要件充足状況を計算
@@ -69,11 +70,19 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
 
     const enrollment = await importTwinsData(profile.id, courses);
     props.onEnrollmentUpdate(enrollment);
-    setShowUploader(false);
+    setIsUploaderOpen(false);
   };
 
   const handleReupload = () => {
-    setShowUploader(true);
+    setIsUploaderOpen(true);
+  };
+
+  const handleUploaderOpenChange = (open: boolean) => {
+    if (!open && !props.enrollment) {
+      return;
+    }
+
+    setIsUploaderOpen(open);
   };
 
   const handleCategoryUpdate = async (
@@ -232,19 +241,20 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
 
   return (
     <div class="space-y-6">
-      <Show when={showUploader()}>
-        <CsvUploader onDataLoaded={handleDataLoaded} />
+      <Dialog open={isUploaderOpen()} onOpenChange={handleUploaderOpenChange}>
+        <DialogContent class="p-0">
+          <CsvUploader onDataLoaded={handleDataLoaded} />
+          <Show when={props.enrollment}>
+            <div class="text-center py-4">
+              <Button variant="link" onClick={() => setIsUploaderOpen(false)}>
+                既存のデータを使用する
+              </Button>
+            </div>
+          </Show>
+        </DialogContent>
+      </Dialog>
 
-        <Show when={props.enrollment}>
-          <div class="text-center">
-            <Button variant="link" onClick={() => setShowUploader(false)}>
-              既存のデータを使用する
-            </Button>
-          </div>
-        </Show>
-      </Show>
-
-      <Show when={!showUploader() && status() && props.requirements}>
+      <Show when={!isUploaderOpen() && status() && props.requirements}>
         <RequirementsSummary
           status={status() as RequirementStatus}
           requirementsLabel={getRequirementLabel(props.requirements)}
@@ -301,7 +311,7 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
               <CardTitle class="text-lg">詳細達成状況</CardTitle>
               <div class="flex gap-2">
                 <Button variant="outline" size="sm" onClick={handleReupload}>
-                  データ再読み込み
+                  成績データを選択
                 </Button>
                 <Switch checked={editMode()} onChange={setEditMode} class="flex items-center gap-2">
                   <SwitchLabel>編集モード</SwitchLabel>
@@ -324,7 +334,7 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
         </div>
       </Show>
 
-      <Show when={!showUploader() && !props.requirements}>
+      <Show when={!isUploaderOpen() && !props.requirements}>
         <Card>
           <CardContent class="py-12 text-center">
             <p class="text-muted-foreground mb-4">達成状況が設定されていません</p>
