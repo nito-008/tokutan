@@ -204,9 +204,7 @@ export const SettingsDialog: Component<SettingsDialogProps> = (props) => {
 
             <div class="border rounded-lg p-4">
               <h4 class="font-medium mb-2">全データを上書きインポート</h4>
-              <p class="text-sm text-muted-foreground mb-3 text-red-500">
-                警告: 既存のすべてのデータが削除されます。
-              </p>
+              <p class="text-sm mb-3 text-red-500">警告: 既存のすべてのデータが削除されます。</p>
               <Button
                 variant="destructive"
                 onClick={() => {
@@ -286,7 +284,7 @@ export const SettingsDialog: Component<SettingsDialogProps> = (props) => {
 
             <div class="border rounded-lg p-4">
               <h4 class="font-medium mb-2">ユーザーデータを削除</h4>
-              <p class="text-sm text-muted-foreground mb-3 text-red-500">
+              <p class="text-sm mb-3 text-red-500">
                 プロファイル、履修データ、卒業要件、履修計画が削除されます。
               </p>
               <Button
