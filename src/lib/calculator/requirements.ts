@@ -22,16 +22,64 @@ function parseRequiredCourseGroups(courseIds: string[]): string[][] {
   return courseIds.map(splitRequiredCourseGroup).filter((group) => group.length > 0);
 }
 
-// 全必修科目番号を収集するヘルパー関数（選択科目からの除外用）
-function collectAllRequiredCourseIds(requirements: GraduationRequirements): Set<string> {
-  return new Set<string>();
+type RequiredCourseExclusion = {
+  courseIds: Set<string>;
+  courseNames: Set<string>;
+};
+
+function buildRequiredCourseExclusionSet(
+  requirements: GraduationRequirements,
+  kdbMap: Map<string, Course>,
+): RequiredCourseExclusion {
+  const exclusion: RequiredCourseExclusion = {
+    courseIds: new Set<string>(),
+    courseNames: new Set<string>(),
+  };
+
+  const nameToId = new Map<string, string>();
+  for (const [courseId, course] of kdbMap.entries()) {
+    const name = course.name?.trim();
+    if (name) {
+      nameToId.set(name, courseId);
+    }
+  }
+
+  for (const category of requirements.categories) {
+    for (const subcategory of category.subcategories) {
+      if (subcategory.type !== "required") continue;
+      for (const rawCourse of subcategory.courseIds ?? []) {
+        const courseKey = rawCourse?.trim();
+        if (!courseKey) continue;
+        exclusion.courseNames.add(courseKey);
+
+        if (kdbMap.has(courseKey)) {
+          exclusion.courseIds.add(courseKey);
+          continue;
+        }
+
+        const mappedId = nameToId.get(courseKey);
+        if (mappedId) {
+          exclusion.courseIds.add(mappedId);
+        }
+      }
+    }
+  }
+
+  return exclusion;
+}
+
+function isCourseExcludedByRequirements(
+  course: UserCourseRecord,
+  exclusion: RequiredCourseExclusion,
+): boolean {
+  return exclusion.courseIds.has(course.courseId) || exclusion.courseNames.has(course.courseName);
 }
 
 function matchRequiredCourseGroups(
   courseGroups: string[][],
   courses: UserCourseRecord[],
   usedCourseIds: Set<string>,
-  kdbMap: Map<string, Course>,
+  _kdbMap: Map<string, Course>,
 ): MatchedCourse[] {
   const matches: MatchedCourse[] = [];
   const coursesByName = new Map<string, UserCourseRecord[]>();
@@ -97,14 +145,13 @@ export function calculateRequirementStatus(
   // 各科目が使用済みかどうかを追跡（同じ科目を複数カテゴリでカウントしない）
   const usedCourseIds = new Set<string>();
 
-  // 全必修科目番号を収集
-  const excludedCourseIds = collectAllRequiredCourseIds(requirements);
-
   // kdbキャッシュのMapを作成（科目番号→科目情報）
   const kdbMap = new Map<string, Course>();
   for (const course of kdbCourses) {
     kdbMap.set(course.id, course);
   }
+  // 全必修科目番号（および科目名）を収集
+  const requiredCourseExclusion = buildRequiredCourseExclusionSet(requirements, kdbMap);
 
   const categoryStatuses: CategoryStatus[] = requirements.categories.map((category) => {
     const subcategoryStatuses: SubcategoryStatus[] = category.subcategories.map((subcategory) => {
@@ -146,7 +193,12 @@ export function calculateRequirementStatus(
       }
 
       for (const group of subcategory.groups) {
-        const groupMatches = matchCoursesToGroup(courses, group, usedCourseIds, excludedCourseIds);
+        const groupMatches = matchCoursesToGroup(
+          courses,
+          group,
+          usedCourseIds,
+          requiredCourseExclusion,
+        );
 
         const earnedCredits = groupMatches
           .filter((m) => m.isPassed)
@@ -244,7 +296,7 @@ function matchCoursesToGroup(
   courses: UserCourseRecord[],
   group: RequirementGroup,
   usedCourseIds: Set<string>,
-  excludedCourseIds: Set<string>,
+  excludedCourseIds: RequiredCourseExclusion,
 ): MatchedCourse[] {
   const matches: MatchedCourse[] = [];
   const groupExcludedCourseIds = new Set<string>();
@@ -260,6 +312,7 @@ function matchCoursesToGroup(
     // 既に使用済みの科目はスキップ
     if (usedCourseIds.has(course.id)) continue;
     if (groupExcludedCourseIds.has(course.courseId)) continue;
+    if (isCourseExcludedByRequirements(course, excludedCourseIds)) continue;
 
     let isMatch = false;
 
@@ -292,8 +345,9 @@ function matchCoursesToGroup(
 function matchCourseToRule(
   course: UserCourseRecord,
   rule: GroupRule,
-  excludedCourseIds: Set<string>,
+  excludedCourseIds: RequiredCourseExclusion,
 ): boolean {
+  if (isCourseExcludedByRequirements(course, excludedCourseIds)) return false;
   switch (rule.type) {
     case "exclude":
       return false;
@@ -302,7 +356,7 @@ function matchCourseToRule(
 
     case "prefix":
       // 必修科目として定義されているものは除外
-      if (excludedCourseIds.has(course.courseId)) {
+      if (excludedCourseIds.courseIds.has(course.courseId)) {
         return false;
       }
       return course.courseId.startsWith(rule.prefix);
