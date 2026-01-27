@@ -1,7 +1,7 @@
 import { Loader } from "lucide-solid";
 import { type Component, createSignal, onMount, Show } from "solid-js";
+import { CsvUploadDialog } from "~/components/dialogs/CsvUploadDialog";
 import { SettingsDialog } from "~/components/dialogs/SettingsDialog";
-import { CsvUploadDialog } from "~/components/graduation/CsvUploadDialog";
 import { GraduationChecker } from "~/components/graduation/GraduationChecker";
 import { RequirementsSelector } from "~/components/graduation/RequirementsSelector";
 import { Header } from "~/components/layout/Header";
