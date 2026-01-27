@@ -49,12 +49,10 @@ const Home: Component = () => {
             }
           >
             <Show when={appState()}>
-              <>
-                <div class="flex justify-center mb-6">
-                  <RequirementsSelector />
-                </div>
-                <GraduationChecker />
-              </>
+              <div class="flex justify-center mb-6">
+                <RequirementsSelector />
+              </div>
+              <GraduationChecker />
             </Show>
           </Show>
         </main>

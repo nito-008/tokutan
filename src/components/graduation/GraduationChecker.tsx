@@ -1,4 +1,5 @@
-﻿import { type Component, createEffect, createSignal, For, onCleanup, Show } from "solid-js";
+﻿import { CircleCheck } from "lucide-solid";
+import { type Component, createEffect, createSignal, For, onCleanup, Show } from "solid-js";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import {
@@ -28,13 +29,20 @@ import type {
 import { useAppState, useAppStateActions } from "~/stores/appState";
 import { CsvUploader } from "./CsvUploader";
 import { DonutChart, getCategoryColor } from "./DonutChart";
-import { RequirementsSummary } from "./RequirementsSummary";
 import { RequirementTree } from "./RequirementTree";
 
 export const GraduationChecker: Component = () => {
   const appState = useAppState();
   const { updateEnrollment, updateRequirements } = useAppStateActions();
-  const [status, setStatus] = createSignal<RequirementStatus | null>(null);
+  const [status, setStatus] = createSignal<RequirementStatus>({
+    requirementsId: "",
+    totalEarnedCredits: 0,
+    totalInProgressCredits: 0,
+    totalRequiredCredits: 0,
+    isGraduationEligible: false,
+    categoryStatuses: [],
+    calculatedAt: "",
+  });
   const [isUploaderOpen, setIsUploaderOpen] = createSignal(!appState()?.enrollment);
   const [editMode, setEditMode] = createSignal(false);
 
@@ -247,6 +255,8 @@ export const GraduationChecker: Component = () => {
     updateRequirements(updatedRequirements);
   };
 
+  const remaining = () => status().totalRequiredCredits - status().totalEarnedCredits;
+
   return (
     <div class="space-y-6">
       <Dialog open={isUploaderOpen()} onOpenChange={handleUploaderOpenChange}>
@@ -266,15 +276,24 @@ export const GraduationChecker: Component = () => {
         </DialogContent>
       </Dialog>
 
-      <Show when={status() && appState()?.requirements}>
-        <RequirementsSummary
-          status={status() as RequirementStatus}
-          requirementsLabel={getRequirementLabel(appState()?.requirements ?? null)}
-        />
-
+      <Show when={appState()?.requirements}>
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <Card class="lg:col-span-1">
+            <CardHeader>
+              <CardTitle class="text-2xl flex items-center gap-2">
+                <Show
+                  when={status().isGraduationEligible}
+                  fallback={<span>卒業まであと&nbsp;{remaining()}単位!</span>}
+                >
+                  <CircleCheck class="size-6 text-green-500" />
+                  <span>卒業!</span>
+                </Show>
+              </CardTitle>
+            </CardHeader>
             <CardContent>
+              <p class="text-sm text-muted-foreground">
+                {getRequirementLabel(appState()?.requirements)}
+              </p>
               <DonutChart
                 categoryStatuses={status()?.categoryStatuses ?? []}
                 totalEarned={status()?.totalEarnedCredits ?? 0}
