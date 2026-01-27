@@ -185,6 +185,10 @@ src/
 | **Toggle Group**    | `toggle-group`    | A set of two-state buttons that can be toggled on or off.                                          |
 | **Tooltip**         | `tooltip`         | A popup that displays information related to an element when hovered or focused.                   |
 
+## Comment Guidelines
+
+- Document functions with appropriate JsDoc comments in Japanese, describing parameters and return values.
+
 ## Planning Mode
 
 - When told "Plan mode", do not implement at first; only produce an implementation plan.
