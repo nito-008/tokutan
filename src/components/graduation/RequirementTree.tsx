@@ -191,8 +191,7 @@ interface SubcategoryPanelProps {
 }
 
 const SubcategoryPanel: Component<SubcategoryPanelProps> = (props) => {
-  const groupDefinitions: RequirementGroup[] =
-    props.definition && props.definition.type !== "required" ? props.definition.groups : [];
+  const groupDefinitions: RequirementGroup[] = props.definition?.groups ?? [];
 
   return (
     <div class="border border-border rounded-xl p-3 space-y-4">
@@ -224,16 +223,35 @@ const SubcategoryPanel: Component<SubcategoryPanelProps> = (props) => {
 
       <div class="space-y-4">
         {props.subcategory.subcategoryType === "required" ? (
-          <div class="space-y-2">
-            <Separator />
-            <div class="space-y-1">
-              <For each={props.subcategory.matchedCourses}>
-                {(course) => <CourseItem course={course} />}
-              </For>
-              <Show when={props.subcategory.matchedCourses.length === 0}>
-                <p class="text-sm text-muted-foreground">該当する科目がありません</p>
-              </Show>
+          <div class="space-y-4">
+            {/* 必修科目リスト */}
+            <div class="space-y-2">
+              <Separator />
+              <div class="space-y-1">
+                <For each={props.subcategory.matchedCourses}>
+                  {(course) => <CourseItem course={course} />}
+                </For>
+                <Show
+                  when={
+                    props.subcategory.matchedCourses.length === 0 &&
+                    props.subcategory.groupStatuses.length === 0
+                  }
+                >
+                  <p class="text-sm text-muted-foreground">該当する科目がありません</p>
+                </Show>
+              </div>
             </div>
+            {/* グループ条件 */}
+            <For each={props.subcategory.groupStatuses}>
+              {(groupStatus) => (
+                <ConditionBlock
+                  groupStatus={groupStatus}
+                  groupDefinition={groupDefinitions.find(
+                    (group) => group.id === groupStatus.groupId,
+                  )}
+                />
+              )}
+            </For>
           </div>
         ) : (
           <div class="space-y-4">

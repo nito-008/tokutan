@@ -124,16 +124,26 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
       const notes = updates.notes ?? existing?.notes;
 
       if (nextType === "required") {
-        type RequiredUpdate = Partial<{ type: "required"; courseIds: string[] }>;
+        type RequiredUpdate = Partial<{
+          type: "required";
+          courseIds: string[];
+          groups: RequirementGroup[];
+        }>;
         const courseIds = hasCourseIds
           ? ((updates as RequiredUpdate).courseIds ?? [])
           : existing?.type === "required"
             ? (existing.courseIds ?? [])
             : [];
+        const groups = hasGroups
+          ? ((updates as RequiredUpdate).groups ?? [])
+          : existing?.type === "required"
+            ? (existing.groups ?? [])
+            : [];
         return {
           id: existing?.id ?? `subcat-${Date.now()}`,
           type: "required",
           courseIds,
+          groups,
           notes,
         };
       }
