@@ -87,31 +87,35 @@ export const CategoryRuleEditor: Component<CategoryRuleEditorProps> = (props) =>
       <Show when={!loading()} fallback={<div class="text-sm text-muted-foreground">読込中...</div>}>
         <div class="flex gap-2">
           <Select
-            value={props.majorCategory}
+            value={props.majorCategory || "すべて"}
             onChange={(value) => {
-              if (value) {
-                props.onUpdate({
-                  majorCategory: value,
-                  middleCategory: undefined,
-                  minorCategory: undefined,
-                });
-              }
+              if (value == null) return;
+              const normalizedMajor = value === "すべて" ? "" : value;
+              props.onUpdate({
+                majorCategory: normalizedMajor,
+                middleCategory: undefined,
+                minorCategory: undefined,
+              });
             }}
-            options={majorCategories()}
-            placeholder="大項目を選択"
+            options={["すべて", ...majorCategories()]}
             itemComponent={(props) => (
               <SelectItem item={props.item}>{props.item.rawValue}</SelectItem>
             )}
           >
             <SelectTrigger class="h-8">
-              <SelectValue<string>>{(state) => state.selectedOption()}</SelectValue>
+              <SelectValue<string>>
+                {(state) => {
+                  const selected = state.selectedOption() as string | undefined;
+                  return selected ?? "すべて";
+                }}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent />
           </Select>
 
           <Show when={props.majorCategory && middleCategories().length > 0}>
             <Select
-              value={props.middleCategory}
+              value={props.middleCategory ?? "すべて"}
               onChange={(value) => {
                 const normalizedMiddle = value === "すべて" ? undefined : value || undefined;
                 props.onUpdate({
@@ -120,13 +124,17 @@ export const CategoryRuleEditor: Component<CategoryRuleEditorProps> = (props) =>
                 });
               }}
               options={["すべて", ...middleCategories()]}
-              placeholder="中項目を選択"
               itemComponent={(props) => (
                 <SelectItem item={props.item}>{props.item.rawValue}</SelectItem>
               )}
             >
               <SelectTrigger class="h-8">
-                <SelectValue<string>>{(state) => state.selectedOption() || "すべて"}</SelectValue>
+                <SelectValue<string>>
+                  {(state) => {
+                    const selected = state.selectedOption() as string | undefined;
+                    return selected ?? "すべて";
+                  }}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent />
             </Select>
@@ -134,20 +142,24 @@ export const CategoryRuleEditor: Component<CategoryRuleEditorProps> = (props) =>
 
           <Show when={props.majorCategory && props.middleCategory && minorCategories().length > 0}>
             <Select
-              value={props.minorCategory}
+              value={props.minorCategory ?? "すべて"}
               onChange={(value) => {
                 props.onUpdate({
                   minorCategory: value === "すべて" ? undefined : value || undefined,
                 });
               }}
               options={["すべて", ...minorCategories()]}
-              placeholder="小項目を選択"
               itemComponent={(props) => (
                 <SelectItem item={props.item}>{props.item.rawValue}</SelectItem>
               )}
             >
               <SelectTrigger class="h-8">
-                <SelectValue<string>>{(state) => state.selectedOption() || "すべて"}</SelectValue>
+                <SelectValue<string>>
+                  {(state) => {
+                    const selected = state.selectedOption() as string | undefined;
+                    return selected ?? "すべて";
+                  }}
+                </SelectValue>
               </SelectTrigger>
               <SelectContent />
             </Select>
