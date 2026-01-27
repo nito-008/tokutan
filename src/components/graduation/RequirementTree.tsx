@@ -338,7 +338,8 @@ const formatGroupConditionLabel = (group?: RequirementGroup): string => {
   }
 
   if (categoryNames.length) {
-    parts.push(`科目区分\n${categoryNames.join("、")}`);
+    const categoryText = categoryNames.join("、");
+    parts.push(parts.length ? `\n${categoryText}` : categoryText);
   }
 
   if (specificCourseIds.length) {
