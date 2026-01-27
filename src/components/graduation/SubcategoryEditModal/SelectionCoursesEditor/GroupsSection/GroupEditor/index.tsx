@@ -31,6 +31,22 @@ export const GroupEditor: Component<GroupEditorProps> = (props) => {
           courseIds: "courseIds" in merged ? (merged.courseIds as string[]) : rule.courseIds,
         } satisfies GroupRule;
       }
+      if (rule.type === "category") {
+        return {
+          id: rule.id,
+          type: "category",
+          majorCategory:
+            "majorCategory" in merged ? (merged.majorCategory as string) : rule.majorCategory,
+          middleCategory:
+            "middleCategory" in merged
+              ? (merged.middleCategory as string | undefined)
+              : rule.middleCategory,
+          minorCategory:
+            "minorCategory" in merged
+              ? (merged.minorCategory as string | undefined)
+              : rule.minorCategory,
+        } satisfies GroupRule;
+      }
       return {
         id: rule.id,
         type: "prefix",
@@ -63,6 +79,15 @@ export const GroupEditor: Component<GroupEditorProps> = (props) => {
       id: `rule-${Date.now()}`,
       type: "exclude",
       courseIds: [],
+    };
+    props.onUpdate({ rules: [...props.group.rules, newRule] });
+  };
+
+  const addCategoryRule = () => {
+    const newRule: GroupRule = {
+      id: `rule-${Date.now()}`,
+      type: "category",
+      majorCategory: "",
     };
     props.onUpdate({ rules: [...props.group.rules, newRule] });
   };
@@ -127,7 +152,7 @@ export const GroupEditor: Component<GroupEditorProps> = (props) => {
         onMoveRule={moveRule}
       />
 
-      <div class="grid grid-cols-1 gap-2 sm:grid-cols-3">
+      <div class="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
         <Button variant="ghost" size="sm" onClick={addSpecificRule} class="h-8">
           <Plus class="size-4 mr-1" />
           特定科目の追加
@@ -135,6 +160,10 @@ export const GroupEditor: Component<GroupEditorProps> = (props) => {
         <Button variant="ghost" size="sm" onClick={addPrefixRule} class="h-8">
           <Plus class="size-4 mr-1" />
           ～で始まる科目の追加
+        </Button>
+        <Button variant="ghost" size="sm" onClick={addCategoryRule} class="h-8">
+          <Plus class="size-4 mr-1" />
+          科目区分から追加
         </Button>
         <Button variant="ghost" size="sm" onClick={addExcludeRule} class="h-8">
           <Plus class="size-4 mr-1" />

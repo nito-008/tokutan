@@ -3,6 +3,7 @@ import { type Component, type JSX, Show } from "solid-js";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import type { GroupRule } from "~/lib/types";
+import { CategoryRuleEditor } from "../CategoryRuleEditor";
 import { CourseIdsInput } from "../CourseIdsInput";
 
 interface RuleRowProps {
@@ -25,6 +26,8 @@ const ruleTypeLabel = (rule: GroupRule) => {
       return "で始まる科目";
     case "exclude":
       return "を除外";
+    case "category":
+      return "科目区分";
   }
 };
 const ROW_HEIGHT = 56;
@@ -70,37 +73,39 @@ export const RuleRow: Component<RuleRowProps> = (props) => {
       </div>
 
       <div class="flex-1">
-        <Show
-          when={props.rule.type === "specific"}
-          fallback={
-            <Show
-              when={props.rule.type === "exclude"}
-              fallback={
-                <Input
-                  class="h-8"
-                  value={(props.rule as Extract<GroupRule, { type: "prefix" }>).prefix}
-                  onInput={(e) =>
-                    props.onUpdate({ prefix: e.currentTarget.value } satisfies Partial<GroupRule>)
-                  }
-                  placeholder="科目の最初の文字列 (例: FG)"
-                />
-              }
-            >
-              <Input
-                class="h-8"
-                value={(props.rule as Extract<GroupRule, { type: "exclude" }>).courseIds[0] ?? ""}
-                onInput={(e) => {
-                  const value = e.currentTarget.value.trim();
-                  props.onUpdate({ courseIds: value ? [value] : [] } satisfies Partial<GroupRule>);
-                }}
-                placeholder="除外科目 (例: FG10101)"
-              />
-            </Show>
-          }
-        >
+        <Show when={props.rule.type === "specific"}>
           <CourseIdsInput
             courseIds={(props.rule as Extract<GroupRule, { type: "specific" }>).courseIds}
             onUpdate={(courseIds) => props.onUpdate({ courseIds } satisfies Partial<GroupRule>)}
+          />
+        </Show>
+        <Show when={props.rule.type === "exclude"}>
+          <Input
+            class="h-8"
+            value={(props.rule as Extract<GroupRule, { type: "exclude" }>).courseIds[0] ?? ""}
+            onInput={(e) => {
+              const value = e.currentTarget.value.trim();
+              props.onUpdate({ courseIds: value ? [value] : [] } satisfies Partial<GroupRule>);
+            }}
+            placeholder="除外科目 (例: FG10101)"
+          />
+        </Show>
+        <Show when={props.rule.type === "prefix"}>
+          <Input
+            class="h-8"
+            value={(props.rule as Extract<GroupRule, { type: "prefix" }>).prefix}
+            onInput={(e) =>
+              props.onUpdate({ prefix: e.currentTarget.value } satisfies Partial<GroupRule>)
+            }
+            placeholder="科目の最初の文字列 (例: FG)"
+          />
+        </Show>
+        <Show when={props.rule.type === "category"}>
+          <CategoryRuleEditor
+            majorCategory={(props.rule as Extract<GroupRule, { type: "category" }>).majorCategory}
+            middleCategory={(props.rule as Extract<GroupRule, { type: "category" }>).middleCategory}
+            minorCategory={(props.rule as Extract<GroupRule, { type: "category" }>).minorCategory}
+            onUpdate={(updates) => props.onUpdate(updates as Partial<GroupRule>)}
           />
         </Show>
       </div>

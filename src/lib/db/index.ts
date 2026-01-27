@@ -13,6 +13,13 @@ export interface Setting {
   value: unknown;
 }
 
+// 科目区分マスターデータのキャッシュ
+export interface CourseTypeMasterCache {
+  id: "master";
+  data: unknown;
+  cachedAt: string;
+}
+
 // Dexie DBクラス定義
 export class TokutanDB extends Dexie {
   requirements!: EntityTable<GraduationRequirements, "id">;
@@ -21,6 +28,7 @@ export class TokutanDB extends Dexie {
   coursePlans!: EntityTable<CoursePlan, "id">;
   kdbCache!: EntityTable<Course, "id">;
   settings!: EntityTable<Setting, "key">;
+  courseTypeMaster!: EntityTable<CourseTypeMasterCache, "id">;
 
   constructor() {
     super("tokutan");
@@ -42,6 +50,17 @@ export class TokutanDB extends Dexie {
       coursePlans: "id, profileId",
       kdbCache: "id, name",
       settings: "key",
+    });
+
+    this.version(3).stores({
+      requirements:
+        "id, year, department, major, isDefault, [year+department], [year+department+major]",
+      enrollment: "id, profileId",
+      profiles: "id, name, enrollmentYear",
+      coursePlans: "id, profileId",
+      kdbCache: "id, name",
+      settings: "key",
+      courseTypeMaster: "id",
     });
   }
 }

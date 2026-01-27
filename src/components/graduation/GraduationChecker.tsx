@@ -53,7 +53,11 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
     void (async () => {
       const kdbCourses = await getCachedKdb();
       if (cancelled) return;
-      const calculated = calculateRequirementStatus(requirements, enrollment.courses, kdbCourses);
+      const calculated = await calculateRequirementStatus(
+        requirements,
+        enrollment.courses,
+        kdbCourses,
+      );
       if (cancelled) return;
       setStatus(calculated);
     })();

@@ -1,4 +1,9 @@
-﻿import type {
+﻿import {
+  type CourseTypeMasterNode,
+  getCourseIdsFromCategory,
+  getCourseTypeMaster,
+} from "../db/courseTypeMaster";
+import type {
   CategoryStatus,
   GraduationRequirements,
   GroupRule,
@@ -137,11 +142,18 @@ function matchRequiredCourseGroups(
 }
 
 // 要件充足状況を計算
-export function calculateRequirementStatus(
+export async function calculateRequirementStatus(
   requirements: GraduationRequirements,
   courses: UserCourseRecord[],
   kdbCourses: Course[] = [],
-): RequirementStatus {
+): Promise<RequirementStatus> {
+  // 科目区分マスターデータを取得
+  let courseTypeMaster: CourseTypeMasterNode[] = [];
+  try {
+    courseTypeMaster = await getCourseTypeMaster();
+  } catch (error) {
+    console.warn("Failed to load course type master, category rules will not work:", error);
+  }
   // 各科目が使用済みかどうかを追跡（同じ科目を複数カテゴリでカウントしない）
   const usedCourseIds = new Set<string>();
 
@@ -168,6 +180,43 @@ export function calculateRequirementStatus(
         );
         matchedCourses.push(...requiredMatches);
 
+        // groupsが存在する場合、追加条件として処理
+        if (subcategory.groups && subcategory.groups.length > 0) {
+          for (const group of subcategory.groups) {
+            const groupMatches = matchCoursesToGroup(
+              courses,
+              group,
+              usedCourseIds,
+              requiredCourseExclusion,
+              courseTypeMaster,
+            );
+
+            const earnedCredits = groupMatches
+              .filter((m) => m.isPassed)
+              .reduce((sum, m) => sum + m.credits, 0);
+
+            const inProgressCredits = groupMatches
+              .filter((m) => m.isInProgress)
+              .reduce((sum, m) => sum + m.credits, 0);
+
+            const isSatisfied =
+              earnedCredits >= group.minCredits &&
+              (group.maxCredits === undefined || earnedCredits <= group.maxCredits);
+
+            groupStatuses.push({
+              groupId: group.id,
+              isSatisfied,
+              earnedCredits,
+              inProgressCredits,
+              requiredCredits: group.minCredits,
+              maxCredits: group.maxCredits,
+              matchedCourses: groupMatches,
+            });
+
+            matchedCourses.push(...groupMatches);
+          }
+        }
+
         const earnedCredits = matchedCourses
           .filter((m) => m.isPassed)
           .reduce((sum, m) => sum + m.credits, 0);
@@ -177,14 +226,19 @@ export function calculateRequirementStatus(
           .reduce((sum, m) => sum + m.credits, 0);
 
         const requiredCredits = requiredMatches.reduce((sum, m) => sum + m.credits, 0);
-        const isSatisfied = requiredMatches.every((m) => m.isPassed || m.isInProgress);
+        const groupRequiredCredits = groupStatuses.reduce((sum, g) => sum + g.requiredCredits, 0);
+        const totalRequiredCredits = requiredCredits + groupRequiredCredits;
+
+        const isSatisfied =
+          requiredMatches.every((m) => m.isPassed || m.isInProgress) &&
+          groupStatuses.every((g) => g.isSatisfied);
 
         return {
           subcategoryId: subcategory.id,
           subcategoryType: subcategory.type,
           earnedCredits,
           inProgressCredits,
-          requiredCredits,
+          requiredCredits: totalRequiredCredits,
           maxCredits: undefined,
           isSatisfied,
           groupStatuses,
@@ -198,6 +252,7 @@ export function calculateRequirementStatus(
           group,
           usedCourseIds,
           requiredCourseExclusion,
+          courseTypeMaster,
         );
 
         const earnedCredits = groupMatches
@@ -297,6 +352,7 @@ function matchCoursesToGroup(
   group: RequirementGroup,
   usedCourseIds: Set<string>,
   excludedCourseIds: RequiredCourseExclusion,
+  courseTypeMaster: CourseTypeMasterNode[],
 ): MatchedCourse[] {
   const matches: MatchedCourse[] = [];
   const groupExcludedCourseIds = new Set<string>();
@@ -319,7 +375,7 @@ function matchCoursesToGroup(
     // グループ内のいずれかのルールにマッチするかチェック
     for (const rule of group.rules) {
       if (rule.type === "exclude") continue;
-      if (matchCourseToRule(course, rule, excludedCourseIds)) {
+      if (matchCourseToRule(course, rule, excludedCourseIds, courseTypeMaster)) {
         isMatch = true;
         break;
       }
@@ -346,6 +402,7 @@ function matchCourseToRule(
   course: UserCourseRecord,
   rule: GroupRule,
   excludedCourseIds: RequiredCourseExclusion,
+  courseTypeMaster: CourseTypeMasterNode[],
 ): boolean {
   if (isCourseExcludedByRequirements(course, excludedCourseIds)) return false;
   switch (rule.type) {
@@ -360,5 +417,15 @@ function matchCourseToRule(
         return false;
       }
       return course.courseId.startsWith(rule.prefix);
+
+    case "category": {
+      const categoryCourseIds = getCourseIdsFromCategory(
+        courseTypeMaster,
+        rule.majorCategory,
+        rule.middleCategory,
+        rule.minorCategory,
+      );
+      return categoryCourseIds.includes(course.courseId);
+    }
   }
 }

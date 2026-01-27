@@ -31,6 +31,7 @@ export type RequirementSubcategory =
   | (RequirementSubcategoryBase & {
       type: "required";
       courseIds: string[];
+      groups?: RequirementGroup[];
     })
   | (RequirementSubcategoryBase & {
       type: "elective" | "free";
@@ -56,6 +57,12 @@ export type GroupRule =
   | (GroupRuleBase & {
       type: "exclude";
       courseIds: string[];
+    })
+  | (GroupRuleBase & {
+      type: "category";
+      majorCategory: string;
+      middleCategory?: string;
+      minorCategory?: string;
     });
 
 // 要件グループ
