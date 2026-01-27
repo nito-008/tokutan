@@ -75,68 +75,60 @@ export const CsvUploader: Component<CsvUploaderProps> = (props) => {
   };
 
   return (
-    <Card class="w-full max-w-2xl mx-auto">
-      <CardHeader>
-        <CardTitle>成績データをアップロード</CardTitle>
-        <CardDescription>
-          TWINSからダウンロードしたCSVファイルをアップロードしてください
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <button
-          type="button"
-          class={`
+    <>
+      <button
+        type="button"
+        class={`
             border-2 border-dashed rounded-lg p-8 text-center cursor-pointer
             transition-colors w-full
             ${isDragging() ? "border-primary bg-primary/5" : "border-muted-foreground/25 hover:border-primary/50"}
           `}
-          onDrop={handleDrop}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onClick={handleClick}
+        onDrop={handleDrop}
+        onDragOver={handleDragOver}
+        onDragLeave={handleDragLeave}
+        onClick={handleClick}
+      >
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept=".csv"
+          class="hidden"
+          onChange={handleFileInput}
+        />
+
+        <Show
+          when={isLoading()}
+          fallback={
+            <>
+              <div class="mb-4">
+                <FolderOpen class="size-12 mx-auto text-muted-foreground" />
+              </div>
+              <p class="text-lg font-medium mb-2">CSVファイルをドラッグ＆ドロップ</p>
+              <p class="text-sm text-muted-foreground">または クリックしてファイルを選択</p>
+            </>
+          }
         >
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".csv"
-            class="hidden"
-            onChange={handleFileInput}
-          />
-
-          <Show
-            when={isLoading()}
-            fallback={
-              <>
-                <div class="mb-4">
-                  <FolderOpen class="size-12 mx-auto text-muted-foreground" />
-                </div>
-                <p class="text-lg font-medium mb-2">CSVファイルをドラッグ＆ドロップ</p>
-                <p class="text-sm text-muted-foreground">または クリックしてファイルを選択</p>
-              </>
-            }
-          >
-            <div class="mb-4">
-              <Loader2 class="size-12 mx-auto text-muted-foreground animate-spin" />
-            </div>
-            <p>読み込み中...</p>
-          </Show>
-        </button>
-
-        <Show when={error()}>
-          <Alert variant="destructive" class="mt-4">
-            <AlertDescription>{error()}</AlertDescription>
-          </Alert>
+          <div class="mb-4">
+            <Loader2 class="size-12 mx-auto text-muted-foreground animate-spin" />
+          </div>
+          <p>読み込み中...</p>
         </Show>
+      </button>
 
-        <div class="mt-6 text-sm text-muted-foreground">
-          <p class="font-medium mb-2">CSVファイルの取得方法:</p>
-          <ol class="list-decimal list-inside space-y-1">
-            <li>TWINSにログイン</li>
-            <li>「成績」→「履修成績照会・成績証明書発行」を選択</li>
-            <li>「CSV出力」ボタンをクリック</li>
-          </ol>
-        </div>
-      </CardContent>
-    </Card>
+      <Show when={error()}>
+        <Alert variant="destructive" class="mt-4">
+          <AlertDescription>{error()}</AlertDescription>
+        </Alert>
+      </Show>
+
+      <div class="mt-6 text-sm text-muted-foreground">
+        <p class="font-medium mb-2">CSVファイルの取得方法:</p>
+        <ol class="list-decimal list-inside space-y-1">
+          <li>TWINSにログイン</li>
+          <li>「成績」→「履修成績照会・成績証明書発行」を選択</li>
+          <li>「CSV出力」ボタンをクリック</li>
+        </ol>
+      </div>
+    </>
   );
 };

@@ -1,7 +1,14 @@
 ﻿import { type Component, createEffect, createSignal, For, onCleanup, Show } from "solid-js";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
-import { Dialog, DialogContent } from "~/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "~/components/ui/dialog";
 import { Switch, SwitchControl, SwitchLabel } from "~/components/ui/switch";
 import { calculateRequirementStatus } from "~/lib/calculator/requirements";
 import { importTwinsData } from "~/lib/db/enrollment";
@@ -242,19 +249,23 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
   return (
     <div class="space-y-6">
       <Dialog open={isUploaderOpen()} onOpenChange={handleUploaderOpenChange}>
-        <DialogContent class="p-0">
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>成績データをアップロード</DialogTitle>
+            <DialogDescription>
+              TWINSからダウンロードしたCSVファイルをアップロードしてください
+            </DialogDescription>
+          </DialogHeader>
           <CsvUploader onDataLoaded={handleDataLoaded} />
-          <Show when={props.enrollment}>
-            <div class="text-center py-4">
-              <Button variant="link" onClick={() => setIsUploaderOpen(false)}>
-                既存のデータを使用する
-              </Button>
-            </div>
-          </Show>
+          <DialogFooter>
+            <Button variant="secondary" onClick={() => setIsUploaderOpen(false)}>
+              戻る
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      <Show when={!isUploaderOpen() && status() && props.requirements}>
+      <Show when={status() && props.requirements}>
         <RequirementsSummary
           status={status() as RequirementStatus}
           requirementsLabel={getRequirementLabel(props.requirements)}
@@ -262,9 +273,6 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <Card class="lg:col-span-1">
-            <CardHeader>
-              <CardTitle class="text-lg">詳細達成状況</CardTitle>
-            </CardHeader>
             <CardContent>
               <DonutChart
                 categoryStatuses={status()?.categoryStatuses ?? []}
@@ -308,7 +316,7 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
 
           <Card class="lg:col-span-2">
             <CardHeader class="flex flex-row items-center justify-between">
-              <CardTitle class="text-lg">詳細達成状況</CardTitle>
+              <CardTitle class="text-lg">{}</CardTitle>
               <div class="flex gap-2">
                 <Button variant="outline" size="sm" onClick={handleReupload}>
                   成績データを選択
