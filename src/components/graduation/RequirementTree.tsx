@@ -36,6 +36,11 @@ interface RequirementTreeProps {
   editMode?: boolean;
 }
 
+const formatCreditDisplay = (earned: number, min: number, max?: number): string => {
+  const range = max !== undefined ? `${min}~${max}` : `${min}`;
+  return `${earned}/${range}単位`;
+};
+
 export const RequirementTree: Component<RequirementTreeProps> = (props) => {
   const [editingSubcategory, setEditingSubcategory] = createSignal<{
     categoryId: string;
@@ -88,7 +93,7 @@ export const RequirementTree: Component<RequirementTreeProps> = (props) => {
                     <StatusIcon isSatisfied={category.isSatisfied} />
                     <span class="font-medium">{category.categoryName}</span>
                     <span class="text-sm text-muted-foreground ml-auto mr-4">
-                      {category.earnedCredits}/{category.requiredCredits}単位{" "}
+                      {formatCreditDisplay(category.earnedCredits, category.requiredCredits)}
                     </span>
                   </div>
                 </AccordionTrigger>
@@ -209,7 +214,11 @@ const SubcategoryPanel: Component<SubcategoryPanelProps> = (props) => {
           </button>
         </Show>
         <span class="text-xs text-muted-foreground ml-auto mr-4">
-          {props.subcategory.earnedCredits}/{props.subcategory.requiredCredits}単位
+          {formatCreditDisplay(
+            props.subcategory.earnedCredits,
+            props.subcategory.requiredCredits,
+            props.subcategory.maxCredits,
+          )}
         </span>
       </div>
 
@@ -258,7 +267,11 @@ const ConditionBlock: Component<ConditionBlockProps> = (props) => {
       <div class="flex items-center gap-3 text-sm">
         <span class="whitespace-pre-line">{description}</span>
         <span class="text-xs text-muted-foreground ml-auto mr-4">
-          {props.groupStatus.earnedCredits}/{props.groupStatus.requiredCredits}単位
+          {formatCreditDisplay(
+            props.groupStatus.earnedCredits,
+            props.groupStatus.requiredCredits,
+            props.groupStatus.maxCredits,
+          )}
         </span>
       </div>
       <Separator />
