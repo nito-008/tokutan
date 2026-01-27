@@ -256,7 +256,7 @@ const ConditionBlock: Component<ConditionBlockProps> = (props) => {
   return (
     <div class="space-y-2">
       <div class="flex items-center gap-3 text-sm">
-        <span>{description}</span>
+        <span class="whitespace-pre-line">{description}</span>
         <span class="text-xs text-muted-foreground ml-auto mr-4">
           {props.groupStatus.earnedCredits}/{props.groupStatus.requiredCredits}単位
         </span>
@@ -279,27 +279,77 @@ const formatGroupConditionLabel = (group?: RequirementGroup): string => {
     return "条件情報なし";
   }
 
-  const descriptions = group.rules
-    .map(formatGroupRuleDescription)
-    .filter((desc): desc is string => !!desc);
+  const prefixNames = Array.from(
+    new Set(
+      group.rules
+        .filter(
+          (rule): rule is GroupRule & { type: "prefix"; prefix: string } => rule.type === "prefix",
+        )
+        .map((rule) => rule.prefix?.trim())
+        .filter(Boolean),
+    ),
+  );
 
-  return descriptions.length > 0 ? descriptions.join(" ・ ") : `グループ ${group.id}`;
-};
+  const specificCourseIds = Array.from(
+    new Set(
+      group.rules
+        .filter(
+          (rule): rule is GroupRule & { type: "specific"; courseIds: string[] } =>
+            rule.type === "specific",
+        )
+        .flatMap((rule) => rule.courseIds.filter(Boolean)),
+    ),
+  );
 
-const formatGroupRuleDescription = (rule: GroupRule): string | null => {
-  switch (rule.type) {
-    case "prefix":
-      return rule.prefix ? `「${rule.prefix}」で始まる科目` : null;
-    case "specific":
-      return rule.courseIds.filter(Boolean).join("、") || null;
-    case "exclude":
-      if (!rule.courseIds.length) {
-        return "除外";
-      }
-      return `除外: ${rule.courseIds.join("、")}`;
-    default:
-      return null;
+  const excludeCourseIds = Array.from(
+    new Set(
+      group.rules
+        .filter(
+          (rule): rule is GroupRule & { type: "exclude"; courseIds: string[] } =>
+            rule.type === "exclude",
+        )
+        .flatMap((rule) => rule.courseIds.filter(Boolean)),
+    ),
+  );
+
+  const categoryNames = Array.from(
+    new Set(
+      group.rules
+        .filter(
+          (
+            rule,
+          ): rule is GroupRule & {
+            type: "category";
+            majorCategory?: string;
+            middleCategory?: string;
+            minorCategory?: string;
+          } => rule.type === "category",
+        )
+        .flatMap((rule) =>
+          [rule.majorCategory, rule.middleCategory, rule.minorCategory].filter(Boolean),
+        ),
+    ),
+  );
+
+  const parts: string[] = [];
+
+  if (prefixNames.length) {
+    parts.push(`「${prefixNames.join(", ")}」で始まる科目`);
   }
+
+  if (categoryNames.length) {
+    parts.push(`科目区分\n${categoryNames.join("、")}`);
+  }
+
+  if (specificCourseIds.length) {
+    parts.push(specificCourseIds.join("、"));
+  }
+
+  if (excludeCourseIds.length) {
+    parts.push(`除外: ${excludeCourseIds.join("、")}`);
+  }
+
+  return parts.length > 0 ? parts.join(" ・ ") : `グループ ${group.id}`;
 };
 
 const CourseItem: Component<{ course: MatchedCourse }> = (props) => {
