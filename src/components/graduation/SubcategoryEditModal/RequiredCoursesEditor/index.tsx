@@ -6,14 +6,19 @@ import {
   SortableProvider,
 } from "@thisbeyond/solid-dnd";
 import { type Accessor, type Component, For, type Setter, Show } from "solid-js";
+import type { SetStoreFunction } from "solid-js/store";
 import { Label } from "~/components/ui/label";
+import type { RequirementGroup } from "~/lib/types";
 import { normalizeCourseIds } from "../utils/courseGroup";
 import { CourseIdRowContent } from "./CourseIdRow/CourseIdRowContent";
 import { SortableCourseIdRow } from "./CourseIdRow/SortableCourseIdRow";
+import { RequiredGroupsEditor } from "./RequiredGroupsEditor";
 
 interface RequiredCoursesEditorProps {
   courseIds: Accessor<string[]>;
   setCourseIds: Setter<string[]>;
+  groups: RequirementGroup[];
+  setGroups: SetStoreFunction<RequirementGroup[]>;
 }
 
 export const RequiredCoursesEditor: Component<RequiredCoursesEditorProps> = (props) => {
@@ -28,8 +33,8 @@ export const RequiredCoursesEditor: Component<RequiredCoursesEditorProps> = (pro
     const { draggable, droppable } = event;
     if (!draggable || !droppable) return;
     const ids = props.courseIds();
-    const fromIndex = ids.findIndex((id) => id === String(draggable.id));
-    const toIndex = ids.findIndex((id) => id === String(droppable.id));
+    const fromIndex = ids.indexOf(String(draggable.id));
+    const toIndex = ids.indexOf(String(droppable.id));
     if (fromIndex < 0 || toIndex < 0) return;
     if (fromIndex !== toIndex) {
       props.setCourseIds((prev) => {
@@ -90,6 +95,7 @@ export const RequiredCoursesEditor: Component<RequiredCoursesEditorProps> = (pro
           </div>
         </SortableProvider>
       </DragDropProvider>
+      <RequiredGroupsEditor groups={props.groups} setGroups={props.setGroups} />
     </div>
   );
 };
