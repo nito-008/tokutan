@@ -48,8 +48,6 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
   const [groups, setGroups] = createStore<RequirementGroup[]>([]);
 
   createEffect(() => {
-    if (!props.open) return;
-
     if (props.subcategory) {
       setType(props.subcategory.type);
       if (props.subcategory.type === "required") {
@@ -60,18 +58,18 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
         );
         setMinCredits(0);
         setMaxCredits(undefined);
+        setGroups([]);
       } else {
         setCourseIds([]);
         setMinCredits(props.subcategory.minCredits);
         setMaxCredits(props.subcategory.maxCredits);
+        setGroups(
+          reconcile(JSON.parse(JSON.stringify(props.subcategory.groups)), {
+            key: "id",
+          }),
+        );
       }
-
-      setGroups(
-        reconcile(JSON.parse(JSON.stringify(props.subcategory.groups ?? [])), {
-          key: "id",
-        }),
-      );
-    } else {
+    } else if (props.open) {
       setType("elective");
       setCourseIds([]);
       setMinCredits(0);
@@ -81,7 +79,6 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
   });
 
   const handleSave = () => {
-    const serializedGroups = JSON.parse(JSON.stringify(unwrap(groups)));
     const updates: Partial<RequirementSubcategory> =
       type() === "required"
         ? {
@@ -89,13 +86,12 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
             courseIds: courseIds()
               .map((value) => value.trim())
               .filter((value) => value),
-            groups: serializedGroups,
           }
         : {
             type: type(),
             minCredits: minCredits(),
             maxCredits: maxCredits(),
-            groups: serializedGroups,
+            groups: JSON.parse(JSON.stringify(unwrap(groups))),
           };
 
     props.onSave(props.categoryId, props.subcategory?.id ?? null, updates);
@@ -156,12 +152,7 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
           </div>
 
           <Show when={type() === "required"}>
-            <RequiredCoursesEditor
-              courseIds={courseIds}
-              setCourseIds={setCourseIds}
-              groups={groups}
-              setGroups={setGroups}
-            />
+            <RequiredCoursesEditor courseIds={courseIds} setCourseIds={setCourseIds} />
           </Show>
 
           <Show when={type() !== "required"}>
