@@ -1,6 +1,6 @@
 import { Plus } from "lucide-solid";
 import { type Component, For, Show } from "solid-js";
-import type { SetStoreFunction } from "solid-js/store";
+import { reconcile, type SetStoreFunction } from "solid-js/store";
 import { Button } from "~/components/ui/button";
 import { Label } from "~/components/ui/label";
 import type { GroupRule, RequirementGroup } from "~/lib/types";
@@ -29,7 +29,21 @@ export const RequiredGroupsEditor: Component<RequiredGroupsEditorProps> = (props
   };
 
   const handleUpdateGroup = (index: number, updates: Partial<RequirementGroup>) => {
-    props.setGroups(index, updates);
+    if ("minCredits" in updates) {
+      props.setGroups(index, "minCredits", updates.minCredits ?? 0);
+    }
+    if ("maxCredits" in updates) {
+      props.setGroups(index, "maxCredits", updates.maxCredits);
+    }
+    if ("rules" in updates) {
+      props.setGroups(
+        index,
+        "rules",
+        reconcile(updates.rules ?? [], {
+          key: "id",
+        }),
+      );
+    }
   };
 
   const handleRemoveGroup = (index: number) => {

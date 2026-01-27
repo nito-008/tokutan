@@ -62,6 +62,8 @@ export const RequiredGroupRow: Component<RequiredGroupRowProps> = (props) => {
                       : currentRule.minorCategory,
                 };
 
+                console.log("update", updates, currentRule);
+
                 props.onUpdate({ rules: [updatedRule] });
               }}
             />
