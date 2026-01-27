@@ -179,10 +179,7 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
           </Show>
         </div>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={props.onClose}>
-            キャンセル
-          </Button>
+        <DialogFooter class="sm:justify-between">
           <Show when={props.subcategory && props.onDelete}>
             <Button
               variant="destructive"
@@ -195,7 +192,12 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
               削除
             </Button>
           </Show>
-          <Button onClick={handleSave}>保存</Button>
+          <div class="flex gap-4">
+            <Button variant="outline" onClick={props.onClose}>
+              キャンセル
+            </Button>
+            <Button onClick={handleSave}>保存</Button>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>

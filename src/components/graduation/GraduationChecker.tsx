@@ -257,7 +257,7 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
             </DialogDescription>
           </DialogHeader>
           <CsvUploader onDataLoaded={handleDataLoaded} />
-          <DialogFooter>
+          <DialogFooter class="flex-col">
             <Button variant="secondary" onClick={() => setIsUploaderOpen(false)}>
               戻る
             </Button>
