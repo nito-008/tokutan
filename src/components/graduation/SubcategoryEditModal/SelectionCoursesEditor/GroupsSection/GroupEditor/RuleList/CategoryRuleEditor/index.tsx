@@ -136,7 +136,7 @@ export const CategoryRuleEditor: Component<CategoryRuleEditorProps> = (props) =>
               value={props.minorCategory}
               onChange={(value) => {
                 props.onUpdate({
-                  minorCategory: value || undefined,
+                  minorCategory: value === "すべて" ? undefined : value || undefined,
                 });
               }}
               options={["すべて", ...minorCategories()]}
