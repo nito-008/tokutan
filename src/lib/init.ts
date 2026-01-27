@@ -1,5 +1,3 @@
-import { defaultRequirements } from "~/data/default-requirements";
-import { mockRequirements } from "~/data/mock-requirements";
 import { getEnrollment } from "./db/enrollment";
 import { ensureDefaultProfile } from "./db/profiles";
 import {
@@ -8,6 +6,7 @@ import {
   hasRequirements,
   saveRequirements,
 } from "./db/requirements";
+import { loadAllRequirements } from "./db/requirements-loader";
 import type { EnrollmentData, GraduationRequirements, UserProfile } from "./types";
 
 export interface AppState {
@@ -23,15 +22,14 @@ export async function initializeApp(): Promise<AppState> {
 
   // デフォルト要件がなければ追加
   if (!(await hasRequirements())) {
-    await saveRequirements(defaultRequirements);
-
-    // モック要件も追加
-    for (const req of mockRequirements) {
+    const allRequirements = await loadAllRequirements();
+    for (const req of allRequirements) {
       await saveRequirements(req);
     }
   } else {
-    // 既に要件が存在する場合でも、モック要件が存在しない場合は追加
-    for (const req of mockRequirements) {
+    // 既に要件が存在する場合でも、存在しない要件は追加
+    const allRequirements = await loadAllRequirements();
+    for (const req of allRequirements) {
       const exists = await getRequirements(req.id);
       if (!exists) {
         await saveRequirements(req);

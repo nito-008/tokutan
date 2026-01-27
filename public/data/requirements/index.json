@@ -1,0 +1,9 @@
+{
+  "requirements": [
+    {
+      "id": "esys-2024",
+      "file": "esys-2024.json",
+      "isDefault": true
+    }
+  ]
+}
