@@ -96,7 +96,7 @@ export async function importRequirements(file: File): Promise<GraduationRequirem
   const data = await readJsonFile<GraduationRequirements>(file);
 
   // バリデーション
-  if (!data.id || !data.name || !data.categories) {
+  if (!data.id || !data.year || !data.department || !data.categories) {
     throw new Error("無効な要件ファイルです");
   }
 

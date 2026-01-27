@@ -33,6 +33,16 @@ export class TokutanDB extends Dexie {
       kdbCache: "id, name",
       settings: "key",
     });
+
+    this.version(2).stores({
+      requirements:
+        "id, year, department, major, isDefault, [year+department], [year+department+major]",
+      enrollment: "id, profileId",
+      profiles: "id, name, enrollmentYear",
+      coursePlans: "id, profileId",
+      kdbCache: "id, name",
+      settings: "key",
+    });
   }
 }
 

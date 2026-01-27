@@ -8,6 +8,7 @@ import {
 } from "~/components/ui/select";
 import { updateSelectedRequirements } from "~/lib/db/profiles";
 import { getAllRequirements } from "~/lib/db/requirements";
+import { getRequirementLabel } from "~/lib/requirements/label";
 import type { GraduationRequirements } from "~/lib/types";
 
 interface RequirementsSelectorProps {
@@ -58,15 +59,16 @@ export const RequirementsSelector: Component<RequirementsSelectorProps> = (props
             onChange={handleChange}
             options={requirements()}
             optionValue="id"
-            optionTextValue="name"
             placeholder="卒業要件を選択"
-            itemComponent={(props) => (
-              <SelectItem item={props.item}>{props.item.rawValue.name}</SelectItem>
+            itemComponent={(selectProps) => (
+              <SelectItem item={selectProps.item}>
+                {getRequirementLabel(selectProps.item.rawValue)}
+              </SelectItem>
             )}
           >
             <SelectTrigger class="w-80">
               <SelectValue<GraduationRequirements>>
-                {(state) => state.selectedOption()?.name || "卒業要件を選択"}
+                {(state) => getRequirementLabel(state.selectedOption()) || "卒業要件を選択"}
               </SelectValue>
             </SelectTrigger>
             <SelectContent />

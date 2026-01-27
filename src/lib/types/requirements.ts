@@ -1,9 +1,9 @@
 ﻿// 卒業要件全体
 export interface GraduationRequirements {
   id: string;
-  name: string;
   year: number;
   department: string;
+  major?: string;
   totalCredits: number;
   categories: RequirementCategory[];
   version: string;

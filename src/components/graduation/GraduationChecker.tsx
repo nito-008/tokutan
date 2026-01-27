@@ -8,6 +8,7 @@ import { getCachedKdb } from "~/lib/db/kdb";
 import { getActiveProfile } from "~/lib/db/profiles";
 import { saveRequirements } from "~/lib/db/requirements";
 import type { ValidationResult } from "~/lib/parsers/twins-csv";
+import { getRequirementLabel } from "~/lib/requirements/label";
 import type {
   EnrollmentData,
   GraduationRequirements,
@@ -232,7 +233,7 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
       <Show when={!showUploader() && status() && props.requirements}>
         <RequirementsSummary
           status={status() as RequirementStatus}
-          requirementsName={props.requirements?.name ?? ""}
+          requirementsLabel={getRequirementLabel(props.requirements)}
         />
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">

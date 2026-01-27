@@ -3,9 +3,9 @@ import type { GraduationRequirements } from "~/lib/types";
 export const mockRequirements: GraduationRequirements[] = [
   {
     id: "sosys-2024",
-    name: "2024年入学 社会工学類",
     year: 2024,
     department: "社会工学類",
+    major: "社会工学専攻",
     totalCredits: 125,
     version: "1.0.0",
     isDefault: false,
@@ -77,9 +77,9 @@ export const mockRequirements: GraduationRequirements[] = [
   },
   {
     id: "klis-2024",
-    name: "2024年入学 知識情報・図書館学類",
     year: 2024,
     department: "知識情報・図書館学類",
+    major: "知識情報専攻",
     totalCredits: 125,
     version: "1.0.0",
     isDefault: false,
@@ -151,9 +151,9 @@ export const mockRequirements: GraduationRequirements[] = [
   },
   {
     id: "coins-2024",
-    name: "2024年入学 情報科学類",
     year: 2024,
     department: "情報科学類",
+    major: "情報科学専攻",
     totalCredits: 125,
     version: "1.0.0",
     isDefault: false,

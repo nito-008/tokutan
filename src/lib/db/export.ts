@@ -1,3 +1,4 @@
+import { getRequirementLabel } from "~/lib/requirements/label";
 import type { CoursePlan, EnrollmentData, GraduationRequirements, UserProfile } from "../types";
 import { db } from "./index";
 
@@ -63,6 +64,7 @@ export async function exportRequirementsAndDownload(id: string): Promise<void> {
     throw new Error("Requirements not found");
   }
 
-  const filename = `tokutan-requirements-${req.name.replace(/\s+/g, "-")}.json`;
+  const label = getRequirementLabel(req).replace(/\s+/g, "-");
+  const filename = `tokutan-requirements-${label}.json`;
   downloadJson(req, filename);
 }

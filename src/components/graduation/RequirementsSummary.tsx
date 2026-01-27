@@ -5,7 +5,7 @@ import type { RequirementStatus } from "~/lib/types";
 
 interface RequirementsSummaryProps {
   status: RequirementStatus;
-  requirementsName: string;
+  requirementsLabel: string;
 }
 
 export const RequirementsSummary: Component<RequirementsSummaryProps> = (props) => {
@@ -26,7 +26,7 @@ export const RequirementsSummary: Component<RequirementsSummaryProps> = (props) 
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <p class="text-sm text-muted-foreground">{props.requirementsName}</p>
+          <p class="text-sm text-muted-foreground">{props.requirementsLabel}</p>
         </CardContent>
       </Card>
 

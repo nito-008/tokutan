@@ -62,10 +62,7 @@ export async function setDefaultRequirements(id: string): Promise<void> {
 }
 
 // 要件をコピー
-export async function copyRequirements(
-  id: string,
-  newName: string,
-): Promise<GraduationRequirements> {
+export async function copyRequirements(id: string): Promise<GraduationRequirements> {
   const original = await getRequirements(id);
   if (!original) {
     throw new Error("Original requirements not found");
@@ -75,7 +72,6 @@ export async function copyRequirements(
   const copy: GraduationRequirements = {
     ...original,
     id: `req-${Date.now()}`,
-    name: newName,
     isDefault: false,
     createdAt: now,
     updatedAt: now,

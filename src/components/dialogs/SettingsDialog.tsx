@@ -12,6 +12,7 @@ import {
 } from "~/lib/db/import";
 import { clearKdbCache } from "~/lib/db/kdb";
 import { getAllRequirements } from "~/lib/db/requirements";
+import { getRequirementLabel } from "~/lib/requirements/label";
 import type { GraduationRequirements } from "~/lib/types";
 
 interface SettingsDialogProps {
@@ -264,7 +265,7 @@ export const SettingsDialog: Component<SettingsDialogProps> = (props) => {
                 ) : (
                   requirements().map((req) => (
                     <div class="flex items-center justify-between p-2 bg-muted rounded">
-                      <span class="text-sm">{req.name}</span>
+                      <span class="text-sm">{getRequirementLabel(req)}</span>
                       <Button
                         variant="outline"
                         size="sm"

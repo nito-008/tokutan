@@ -2,9 +2,9 @@
 
 export const defaultRequirements: GraduationRequirements = {
   id: "esys-2024",
-  name: "2024年入学 工学システム学類",
   year: 2024,
   department: "工学システム学類",
+  major: "知的・機能工学システム主専攻",
   totalCredits: 125,
   version: "1.0.0",
   isDefault: true,
