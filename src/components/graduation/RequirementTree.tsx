@@ -7,12 +7,16 @@ import {
   AccordionTrigger,
 } from "~/components/ui/accordion";
 import { Badge } from "~/components/ui/badge";
+import { Separator } from "~/components/ui/separator";
 import { getSubcategoryLabel } from "~/lib/requirements/subcategory";
 import type {
   CategoryStatus,
   GraduationRequirements,
+  GroupRule,
+  GroupStatus,
   MatchedCourse,
   RequirementCategory,
+  RequirementGroup,
   RequirementSubcategory,
   SubcategoryStatus,
 } from "~/lib/types";
@@ -89,13 +93,18 @@ export const RequirementTree: Component<RequirementTreeProps> = (props) => {
                   </div>
                 </AccordionTrigger>
                 <AccordionContent>
-                  <div class="pl-6">
-                    <Accordion multiple={true} collapsible class="space-y-2">
-                      <For each={category.subcategoryStatuses}>
-                        {(subcategory) => (
-                          <SubcategoryItem
+                  <div class="pl-6 space-y-4">
+                    <For each={category.subcategoryStatuses}>
+                      {(subcategory) => {
+                        const definition = findSubcategory(
+                          category.categoryId,
+                          subcategory.subcategoryId,
+                        )?.subcategory;
+
+                        return (
+                          <SubcategoryPanel
                             subcategory={subcategory}
-                            categoryId={category.categoryId}
+                            definition={definition}
                             editable={
                               !!props.editMode &&
                               !!props.requirements &&
@@ -109,9 +118,9 @@ export const RequirementTree: Component<RequirementTreeProps> = (props) => {
                               if (sub) setEditingSubcategory(sub);
                             }}
                           />
-                        )}
-                      </For>
-                    </Accordion>
+                        );
+                      }}
+                    </For>
                     <Show when={props.editMode && props.requirements && props.onSubcategoryUpdate}>
                       <button
                         type="button"
@@ -169,49 +178,128 @@ export const RequirementTree: Component<RequirementTreeProps> = (props) => {
   );
 };
 
-const SubcategoryItem: Component<{
+interface SubcategoryPanelProps {
   subcategory: SubcategoryStatus;
-  categoryId: string;
+  definition?: RequirementSubcategory;
   editable: boolean;
   onEdit: () => void;
-}> = (props) => {
+}
+
+const SubcategoryPanel: Component<SubcategoryPanelProps> = (props) => {
+  const groupDefinitions: RequirementGroup[] =
+    props.definition && props.definition.type !== "required" ? props.definition.groups : [];
+
   return (
-    <AccordionItem value={props.subcategory.subcategoryId}>
-      <AccordionTrigger class="hover:no-underline">
-        <div class="flex items-center gap-3 w-full">
-          <StatusIcon isSatisfied={props.subcategory.isSatisfied} />
-          <span class="font-medium text-sm">
-            {getSubcategoryLabel(props.subcategory.subcategoryType)}
-          </span>
-          <Show when={props.editable}>
-            <button
-              type="button"
-              class="p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground"
-              onClick={(e) => {
-                e.stopPropagation();
-                props.onEdit();
-              }}
-            >
-              <Pencil class="size-4" />
-            </button>
-          </Show>
-          <span class="text-xs text-muted-foreground ml-auto mr-4">
-            {props.subcategory.earnedCredits}/{props.subcategory.requiredCredits}単位
-          </span>
-        </div>
-      </AccordionTrigger>
-      <AccordionContent>
-        <div class="pl-6 space-y-1">
-          <For each={props.subcategory.matchedCourses}>
-            {(course) => <CourseItem course={course} />}
-          </For>
-          <Show when={props.subcategory.matchedCourses.length === 0}>
-            <p class="text-sm text-muted-foreground">該当する科目がありません</p>
-          </Show>
-        </div>
-      </AccordionContent>
-    </AccordionItem>
+    <div class="border border-border rounded-xl p-3 space-y-4">
+      <div class="flex items-center gap-3">
+        <StatusIcon isSatisfied={props.subcategory.isSatisfied} />
+        <span class="font-medium text-sm">
+          {getSubcategoryLabel(props.subcategory.subcategoryType)}
+        </span>
+        <Show when={props.editable}>
+          <button
+            type="button"
+            class="p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground"
+            onClick={(e) => {
+              e.stopPropagation();
+              props.onEdit();
+            }}
+          >
+            <Pencil class="size-4" />
+          </button>
+        </Show>
+        <span class="text-xs text-muted-foreground ml-auto mr-4">
+          {props.subcategory.earnedCredits}/{props.subcategory.requiredCredits}単位
+        </span>
+      </div>
+
+      <div class="space-y-4">
+        {props.subcategory.subcategoryType === "required" ? (
+          <div class="space-y-2">
+            <Separator />
+            <div class="space-y-1">
+              <For each={props.subcategory.matchedCourses}>
+                {(course) => <CourseItem course={course} />}
+              </For>
+              <Show when={props.subcategory.matchedCourses.length === 0}>
+                <p class="text-sm text-muted-foreground">該当する科目がありません</p>
+              </Show>
+            </div>
+          </div>
+        ) : (
+          <div class="space-y-4">
+            <For each={props.subcategory.groupStatuses}>
+              {(groupStatus) => (
+                <ConditionBlock
+                  groupStatus={groupStatus}
+                  groupDefinition={groupDefinitions.find(
+                    (group) => group.id === groupStatus.groupId,
+                  )}
+                />
+              )}
+            </For>
+          </div>
+        )}
+      </div>
+    </div>
   );
+};
+
+interface ConditionBlockProps {
+  groupStatus: GroupStatus;
+  groupDefinition?: RequirementGroup;
+}
+
+const ConditionBlock: Component<ConditionBlockProps> = (props) => {
+  const description = formatGroupConditionLabel(props.groupDefinition);
+
+  return (
+    <div class="space-y-2">
+      <div class="flex items-center gap-3 text-sm">
+        <span>{description}</span>
+        <span class="text-xs text-muted-foreground ml-auto mr-4">
+          {props.groupStatus.earnedCredits}/{props.groupStatus.requiredCredits}単位
+        </span>
+      </div>
+      <Separator />
+      <div class="space-y-1">
+        <For each={props.groupStatus.matchedCourses}>
+          {(course) => <CourseItem course={course} />}
+        </For>
+        <Show when={props.groupStatus.matchedCourses.length === 0}>
+          <p class="text-sm text-muted-foreground">該当する科目がありません</p>
+        </Show>
+      </div>
+    </div>
+  );
+};
+
+const formatGroupConditionLabel = (group?: RequirementGroup): string => {
+  if (!group) {
+    return "条件情報なし";
+  }
+
+  const descriptions = group.rules
+    .map(formatGroupRuleDescription)
+    .filter((desc): desc is string => !!desc);
+
+  return descriptions.length > 0 ? descriptions.join(" ・ ") : `グループ ${group.id}`;
+};
+
+const formatGroupRuleDescription = (rule: GroupRule): string | null => {
+  switch (rule.type) {
+    case "prefix":
+      return rule.prefix ? `「${rule.prefix}」で始まる科目` : null;
+    case "specific":
+      return rule.courseIds.filter(Boolean).join("、") || null;
+    case "exclude":
+      if (!rule.courseIds.length) {
+        return "除外";
+      }
+      return `除外: ${rule.courseIds.join("、")}`;
+    default:
+      return null;
+  }
 };
 
 const CourseItem: Component<{ course: MatchedCourse }> = (props) => {
