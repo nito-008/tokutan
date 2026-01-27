@@ -425,7 +425,7 @@ function matchCourseToRule(
         rule.middleCategory,
         rule.minorCategory,
       );
-      return categoryCourseIds.includes(course.courseId);
+      return categoryCourseIds.some((id) => course.courseId.startsWith(id));
     }
   }
 }

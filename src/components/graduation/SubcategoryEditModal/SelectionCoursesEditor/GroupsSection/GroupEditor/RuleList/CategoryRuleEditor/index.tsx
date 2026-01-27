@@ -14,6 +14,7 @@ import {
   getMiddleCategories,
   getMinorCategories,
 } from "~/lib/db/courseTypeMaster";
+import { getCachedKdb } from "~/lib/db/kdb";
 
 interface CategoryRuleEditorProps {
   majorCategory: string;
@@ -47,13 +48,20 @@ export const CategoryRuleEditor: Component<CategoryRuleEditorProps> = (props) =>
     const master = masterData();
     if (master.length === 0) return;
 
-    const ids = getCourseIdsFromCategory(
+    const categoryIds = getCourseIdsFromCategory(
       master,
       props.majorCategory,
       props.middleCategory,
       props.minorCategory,
     );
-    setCourseCount(ids.length);
+
+    // KDBから全科目を取得し、前方一致でマッチする科目数をカウント
+    getCachedKdb().then((courses) => {
+      const matchCount = courses.filter((course) =>
+        categoryIds.some((id) => course.id.startsWith(id)),
+      ).length;
+      setCourseCount(matchCount);
+    });
   });
 
   const majorCategories = () => {
