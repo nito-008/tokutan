@@ -6,14 +6,19 @@ import {
   SortableProvider,
 } from "@thisbeyond/solid-dnd";
 import { type Accessor, type Component, For, type Setter, Show } from "solid-js";
+import type { SetStoreFunction } from "solid-js/store";
 import { Label } from "~/components/ui/label";
+import type { RequirementGroup } from "~/lib/types";
 import { normalizeCourseIds } from "../utils/courseGroup";
 import { CourseIdRowContent } from "./CourseIdRow/CourseIdRowContent";
 import { SortableCourseIdRow } from "./CourseIdRow/SortableCourseIdRow";
+import { RequiredGroupsEditor } from "./RequiredGroupsEditor";
 
 interface RequiredCoursesEditorProps {
   courseIds: Accessor<string[]>;
   setCourseIds: Setter<string[]>;
+  groups: RequirementGroup[];
+  setGroups: SetStoreFunction<RequirementGroup[]>;
 }
 
 export const RequiredCoursesEditor: Component<RequiredCoursesEditorProps> = (props) => {
@@ -54,42 +59,46 @@ export const RequiredCoursesEditor: Component<RequiredCoursesEditorProps> = (pro
   };
 
   return (
-    <div class="space-y-2">
-      <Label>科目名</Label>
-      <DragDropProvider collisionDetector={closestCenter} onDragEnd={handleDragEnd}>
-        <DragDropSensors />
-        <SortableProvider ids={sortableIds()}>
-          <div class="space-y-2">
-            <For each={props.courseIds()}>
-              {(id, index) => {
-                const isPlaceholder = () => index() === props.courseIds().length - 1;
-                return (
-                  <Show
-                    when={!isPlaceholder()}
-                    fallback={
-                      <CourseIdRowContent
+    <div class="space-y-4">
+      <div class="space-y-2">
+        <Label>科目名</Label>
+        <DragDropProvider collisionDetector={closestCenter} onDragEnd={handleDragEnd}>
+          <DragDropSensors />
+          <SortableProvider ids={sortableIds()}>
+            <div class="space-y-2">
+              <For each={props.courseIds()}>
+                {(id, index) => {
+                  const isPlaceholder = () => index() === props.courseIds().length - 1;
+                  return (
+                    <Show
+                      when={!isPlaceholder()}
+                      fallback={
+                        <CourseIdRowContent
+                          id={id}
+                          index={index()}
+                          isPlaceholder={true}
+                          onUpdateCourseId={handleUpdateCourseId}
+                          onRemoveCourseId={handleRemoveCourseId}
+                        />
+                      }
+                    >
+                      <SortableCourseIdRow
                         id={id}
                         index={index()}
-                        isPlaceholder={true}
+                        sortableCount={sortableIds().length}
                         onUpdateCourseId={handleUpdateCourseId}
                         onRemoveCourseId={handleRemoveCourseId}
                       />
-                    }
-                  >
-                    <SortableCourseIdRow
-                      id={id}
-                      index={index()}
-                      sortableCount={sortableIds().length}
-                      onUpdateCourseId={handleUpdateCourseId}
-                      onRemoveCourseId={handleRemoveCourseId}
-                    />
-                  </Show>
-                );
-              }}
-            </For>
-          </div>
-        </SortableProvider>
-      </DragDropProvider>
+                    </Show>
+                  );
+                }}
+              </For>
+            </div>
+          </SortableProvider>
+        </DragDropProvider>
+      </div>
+
+      <RequiredGroupsEditor groups={props.groups} setGroups={props.setGroups} />
     </div>
   );
 };

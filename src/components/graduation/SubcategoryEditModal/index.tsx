@@ -58,7 +58,7 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
         );
         setMinCredits(0);
         setMaxCredits(undefined);
-        setGroups([]);
+        setGroups(reconcile(props.subcategory.groups ?? [], { key: "id" }));
       } else {
         setCourseIds([]);
         setMinCredits(props.subcategory.minCredits);
@@ -86,6 +86,7 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
             courseIds: courseIds()
               .map((value) => value.trim())
               .filter((value) => value),
+            groups: groups.length > 0 ? JSON.parse(JSON.stringify(unwrap(groups))) : undefined,
           }
         : {
             type: type(),
@@ -152,7 +153,12 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
           </div>
 
           <Show when={type() === "required"}>
-            <RequiredCoursesEditor courseIds={courseIds} setCourseIds={setCourseIds} />
+            <RequiredCoursesEditor
+              courseIds={courseIds}
+              setCourseIds={setCourseIds}
+              groups={groups}
+              setGroups={setGroups}
+            />
           </Show>
 
           <Show when={type() !== "required"}>
