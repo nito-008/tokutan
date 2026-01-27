@@ -317,7 +317,7 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
           <Card class="lg:col-span-2">
             <CardHeader class="flex flex-row items-center justify-between">
               <CardTitle class="text-lg">{}</CardTitle>
-              <div class="flex gap-2">
+              <div class="flex justify-between w-full">
                 <Button variant="outline" size="sm" onClick={handleReupload}>
                   成績データを選択
                 </Button>
