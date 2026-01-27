@@ -1,0 +1,268 @@
+{
+  "type": "object",
+  "properties": {
+    "requirementsId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "totalEarnedCredits": {
+      "type": "number",
+      "minimum": 0
+    },
+    "totalInProgressCredits": {
+      "type": "number",
+      "minimum": 0
+    },
+    "totalRequiredCredits": {
+      "type": "number",
+      "minimum": 0
+    },
+    "isGraduationEligible": {
+      "type": "boolean"
+    },
+    "categoryStatuses": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "categoryId": {
+            "type": "string",
+            "minLength": 1
+          },
+          "categoryName": {
+            "type": "string"
+          },
+          "earnedCredits": {
+            "type": "number",
+            "minimum": 0
+          },
+          "inProgressCredits": {
+            "type": "number",
+            "minimum": 0
+          },
+          "requiredCredits": {
+            "type": "number",
+            "minimum": 0
+          },
+          "isSatisfied": {
+            "type": "boolean"
+          },
+          "subcategoryStatuses": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "subcategoryId": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "subcategoryType": {
+                  "enum": ["required", "elective", "free"]
+                },
+                "earnedCredits": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "inProgressCredits": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "requiredCredits": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "maxCredits": {
+                  "type": "number",
+                  "minimum": 0
+                },
+                "isSatisfied": {
+                  "type": "boolean"
+                },
+                "groupStatuses": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "groupId": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "isSatisfied": {
+                        "type": "boolean"
+                      },
+                      "earnedCredits": {
+                        "type": "number",
+                        "minimum": 0
+                      },
+                      "inProgressCredits": {
+                        "type": "number",
+                        "minimum": 0
+                      },
+                      "requiredCredits": {
+                        "type": "number",
+                        "minimum": 0
+                      },
+                      "maxCredits": {
+                        "type": "number",
+                        "minimum": 0
+                      },
+                      "matchedCourses": {
+                        "type": "array",
+                        "items": {
+                          "type": "object",
+                          "properties": {
+                            "courseId": {
+                              "type": "string"
+                            },
+                            "courseName": {
+                              "type": "string"
+                            },
+                            "credits": {
+                              "type": "number",
+                              "minimum": 0
+                            },
+                            "grade": {
+                              "type": "string"
+                            },
+                            "isPassed": {
+                              "type": "boolean"
+                            },
+                            "isInProgress": {
+                              "type": "boolean"
+                            },
+                            "isUnregistered": {
+                              "type": "boolean"
+                            }
+                          },
+                          "required": [
+                            "courseId",
+                            "courseName",
+                            "credits",
+                            "grade",
+                            "isPassed",
+                            "isInProgress"
+                          ]
+                        }
+                      }
+                    },
+                    "required": [
+                      "groupId",
+                      "isSatisfied",
+                      "earnedCredits",
+                      "inProgressCredits",
+                      "requiredCredits",
+                      "matchedCourses"
+                    ]
+                  }
+                },
+                "matchedCourses": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "courseId": {
+                        "type": "string"
+                      },
+                      "courseName": {
+                        "type": "string"
+                      },
+                      "credits": {
+                        "type": "number",
+                        "minimum": 0
+                      },
+                      "grade": {
+                        "type": "string"
+                      },
+                      "isPassed": {
+                        "type": "boolean"
+                      },
+                      "isInProgress": {
+                        "type": "boolean"
+                      },
+                      "isUnregistered": {
+                        "type": "boolean"
+                      }
+                    },
+                    "required": [
+                      "courseId",
+                      "courseName",
+                      "credits",
+                      "grade",
+                      "isPassed",
+                      "isInProgress"
+                    ]
+                  }
+                }
+              },
+              "required": [
+                "subcategoryId",
+                "subcategoryType",
+                "earnedCredits",
+                "inProgressCredits",
+                "requiredCredits",
+                "isSatisfied",
+                "groupStatuses",
+                "matchedCourses"
+              ]
+            }
+          }
+        },
+        "required": [
+          "categoryId",
+          "categoryName",
+          "earnedCredits",
+          "inProgressCredits",
+          "requiredCredits",
+          "isSatisfied",
+          "subcategoryStatuses"
+        ]
+      }
+    },
+    "unmatchedCourses": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "courseId": {
+            "type": "string"
+          },
+          "courseName": {
+            "type": "string"
+          },
+          "credits": {
+            "type": "number",
+            "minimum": 0
+          },
+          "grade": {
+            "type": "string"
+          },
+          "isPassed": {
+            "type": "boolean"
+          },
+          "isInProgress": {
+            "type": "boolean"
+          },
+          "isUnregistered": {
+            "type": "boolean"
+          }
+        },
+        "required": ["courseId", "courseName", "credits", "grade", "isPassed", "isInProgress"]
+      }
+    },
+    "calculatedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "requirementsId",
+    "totalEarnedCredits",
+    "totalInProgressCredits",
+    "totalRequiredCredits",
+    "isGraduationEligible",
+    "categoryStatuses",
+    "calculatedAt"
+  ],
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "卒業要件の充足状況スキーマ（計算結果）"
+}

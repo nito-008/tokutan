@@ -1,0 +1,40 @@
+{
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "studentId": {
+      "type": "string"
+    },
+    "enrollmentYear": {
+      "type": "integer",
+      "minimum": 1900,
+      "maximum": 2100
+    },
+    "department": {
+      "type": "string",
+      "minLength": 1
+    },
+    "selectedRequirementsId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "required": ["id", "name", "enrollmentYear", "department", "createdAt", "updatedAt"],
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "description": "ユーザープロファイルスキーマ（学生基本情報）"
+}
