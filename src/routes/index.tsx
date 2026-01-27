@@ -1,4 +1,4 @@
-import { Loader2 } from "lucide-solid";
+import { Loader } from "lucide-solid";
 import { type Component, createSignal, onMount, Show } from "solid-js";
 import { SettingsDialog } from "~/components/dialogs/SettingsDialog";
 import { GraduationChecker } from "~/components/graduation/GraduationChecker";
@@ -70,7 +70,7 @@ const Home: Component = () => {
             <div class="flex items-center justify-center py-12">
               <div class="text-center">
                 <div class="mb-4">
-                  <Loader2 class="size-12 mx-auto text-muted-foreground animate-spin" />
+                  <Loader class="size-12 mx-auto text-muted-foreground animate-spin" />
                 </div>
                 <p class="text-muted-foreground">読み込み中...</p>
               </div>
