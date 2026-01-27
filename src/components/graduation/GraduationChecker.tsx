@@ -1,4 +1,4 @@
-﻿import { CircleCheck } from "lucide-solid";
+﻿import { CircleCheck, FilePlusCorner } from "lucide-solid";
 import { type Component, createEffect, createSignal, For, onCleanup, Show } from "solid-js";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
@@ -268,7 +268,7 @@ export const GraduationChecker: Component = () => {
             </DialogDescription>
           </DialogHeader>
           <CsvUploader onDataLoaded={handleDataLoaded} />
-          <DialogFooter class="flex-col">
+          <DialogFooter class="sm:justify-start">
             <Button variant="secondary" onClick={() => setIsUploaderOpen(false)}>
               戻る
             </Button>
@@ -291,9 +291,6 @@ export const GraduationChecker: Component = () => {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p class="text-sm text-muted-foreground">
-                {getRequirementLabel(appState()?.requirements)}
-              </p>
               <DonutChart
                 categoryStatuses={status()?.categoryStatuses ?? []}
                 totalEarned={status()?.totalEarnedCredits ?? 0}
@@ -339,7 +336,8 @@ export const GraduationChecker: Component = () => {
               <CardTitle class="text-lg">{}</CardTitle>
               <div class="flex justify-between w-full">
                 <Button variant="outline" size="sm" onClick={handleReupload}>
-                  成績データを選択
+                  <FilePlusCorner />
+                  <span>成績データを選択</span>
                 </Button>
                 <Switch checked={editMode()} onChange={setEditMode} class="flex items-center gap-2">
                   <SwitchLabel>編集モード</SwitchLabel>

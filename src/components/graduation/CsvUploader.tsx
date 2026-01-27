@@ -1,7 +1,6 @@
-import { FolderOpen, Loader2 } from "lucide-solid";
+import { FolderOpen, Loader } from "lucide-solid";
 import { type Component, createSignal, Show } from "solid-js";
 import { Alert, AlertDescription } from "~/components/ui/alert";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "~/components/ui/card";
 import {
   parseTwinsCsv,
   type ValidationResult,
@@ -109,7 +108,7 @@ export const CsvUploader: Component<CsvUploaderProps> = (props) => {
           }
         >
           <div class="mb-4">
-            <Loader2 class="size-12 mx-auto text-muted-foreground animate-spin" />
+            <Loader class="size-12 mx-auto text-muted-foreground animate-spin" />
           </div>
           <p>読み込み中...</p>
         </Show>
@@ -125,8 +124,10 @@ export const CsvUploader: Component<CsvUploaderProps> = (props) => {
         <p class="font-medium mb-2">CSVファイルの取得方法:</p>
         <ol class="list-decimal list-inside space-y-1">
           <li>TWINSにログイン</li>
-          <li>「成績」→「履修成績照会・成績証明書発行」を選択</li>
-          <li>「CSV出力」ボタンをクリック</li>
+          <li>「成績」→「成績照会」を選択</li>
+          <li>一番下にある「ダウンロード」ボタンをクリック</li>
+          <li>ファイル形式：CSV, 文字コード：Unicode（UTF-8）, BOM有無：BOMなし</li>
+          <li>「出力」ボタンをクリック</li>
         </ol>
       </div>
     </>

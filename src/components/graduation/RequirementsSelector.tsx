@@ -65,7 +65,7 @@ export const RequirementsSelector: Component = () => {
               </SelectItem>
             )}
           >
-            <SelectTrigger class="w-80">
+            <SelectTrigger>
               <SelectValue<GraduationRequirements>>
                 {(state) => getRequirementLabel(state.selectedOption()) || "卒業要件を選択"}
               </SelectValue>
