@@ -18,7 +18,6 @@ import { saveRequirements } from "~/lib/db/requirements";
 import type { ValidationResult } from "~/lib/parsers/twins-csv";
 import { getRequirementLabel } from "~/lib/requirements/label";
 import type {
-  EnrollmentData,
   GraduationRequirements,
   RequirementCategory,
   RequirementGroup,
@@ -26,28 +25,30 @@ import type {
   RequirementSubcategory,
   TwinsCourse,
 } from "~/lib/types";
+import { useAppState, useAppStateActions } from "~/stores/appState";
 import { CsvUploader } from "./CsvUploader";
 import { DonutChart, getCategoryColor } from "./DonutChart";
 import { RequirementsSummary } from "./RequirementsSummary";
 import { RequirementTree } from "./RequirementTree";
 
-interface GraduationCheckerProps {
-  requirements: GraduationRequirements | null;
-  enrollment: EnrollmentData | null;
-  onEnrollmentUpdate: (enrollment: EnrollmentData) => void;
-  onEditRequirements: () => void;
-  onRequirementsUpdate?: (requirements: GraduationRequirements) => void;
-}
-
-export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
+export const GraduationChecker: Component = () => {
+  const appState = useAppState();
+  const { updateEnrollment, updateRequirements } = useAppStateActions();
   const [status, setStatus] = createSignal<RequirementStatus | null>(null);
-  const [isUploaderOpen, setIsUploaderOpen] = createSignal(!props.enrollment);
+  const [isUploaderOpen, setIsUploaderOpen] = createSignal(!appState()?.enrollment);
   const [editMode, setEditMode] = createSignal(false);
+
+  createEffect(() => {
+    if (!appState()?.enrollment) {
+      setIsUploaderOpen(true);
+    }
+  });
 
   // 要件充足状況を計算
   createEffect(() => {
-    const requirements = props.requirements;
-    const enrollment = props.enrollment;
+    const state = appState();
+    const requirements = state?.requirements;
+    const enrollment = state?.enrollment;
 
     if (!requirements || !enrollment) {
       return;
@@ -76,7 +77,7 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
     if (!profile) return;
 
     const enrollment = await importTwinsData(profile.id, courses);
-    props.onEnrollmentUpdate(enrollment);
+    updateEnrollment(enrollment);
     setIsUploaderOpen(false);
   };
 
@@ -85,7 +86,7 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
   };
 
   const handleUploaderOpenChange = (open: boolean) => {
-    if (!open && !props.enrollment) {
+    if (!open && !appState()?.enrollment) {
       return;
     }
 
@@ -96,7 +97,7 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
     categoryId: string | null,
     updates: Partial<RequirementCategory>,
   ) => {
-    const requirements = props.requirements;
+    const requirements = appState()?.requirements;
     if (!requirements) return;
 
     let updatedCategories: RequirementCategory[];
@@ -119,7 +120,7 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
     };
 
     await saveRequirements(updatedRequirements);
-    props.onRequirementsUpdate?.(updatedRequirements);
+    updateRequirements(updatedRequirements);
   };
 
   const handleSubcategoryUpdate = async (
@@ -127,7 +128,7 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
     subcategoryId: string | null,
     updates: Partial<RequirementSubcategory>,
   ) => {
-    const requirements = props.requirements;
+    const requirements = appState()?.requirements;
     if (!requirements) return;
 
     const hasCourseIds = Object.hasOwn(updates, "courseIds");
@@ -221,11 +222,11 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
     };
 
     await saveRequirements(updatedRequirements);
-    props.onRequirementsUpdate?.(updatedRequirements);
+    updateRequirements(updatedRequirements);
   };
 
   const handleSubcategoryDelete = async (categoryId: string, subcategoryId: string) => {
-    const requirements = props.requirements;
+    const requirements = appState()?.requirements;
     if (!requirements) return;
 
     const updatedCategories = requirements.categories.map((cat) =>
@@ -243,7 +244,7 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
     };
 
     await saveRequirements(updatedRequirements);
-    props.onRequirementsUpdate?.(updatedRequirements);
+    updateRequirements(updatedRequirements);
   };
 
   return (
@@ -265,10 +266,10 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
         </DialogContent>
       </Dialog>
 
-      <Show when={status() && props.requirements}>
+      <Show when={status() && appState()?.requirements}>
         <RequirementsSummary
           status={status() as RequirementStatus}
-          requirementsLabel={getRequirementLabel(props.requirements)}
+          requirementsLabel={getRequirementLabel(appState()?.requirements ?? null)}
         />
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -331,7 +332,7 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
               <RequirementTree
                 categoryStatuses={status()?.categoryStatuses ?? []}
                 unmatchedCourses={status()?.unmatchedCourses ?? []}
-                requirements={props.requirements ?? undefined}
+                requirements={appState()?.requirements ?? undefined}
                 onCategoryUpdate={handleCategoryUpdate}
                 onSubcategoryUpdate={handleSubcategoryUpdate}
                 onSubcategoryDelete={handleSubcategoryDelete}

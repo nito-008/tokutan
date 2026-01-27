@@ -1,4 +1,4 @@
-import { type Component, createSignal, onMount, Show } from "solid-js";
+import { type Component, createEffect, createSignal, onMount, Show } from "solid-js";
 import {
   Select,
   SelectContent,
@@ -10,14 +10,11 @@ import { updateSelectedRequirements } from "~/lib/db/profiles";
 import { getAllRequirements } from "~/lib/db/requirements";
 import { getRequirementLabel } from "~/lib/requirements/label";
 import type { GraduationRequirements } from "~/lib/types";
+import { useAppState, useAppStateActions } from "~/stores/appState";
 
-interface RequirementsSelectorProps {
-  profileId: string;
-  selectedRequirementsId?: string;
-  onRequirementsChange?: (requirementsId: string) => void;
-}
-
-export const RequirementsSelector: Component<RequirementsSelectorProps> = (props) => {
+export const RequirementsSelector: Component = () => {
+  const appState = useAppState();
+  const { updateRequirements, updateProfile } = useAppStateActions();
   const [requirements, setRequirements] = createSignal<GraduationRequirements[]>([]);
   const [selectedReq, setSelectedReq] = createSignal<GraduationRequirements | undefined>();
   const [isLoading, setIsLoading] = createSignal(true);
@@ -26,11 +23,6 @@ export const RequirementsSelector: Component<RequirementsSelectorProps> = (props
     try {
       const allReqs = await getAllRequirements();
       setRequirements(allReqs);
-      // 初期選択値を設定
-      if (props.selectedRequirementsId) {
-        const found = allReqs.find((r) => r.id === props.selectedRequirementsId);
-        setSelectedReq(found);
-      }
     } catch (error) {
       console.error("Failed to load requirements:", error);
     } finally {
@@ -38,12 +30,19 @@ export const RequirementsSelector: Component<RequirementsSelectorProps> = (props
     }
   });
 
+  createEffect(() => {
+    setSelectedReq(appState()?.requirements ?? undefined);
+  });
+
   const handleChange = async (value: GraduationRequirements | null) => {
     if (!value) return;
+    const profile = appState()?.profile;
+    if (!profile) return;
     setSelectedReq(value);
     try {
-      await updateSelectedRequirements(props.profileId, value.id);
-      props.onRequirementsChange?.(value.id);
+      await updateSelectedRequirements(profile.id, value.id);
+      updateProfile((current) => ({ ...current, selectedRequirementsId: value.id }));
+      updateRequirements(value);
     } catch (error) {
       console.error("Failed to update selected requirements:", error);
     }
