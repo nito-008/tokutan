@@ -32,22 +32,26 @@ type RequiredCourseExclusion = {
   courseNames: Set<string>;
 };
 
+function buildCourseNameToIdMap(kdbMap: Map<string, Course>): Map<string, string> {
+  const courseNameToIdMap = new Map<string, string>();
+  for (const [courseId, course] of kdbMap.entries()) {
+    const name = course.name?.trim();
+    if (name) {
+      courseNameToIdMap.set(name, courseId);
+    }
+  }
+  return courseNameToIdMap;
+}
+
 function buildRequiredCourseExclusionSet(
   requirements: GraduationRequirements,
   kdbMap: Map<string, Course>,
+  courseNameToIdMap: Map<string, string>,
 ): RequiredCourseExclusion {
   const exclusion: RequiredCourseExclusion = {
     courseIds: new Set<string>(),
     courseNames: new Set<string>(),
   };
-
-  const nameToId = new Map<string, string>();
-  for (const [courseId, course] of kdbMap.entries()) {
-    const name = course.name?.trim();
-    if (name) {
-      nameToId.set(name, courseId);
-    }
-  }
 
   for (const category of requirements.categories) {
     for (const subcategory of category.subcategories) {
@@ -62,7 +66,7 @@ function buildRequiredCourseExclusionSet(
           continue;
         }
 
-        const mappedId = nameToId.get(courseKey);
+        const mappedId = courseNameToIdMap.get(courseKey);
         if (mappedId) {
           exclusion.courseIds.add(mappedId);
         }
@@ -162,8 +166,13 @@ export async function calculateRequirementStatus(
   for (const course of kdbCourses) {
     kdbMap.set(course.id, course);
   }
+  const courseNameToIdMap = buildCourseNameToIdMap(kdbMap);
   // 全必修科目番号（および科目名）を収集
-  const requiredCourseExclusion = buildRequiredCourseExclusionSet(requirements, kdbMap);
+  const requiredCourseExclusion = buildRequiredCourseExclusionSet(
+    requirements,
+    kdbMap,
+    courseNameToIdMap,
+  );
 
   const categoryStatuses: CategoryStatus[] = requirements.categories.map((category) => {
     const subcategoryStatuses: SubcategoryStatus[] = category.subcategories.map((subcategory) => {
@@ -189,6 +198,7 @@ export async function calculateRequirementStatus(
               usedCourseIds,
               requiredCourseExclusion,
               courseTypeMaster,
+              courseNameToIdMap,
             );
 
             const earnedCredits = groupMatches
@@ -253,6 +263,7 @@ export async function calculateRequirementStatus(
           usedCourseIds,
           requiredCourseExclusion,
           courseTypeMaster,
+          courseNameToIdMap,
         );
 
         const earnedCredits = groupMatches
@@ -353,6 +364,7 @@ function matchCoursesToGroup(
   usedCourseIds: Set<string>,
   excludedCourseIds: RequiredCourseExclusion,
   courseTypeMaster: CourseTypeMasterNode[],
+  courseNameToIdMap: Map<string, string>,
 ): MatchedCourse[] {
   const matches: MatchedCourse[] = [];
   const groupExcludedCourseIds = new Set<string>();
@@ -375,7 +387,7 @@ function matchCoursesToGroup(
     // グループ内のいずれかのルールにマッチするかチェック
     for (const rule of group.rules) {
       if (rule.type === "exclude") continue;
-      if (matchCourseToRule(course, rule, excludedCourseIds, courseTypeMaster)) {
+      if (matchCourseToRule(course, rule, excludedCourseIds, courseTypeMaster, courseNameToIdMap)) {
         isMatch = true;
         break;
       }
@@ -403,13 +415,28 @@ function matchCourseToRule(
   rule: GroupRule,
   excludedCourseIds: RequiredCourseExclusion,
   courseTypeMaster: CourseTypeMasterNode[],
+  courseNameToIdMap: Map<string, string>,
 ): boolean {
   if (isCourseExcludedByRequirements(course, excludedCourseIds)) return false;
   switch (rule.type) {
     case "exclude":
       return false;
     case "specific":
-      return rule.courseIds.includes(course.courseId);
+      for (const rawValue of rule.courseIds) {
+        const specificKey = rawValue?.trim();
+        if (!specificKey) continue;
+        if (course.courseId === specificKey) {
+          return true;
+        }
+        if (course.courseName === specificKey) {
+          return true;
+        }
+        const mappedId = courseNameToIdMap.get(specificKey);
+        if (mappedId && course.courseId === mappedId) {
+          return true;
+        }
+      }
+      return false;
 
     case "prefix":
       // 必修科目として定義されているものは除外
