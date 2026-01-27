@@ -341,15 +341,6 @@ export const GraduationChecker: Component<GraduationCheckerProps> = (props) => {
           </Card>
         </div>
       </Show>
-
-      <Show when={!isUploaderOpen() && !props.requirements}>
-        <Card>
-          <CardContent class="py-12 text-center">
-            <p class="text-muted-foreground mb-4">達成状況が設定されていません</p>
-            <Button onClick={props.onEditRequirements}>達成状況を設定</Button>
-          </CardContent>
-        </Card>
-      </Show>
     </div>
   );
 };
