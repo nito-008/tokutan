@@ -222,18 +222,23 @@ export async function calculateRequirementStatus(
               maxCredits: group.maxCredits,
               matchedCourses: groupMatches,
             });
-
-            matchedCourses.push(...groupMatches);
           }
         }
 
-        const earnedCredits = matchedCourses
+        const requiredEarnedCredits = requiredMatches
           .filter((m) => m.isPassed)
           .reduce((sum, m) => sum + m.credits, 0);
+        const groupEarnedCredits = groupStatuses.reduce((sum, g) => sum + g.earnedCredits, 0);
+        const earnedCredits = requiredEarnedCredits + groupEarnedCredits;
 
-        const inProgressCredits = matchedCourses
+        const requiredInProgressCredits = requiredMatches
           .filter((m) => m.isInProgress)
           .reduce((sum, m) => sum + m.credits, 0);
+        const groupInProgressCredits = groupStatuses.reduce(
+          (sum, g) => sum + g.inProgressCredits,
+          0,
+        );
+        const inProgressCredits = requiredInProgressCredits + groupInProgressCredits;
 
         const requiredCredits = requiredMatches.reduce((sum, m) => sum + m.credits, 0);
         const groupRequiredCredits = groupStatuses.reduce((sum, g) => sum + g.requiredCredits, 0);
