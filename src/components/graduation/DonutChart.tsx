@@ -21,8 +21,8 @@ interface DonutChartProps {
 const categoryColors: Record<string, string> = {
   専門科目: "#0284c7", // sky-600 (濃い水色)
   専門基礎科目: "#0ea5e9", // sky-500 (水色)
-  共通科目: "#38bdf8", // sky-400 (明るい水色)
-  基礎科目: "#7dd3fc", // sky-300 (薄い水色)
+  基礎科目共通科目: "#38bdf8", // sky-400 (明るい水色)
+  基礎科目関連科目: "#7dd3fc", // sky-300 (薄い水色)
 };
 
 export const DonutChart: Component<DonutChartProps> = (props) => {
