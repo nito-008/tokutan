@@ -225,7 +225,6 @@ export const GraduationChecker: Component = () => {
                   when={status().isGraduationEligible}
                   fallback={<span>卒業まであと&nbsp;{remaining()}単位!</span>}
                 >
-                  <CircleCheck class="size-6 text-green-500" />
                   <span>卒業!</span>
                 </Show>
               </CardTitle>
