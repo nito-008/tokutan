@@ -22,23 +22,9 @@ function parseRequiredCourseGroups(courseIds: string[]): string[][] {
   return courseIds.map(splitRequiredCourseGroup).filter((group) => group.length > 0);
 }
 
-// 全必修科目番号を収集するヘルパー関数
+// 全必修科目番号を収集するヘルパー関数（選択科目からの除外用）
 function collectAllRequiredCourseIds(requirements: GraduationRequirements): Set<string> {
-  const requiredCourseIds = new Set<string>();
-
-  for (const category of requirements.categories) {
-    for (const subcategory of category.subcategories) {
-      if (subcategory.type !== "required") continue;
-      const groups = parseRequiredCourseGroups(subcategory.courseIds ?? []);
-      for (const group of groups) {
-        for (const courseId of group) {
-          requiredCourseIds.add(courseId);
-        }
-      }
-    }
-  }
-
-  return requiredCourseIds;
+  return new Set<string>();
 }
 
 function matchRequiredCourseGroups(
@@ -48,24 +34,24 @@ function matchRequiredCourseGroups(
   kdbMap: Map<string, Course>,
 ): MatchedCourse[] {
   const matches: MatchedCourse[] = [];
-  const coursesById = new Map<string, UserCourseRecord[]>();
+  const coursesByName = new Map<string, UserCourseRecord[]>();
 
   for (const course of courses) {
-    const list = coursesById.get(course.courseId);
+    const list = coursesByName.get(course.courseName);
     if (list) {
       list.push(course);
     } else {
-      coursesById.set(course.courseId, [course]);
+      coursesByName.set(course.courseName, [course]);
     }
   }
 
   for (const group of courseGroups) {
-    const primaryCourseId = group[0];
-    if (!primaryCourseId) continue;
+    const primaryCourseName = group[0];
+    if (!primaryCourseName) continue;
     let selected: UserCourseRecord | null = null;
 
-    for (const courseId of group) {
-      const records = coursesById.get(courseId);
+    for (const courseName of group) {
+      const records = coursesByName.get(courseName);
       if (!records) continue;
       const record = records.find((item) => !usedCourseIds.has(item.id));
       if (record) {
@@ -87,11 +73,11 @@ function matchRequiredCourseGroups(
       continue;
     }
 
-    const kdbCourse = kdbMap.get(primaryCourseId);
+    // 未履修の場合、科目名を表示（courseIdは空文字）
     matches.push({
-      courseId: primaryCourseId,
-      courseName: kdbCourse?.name ?? primaryCourseId,
-      credits: kdbCourse?.credits ?? 2,
+      courseId: "",
+      courseName: primaryCourseName,
+      credits: 2, // デフォルト単位数
       grade: "未履修",
       isPassed: false,
       isInProgress: false,

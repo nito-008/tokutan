@@ -220,7 +220,7 @@ export const CourseIdRowContent: Component<CourseIdRowContentProps> = (props) =>
                         blurTarget?.focus();
                       }
                     }}
-                    placeholder={props.isPlaceholder ? "科目番号を追加" : "例: FG20204"}
+                    placeholder={props.isPlaceholder ? "科目名を追加" : "例: 工学システム概論"}
                   />
                   <Show when={groupIds().length > 0 && !isFocused()}>
                     <div

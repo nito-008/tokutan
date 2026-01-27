@@ -55,7 +55,7 @@ export const RequiredCoursesEditor: Component<RequiredCoursesEditorProps> = (pro
 
   return (
     <div class="space-y-2">
-      <Label>科目番号（カンマ区切り）</Label>
+      <Label>科目名（カンマ区切り）</Label>
       <DragDropProvider collisionDetector={closestCenter} onDragEnd={handleDragEnd}>
         <DragDropSensors />
         <SortableProvider ids={sortableIds()}>
