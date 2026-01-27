@@ -204,12 +204,6 @@ export const defaultRequirements: GraduationRequirements = {
             "プログラミング序論B",
           ],
         },
-        {
-          id: "subcat-1769461527016",
-          type: "elective",
-          minCredits: 0,
-          groups: [],
-        },
       ],
     },
     {
@@ -224,8 +218,97 @@ export const defaultRequirements: GraduationRequirements = {
         {
           id: "subcat-1769461553835",
           type: "elective",
-          minCredits: 0,
-          groups: [],
+          minCredits: 1,
+          maxCredits: 10,
+          groups: [
+            {
+              id: "group-1769490412309",
+              minCredits: 1,
+              rules: [
+                {
+                  id: "rule-1769490413726",
+                  type: "category",
+                  majorCategory: "総合科目",
+                  middleCategory: "学士基盤科目",
+                },
+                {
+                  id: "rule-1769490427117",
+                  type: "category",
+                  majorCategory: "総合科目",
+                  middleCategory: "学士基盤科目-高年次向け-",
+                },
+              ],
+              maxCredits: 3,
+            },
+            {
+              id: "group-1769490435346",
+              minCredits: 0,
+              rules: [
+                {
+                  id: "rule-1769490437267",
+                  type: "category",
+                  majorCategory: "体育",
+                  middleCategory: "全学年対象自由科目（講義）",
+                },
+                {
+                  id: "rule-1769490737428",
+                  type: "category",
+                  majorCategory: "体育",
+                  middleCategory: "全学年対象自由科目（演習）",
+                },
+                {
+                  id: "rule-1769490746446",
+                  type: "category",
+                  majorCategory: "体育",
+                  middleCategory: "全学年対象自由科目（通年実技）",
+                },
+                {
+                  id: "rule-1769490747142",
+                  type: "category",
+                  majorCategory: "体育",
+                  middleCategory: "全学年対象自由科目（集中実技）",
+                },
+              ],
+              maxCredits: 1,
+            },
+            {
+              id: "group-1769490790479",
+              minCredits: 0,
+              rules: [
+                {
+                  id: "rule-1769490795835",
+                  type: "category",
+                  majorCategory: "外国語",
+                  middleCategory: "英語",
+                },
+              ],
+              maxCredits: 4,
+            },
+            {
+              id: "group-1769490807117",
+              minCredits: 0,
+              rules: [
+                {
+                  id: "rule-1769490829838",
+                  type: "category",
+                  majorCategory: "芸術",
+                },
+              ],
+              maxCredits: 1,
+            },
+            {
+              id: "group-1769490833766",
+              minCredits: 0,
+              rules: [
+                {
+                  id: "rule-1769490837749",
+                  type: "category",
+                  majorCategory: "国語",
+                },
+              ],
+              maxCredits: 1,
+            },
+          ],
         },
       ],
     },
@@ -241,8 +324,66 @@ export const defaultRequirements: GraduationRequirements = {
         {
           id: "subcat-1769461571505",
           type: "elective",
-          minCredits: 0,
-          groups: [],
+          minCredits: 6,
+          maxCredits: 15,
+          groups: [
+            {
+              id: "group-1769490983361",
+              minCredits: 0,
+              rules: [
+                {
+                  id: "rule-1769491000689",
+                  type: "specific",
+                  courseIds: ["FG16051"],
+                },
+              ],
+              maxCredits: 1,
+            },
+            {
+              id: "group-1769491020908",
+              minCredits: 0,
+              rules: [
+                {
+                  id: "rule-1769491024959",
+                  type: "category",
+                  majorCategory: "博物館",
+                },
+              ],
+            },
+            {
+              id: "group-1769491030034",
+              minCredits: 0,
+              rules: [
+                {
+                  id: "rule-1769491032730",
+                  type: "category",
+                  majorCategory: "教職",
+                },
+              ],
+            },
+            {
+              id: "group-1769491041512",
+              minCredits: 0,
+              rules: [
+                {
+                  id: "rule-1769491044941",
+                  type: "category",
+                  majorCategory: "自由科目（特設）",
+                },
+              ],
+            },
+            {
+              id: "group-1769494514703",
+              minCredits: 0,
+              rules: [
+                {
+                  id: "rule-1769494526690",
+                  type: "category",
+                  majorCategory: "外国語",
+                },
+              ],
+            },
+          ],
         },
       ],
     },
