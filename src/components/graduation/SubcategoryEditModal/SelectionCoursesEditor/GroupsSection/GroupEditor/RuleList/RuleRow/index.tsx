@@ -1,9 +1,9 @@
 import { GripVertical, Trash2 } from "lucide-solid";
 import { type Component, type JSX, Show } from "solid-js";
+import { CategoryRuleEditor } from "~/components/graduation/SubcategoryEditModal/shared/CategoryRuleEditor";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import type { GroupRule } from "~/lib/types";
-import { CategoryRuleEditor } from "../CategoryRuleEditor";
 import { CourseIdsInput } from "../CourseIdsInput";
 
 interface RuleRowProps {

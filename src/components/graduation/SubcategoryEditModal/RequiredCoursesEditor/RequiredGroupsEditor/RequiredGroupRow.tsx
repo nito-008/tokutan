@@ -1,6 +1,6 @@
 import { Trash2 } from "lucide-solid";
 import type { Component } from "solid-js";
-import { CategoryRuleEditor } from "~/components/graduation/SubcategoryEditModal/SelectionCoursesEditor/GroupsSection/GroupEditor/RuleList/CategoryRuleEditor";
+import { CategoryRuleEditor } from "~/components/graduation/SubcategoryEditModal/shared/CategoryRuleEditor";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
