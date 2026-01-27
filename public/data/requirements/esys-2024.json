@@ -333,7 +333,8 @@
                 {
                   "id": "rule-1769491000689",
                   "type": "specific",
-                  "courseIds": ["FG16051"]
+                  "courseIds": ["FG16051"],
+                  "courseNames": ["工学システム概論"]
                 }
               ],
               "maxCredits": 1

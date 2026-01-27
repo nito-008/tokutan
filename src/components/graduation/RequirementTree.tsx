@@ -321,14 +321,19 @@ const formatGroupConditionLabel = (group?: RequirementGroup): string => {
     ),
   );
 
-  const specificCourseIds = Array.from(
+  const specificCourseNames = Array.from(
     new Set(
       group.rules
         .filter(
-          (rule): rule is GroupRule & { type: "specific"; courseIds: string[] } =>
-            rule.type === "specific",
+          (
+            rule,
+          ): rule is GroupRule & {
+            type: "specific";
+            courseIds: string[];
+            courseNames?: string[];
+          } => rule.type === "specific",
         )
-        .flatMap((rule) => rule.courseIds.filter(Boolean)),
+        .flatMap((rule) => [...(rule.courseNames ?? []), ...rule.courseIds].filter(Boolean)),
     ),
   );
 
@@ -373,8 +378,8 @@ const formatGroupConditionLabel = (group?: RequirementGroup): string => {
     parts.push(parts.length ? `\n${categoryText}` : categoryText);
   }
 
-  if (specificCourseIds.length) {
-    parts.push(specificCourseIds.join("、"));
+  if (specificCourseNames.length) {
+    parts.push(specificCourseNames.join("、"));
   }
 
   if (excludeCourseIds.length) {

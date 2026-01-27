@@ -22,6 +22,10 @@ export const GroupEditor: Component<GroupEditorProps> = (props) => {
           id: rule.id,
           type: "specific",
           courseIds: "courseIds" in merged ? (merged.courseIds as string[]) : rule.courseIds,
+          courseNames:
+            "courseNames" in merged
+              ? (merged.courseNames as string[] | undefined)
+              : rule.courseNames,
         } satisfies GroupRule;
       }
       if (rule.type === "exclude") {
@@ -61,6 +65,7 @@ export const GroupEditor: Component<GroupEditorProps> = (props) => {
       id: `rule-${Date.now()}`,
       type: "specific",
       courseIds: [],
+      courseNames: [],
     };
     props.onUpdate({ rules: [...props.group.rules, newRule] });
   };

@@ -49,6 +49,7 @@ export type GroupRule =
   | (GroupRuleBase & {
       type: "specific";
       courseIds: string[];
+      courseNames?: string[];
     })
   | (GroupRuleBase & {
       type: "prefix";

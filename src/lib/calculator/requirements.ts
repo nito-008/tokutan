@@ -27,6 +27,10 @@ function parseRequiredCourseGroups(courseIds: string[]): string[][] {
   return courseIds.map(splitRequiredCourseGroup).filter((group) => group.length > 0);
 }
 
+function normalizeCourseName(value: string | undefined): string {
+  return (value ?? "").trim().toLowerCase();
+}
+
 type RequiredCourseExclusion = {
   courseIds: Set<string>;
   courseNames: Set<string>;
@@ -35,9 +39,9 @@ type RequiredCourseExclusion = {
 function buildCourseNameToIdMap(kdbMap: Map<string, Course>): Map<string, string> {
   const courseNameToIdMap = new Map<string, string>();
   for (const [courseId, course] of kdbMap.entries()) {
-    const name = course.name?.trim();
-    if (name) {
-      courseNameToIdMap.set(name, courseId);
+    const normalizedName = normalizeCourseName(course.name);
+    if (normalizedName) {
+      courseNameToIdMap.set(normalizedName, courseId);
     }
   }
   return courseNameToIdMap;
@@ -59,7 +63,10 @@ function buildRequiredCourseExclusionSet(
       for (const rawCourse of subcategory.courseIds ?? []) {
         const courseKey = rawCourse?.trim();
         if (!courseKey) continue;
-        exclusion.courseNames.add(courseKey);
+        const normalizedCourseName = normalizeCourseName(courseKey);
+        if (normalizedCourseName) {
+          exclusion.courseNames.add(normalizedCourseName);
+        }
 
         if (kdbMap.has(courseKey)) {
           exclusion.courseIds.add(courseKey);
@@ -81,7 +88,10 @@ function isCourseExcludedByRequirements(
   course: UserCourseRecord,
   exclusion: RequiredCourseExclusion,
 ): boolean {
-  return exclusion.courseIds.has(course.courseId) || exclusion.courseNames.has(course.courseName);
+  const normalizedCourseName = normalizeCourseName(course.courseName);
+  const isNameExcluded =
+    normalizedCourseName.length > 0 && exclusion.courseNames.has(normalizedCourseName);
+  return exclusion.courseIds.has(course.courseId) || isNameExcluded;
 }
 
 function matchRequiredCourseGroups(
@@ -426,7 +436,14 @@ function matchCourseToRule(
   switch (rule.type) {
     case "exclude":
       return false;
-    case "specific":
+    case "specific": {
+      const normalizedCourseName = normalizeCourseName(course.courseName);
+      for (const rawName of rule.courseNames ?? []) {
+        const normalizedRuleName = normalizeCourseName(rawName);
+        if (normalizedRuleName && normalizedRuleName === normalizedCourseName) {
+          return true;
+        }
+      }
       for (const rawValue of rule.courseIds) {
         const specificKey = rawValue?.trim();
         if (!specificKey) continue;
@@ -436,12 +453,17 @@ function matchCourseToRule(
         if (course.courseName === specificKey) {
           return true;
         }
-        const mappedId = courseNameToIdMap.get(specificKey);
+        const normalizedSpecificKey = normalizeCourseName(specificKey);
+        if (normalizedSpecificKey && normalizedSpecificKey === normalizedCourseName) {
+          return true;
+        }
+        const mappedId = courseNameToIdMap.get(normalizedSpecificKey);
         if (mappedId && course.courseId === mappedId) {
           return true;
         }
       }
       return false;
+    }
 
     case "prefix":
       // 必修科目として定義されているものは除外

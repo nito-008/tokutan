@@ -4,7 +4,7 @@ import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import type { GroupRule } from "~/lib/types";
 import { CategoryRuleEditor } from "../CategoryRuleEditor";
-import { CourseIdsInput } from "../CourseIdsInput";
+import { CourseNamesInput } from "../CourseNamesInput";
 
 interface RuleRowProps {
   rule: GroupRule;
@@ -74,9 +74,9 @@ export const RuleRow: Component<RuleRowProps> = (props) => {
 
       <div class="flex-1">
         <Show when={props.rule.type === "specific"}>
-          <CourseIdsInput
-            courseIds={(props.rule as Extract<GroupRule, { type: "specific" }>).courseIds}
-            onUpdate={(courseIds) => props.onUpdate({ courseIds } satisfies Partial<GroupRule>)}
+          <CourseNamesInput
+            courseNames={(props.rule as Extract<GroupRule, { type: "specific" }>).courseNames ?? []}
+            onUpdate={(courseNames) => props.onUpdate({ courseNames } satisfies Partial<GroupRule>)}
           />
         </Show>
         <Show when={props.rule.type === "exclude"}>

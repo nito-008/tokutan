@@ -16,6 +16,7 @@ const SpecificRuleSchema = v.object({
   ...GroupRuleBaseSchema.entries,
   type: v.literal("specific"),
   courseIds: v.array(v.string()),
+  courseNames: v.optional(v.array(v.string())),
 });
 
 /**
