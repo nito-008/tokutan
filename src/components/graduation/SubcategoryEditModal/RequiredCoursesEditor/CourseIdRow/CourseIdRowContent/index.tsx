@@ -174,7 +174,7 @@ export const CourseIdRowContent: Component<CourseIdRowContentProps> = (props) =>
           type="button"
           variant="ghost"
           size="icon"
-          class="text-muted-foreground hover:text-foreground"
+          class="text-destructive hover:text-destructive hover:bg-destructive/10"
           onClick={() => props.onRemoveCourseId(props.index)}
         >
           <Trash2 class="size-4" />

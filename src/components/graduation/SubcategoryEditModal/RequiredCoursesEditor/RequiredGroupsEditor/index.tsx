@@ -51,17 +51,9 @@ export const RequiredGroupsEditor: Component<RequiredGroupsEditorProps> = (props
   };
 
   return (
-    <div class="space-y-2">
+    <div class="space-y-4">
       <Label>科目区分グループ</Label>
-
-      <Show
-        when={props.groups.length > 0}
-        fallback={
-          <div class="text-sm text-muted-foreground border rounded-lg p-4 text-center">
-            グループが設定されていません
-          </div>
-        }
-      >
+      <Show when={props.groups.length > 0}>
         <div class="space-y-2">
           <For each={props.groups}>
             {(group, index) => (
