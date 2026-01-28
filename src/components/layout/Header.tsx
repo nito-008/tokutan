@@ -1,4 +1,4 @@
-import { Settings } from "lucide-solid";
+import Settings from "lucide-solid/icons/settings";
 import type { Component } from "solid-js";
 import { Button } from "~/components/ui/button";
 

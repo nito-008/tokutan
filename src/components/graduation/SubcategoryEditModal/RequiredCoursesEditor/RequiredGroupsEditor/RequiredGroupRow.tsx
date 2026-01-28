@@ -1,4 +1,4 @@
-import { Trash2 } from "lucide-solid";
+import Trash2 from "lucide-solid/icons/trash-2";
 import type { Component } from "solid-js";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";

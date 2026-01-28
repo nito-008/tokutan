@@ -1,4 +1,5 @@
-import { GripVertical, Trash2 } from "lucide-solid";
+import GripVertical from "lucide-solid/icons/grip-vertical";
+import Trash2 from "lucide-solid/icons/trash-2";
 import {
   type Accessor,
   type Component,

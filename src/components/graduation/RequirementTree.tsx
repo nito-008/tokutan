@@ -1,4 +1,7 @@
-﻿import { Circle, CircleCheck, Pencil, Plus } from "lucide-solid";
+﻿import Circle from "lucide-solid/icons/circle";
+import CircleCheck from "lucide-solid/icons/circle-check";
+import Pencil from "lucide-solid/icons/pencil";
+import Plus from "lucide-solid/icons/plus";
 import { type Component, createSignal, For, Show } from "solid-js";
 import {
   Accordion,

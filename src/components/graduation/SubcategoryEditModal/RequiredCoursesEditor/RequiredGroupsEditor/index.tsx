@@ -1,4 +1,4 @@
-import { Plus } from "lucide-solid";
+import Plus from "lucide-solid/icons/plus";
 import { type Component, For, Show } from "solid-js";
 import { reconcile, type SetStoreFunction } from "solid-js/store";
 import { Button } from "~/components/ui/button";

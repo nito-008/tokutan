@@ -1,4 +1,5 @@
-import { GripVertical, Trash2 } from "lucide-solid";
+import GripVertical from "lucide-solid/icons/grip-vertical";
+import Trash2 from "lucide-solid/icons/trash-2";
 import { type Component, type JSX, Show } from "solid-js";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";

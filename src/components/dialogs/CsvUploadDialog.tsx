@@ -1,4 +1,6 @@
-import { FilePlusCorner, FolderOpen, Loader } from "lucide-solid";
+import FilePlusCorner from "lucide-solid/icons/file-plus-corner";
+import FolderOpen from "lucide-solid/icons/folder-open";
+import Loader from "lucide-solid/icons/loader";
 import { type Component, createSignal, Show } from "solid-js";
 import { Alert, AlertDescription } from "~/components/ui/alert";
 import { importTwinsData } from "~/lib/db/enrollment";

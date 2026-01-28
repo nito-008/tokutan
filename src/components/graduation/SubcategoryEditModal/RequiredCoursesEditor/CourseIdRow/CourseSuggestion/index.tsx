@@ -1,4 +1,4 @@
-import { Check } from "lucide-solid";
+import Check from "lucide-solid/icons/check";
 import { type Accessor, type Component, For, Show } from "solid-js";
 import { PopoverContent } from "~/components/ui/popover";
 import { Tooltip, TooltipContent, TooltipTrigger } from "~/components/ui/tooltip";
