@@ -12,3 +12,7 @@ export async function clearUserData(): Promise<void> {
     },
   );
 }
+
+export async function clearRequirements(): Promise<void> {
+  await db.requirements.clear();
+}

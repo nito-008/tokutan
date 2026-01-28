@@ -2,7 +2,7 @@ import { type Component, createSignal, Show } from "solid-js";
 import { Alert, AlertDescription } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "~/components/ui/dialog";
-import { clearUserData } from "~/lib/db/cleanup";
+import { clearRequirements, clearUserData } from "~/lib/db/cleanup";
 import { exportAndDownload, exportRequirementsAndDownload } from "~/lib/db/export";
 import {
   type ImportResult,
@@ -29,6 +29,7 @@ export const SettingsDialog: Component<SettingsDialogProps> = (props) => {
   const [isExporting, setIsExporting] = createSignal(false);
   const [requirements, setRequirements] = createSignal<GraduationRequirements[]>([]);
   const [isDeletingUserData, setIsDeletingUserData] = createSignal(false);
+  const [isDeletingRequirements, setIsDeletingRequirements] = createSignal(false);
   const [isDeletingKdbCache, setIsDeletingKdbCache] = createSignal(false);
 
   let fileInputRef: HTMLInputElement | undefined;
@@ -129,6 +130,22 @@ export const SettingsDialog: Component<SettingsDialogProps> = (props) => {
       console.error("Delete user data failed:", error);
     } finally {
       setIsDeletingUserData(false);
+    }
+  };
+
+  const handleDeleteRequirements = async () => {
+    const confirmed = window.confirm("卒業要件データを削除します。よろしいですか？");
+    if (!confirmed) return;
+
+    setIsDeletingRequirements(true);
+    try {
+      await clearRequirements();
+      await loadRequirements();
+      await props.onImportComplete();
+    } catch (error) {
+      console.error("Delete requirements failed:", error);
+    } finally {
+      setIsDeletingRequirements(false);
     }
   };
 
@@ -280,10 +297,24 @@ export const SettingsDialog: Component<SettingsDialogProps> = (props) => {
           </section>
 
           <section class="space-y-4">
-            <h3 class="text-base font-semibold">ローカルデータ削除</h3>
+            <h3 class="text-base font-semibold">データの削除</h3>
+            <p class="text-sm mb-3 text-muted-foreground">
+              データはすべてローカルに保存されています。サーバー側には送信されません。
+            </p>
 
             <div class="border rounded-lg p-4">
-              <h4 class="font-medium mb-2">ユーザーデータを削除</h4>
+              <h4 class="font-medium mb-2">卒業要件データを削除</h4>
+              <Button
+                variant="destructive"
+                onClick={handleDeleteRequirements}
+                disabled={isDeletingRequirements()}
+              >
+                {isDeletingRequirements() ? "削除中..." : "卒業要件データを削除"}
+              </Button>
+            </div>
+
+            <div class="border rounded-lg p-4">
+              <h4 class="font-medium mb-2">すべてのデータを削除</h4>
               <p class="text-sm mb-3 text-red-500">
                 プロファイル、履修データ、卒業要件、履修計画が削除されます。
               </p>
@@ -298,9 +329,7 @@ export const SettingsDialog: Component<SettingsDialogProps> = (props) => {
 
             <div class="border rounded-lg p-4">
               <h4 class="font-medium mb-2">KDBキャッシュを削除</h4>
-              <p class="text-sm text-muted-foreground mb-3">
-                科目検索のキャッシュを削除します。再検索時に再取得されます。
-              </p>
+              <p class="text-sm text-muted-foreground mb-3">KDBデータのキャッシュを削除します。</p>
               <Button
                 variant="outline"
                 onClick={handleDeleteKdbCache}
