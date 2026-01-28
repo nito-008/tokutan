@@ -208,13 +208,6 @@ export const GroupEditor: Component<GroupEditorProps> = (props) => {
             />
           </div>
         </div>
-        <Button
-          variant="ghost"
-          class="size-8 text-destructive hover:text-destructive hover:bg-destructive/10"
-          onClick={props.onRemove}
-        >
-          <Trash2 class="size-4" />
-        </Button>
       </div>
 
       <div class="space-y-4">
@@ -241,26 +234,39 @@ export const GroupEditor: Component<GroupEditorProps> = (props) => {
               />
             </div>
           </Show>
-          <div class="flex gap-2">
-            <Select
-              value={selectedRuleType()}
-              onChange={handleRuleTypeChange}
-              options={ruleTypeOptions}
-              optionValue="value"
-              optionTextValue="label"
-              itemComponent={(itemProps) => (
-                <SelectItem item={itemProps.item}>{itemProps.item.rawValue.label}</SelectItem>
-              )}
-              class="flex-1"
+          <div class="flex justify-between gap-2">
+            <div class="flex gap-2">
+              <Select
+                value={selectedRuleType()}
+                onChange={handleRuleTypeChange}
+                options={ruleTypeOptions}
+                optionValue="value"
+                optionTextValue="label"
+                itemComponent={(itemProps) => (
+                  <SelectItem item={itemProps.item}>{itemProps.item.rawValue.label}</SelectItem>
+                )}
+                class="w-fit"
+              >
+                <SelectTrigger class="h-8">
+                  <SelectValue<RuleTypeOption>>
+                    {(state) => state.selectedOption().label}
+                  </SelectValue>
+                </SelectTrigger>
+                <SelectContent />
+              </Select>
+              <Button variant="outline" size="sm" onClick={addRule} class="h-8">
+                <Plus class="size-4 mr-1" />
+                ルールを追加
+              </Button>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              class="h-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+              onClick={props.onRemove}
             >
-              <SelectTrigger class="h-8">
-                <SelectValue<RuleTypeOption>>{(state) => state.selectedOption().label}</SelectValue>
-              </SelectTrigger>
-              <SelectContent />
-            </Select>
-            <Button variant="outline" size="sm" onClick={addRule} class="h-8">
-              <Plus class="size-4 mr-1" />
-              ルールを追加
+              <Trash2 class="size-4 mr-1" />
+              グループを削除
             </Button>
           </div>
         </div>
