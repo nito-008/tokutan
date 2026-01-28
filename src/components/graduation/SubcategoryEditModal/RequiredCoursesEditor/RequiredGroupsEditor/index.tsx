@@ -12,6 +12,11 @@ interface RequiredGroupsEditorProps {
 }
 
 export const RequiredGroupsEditor: Component<RequiredGroupsEditorProps> = (props) => {
+  const categoryGroups = () =>
+    props.groups
+      .map((group, index) => ({ group, originalIndex: index }))
+      .filter(({ group }) => group.includeRules[0]?.type === "category");
+
   const handleAddGroup = () => {
     const newGroup: RequirementGroup = {
       id: `group-${Date.now()}`,
@@ -62,14 +67,14 @@ export const RequiredGroupsEditor: Component<RequiredGroupsEditorProps> = (props
   return (
     <div class="space-y-4">
       <Label>科目区分グループ</Label>
-      <Show when={props.groups.length > 0}>
+      <Show when={categoryGroups().length > 0}>
         <div class="space-y-2">
-          <For each={props.groups}>
-            {(group, index) => (
+          <For each={categoryGroups()}>
+            {({ group, originalIndex }) => (
               <RequiredGroupRow
                 group={group}
-                onUpdate={(updates) => handleUpdateGroup(index(), updates)}
-                onRemove={() => handleRemoveGroup(index())}
+                onUpdate={(updates) => handleUpdateGroup(originalIndex, updates)}
+                onRemove={() => handleRemoveGroup(originalIndex)}
               />
             )}
           </For>
