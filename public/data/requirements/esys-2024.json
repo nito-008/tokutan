@@ -17,7 +17,7 @@
         {
           "id": "specialized-required",
           "type": "required",
-          "courseIds": [
+          "courseNames": [
             "プログラミング序論C",
             "プログラミング序論D",
             "工学システム基礎実験A",
@@ -158,7 +158,7 @@
                 {
                   "id": "rule-1769460999999",
                   "type": "exclude",
-                  "courseIds": []
+                  "courseNames": []
                 }
               ]
             }
@@ -173,7 +173,7 @@
         {
           "id": "foundation-required",
           "type": "required",
-          "courseIds": [
+          "courseNames": [
             "数学リテラシー1",
             "数学リテラシー2",
             "線形代数1",
@@ -212,7 +212,7 @@
         {
           "id": "subcat-1769461547235",
           "type": "required",
-          "courseIds": []
+          "courseNames": []
         },
         {
           "id": "subcat-1769461553835",
@@ -318,7 +318,7 @@
         {
           "id": "subcat-1769461564785",
           "type": "required",
-          "courseIds": []
+          "courseNames": []
         },
         {
           "id": "subcat-1769461571505",
@@ -333,7 +333,6 @@
                 {
                   "id": "rule-1769491000689",
                   "type": "specific",
-                  "courseIds": ["FG16051"],
                   "courseNames": ["工学システム概論"]
                 }
               ],

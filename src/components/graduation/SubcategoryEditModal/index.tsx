@@ -42,7 +42,7 @@ interface SubcategoryEditModalProps {
 
 export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props) => {
   const [type, setType] = createSignal<"required" | "elective" | "free">("required");
-  const [courseIds, setCourseIds] = createSignal<string[]>([]);
+  const [courseNames, setCourseNames] = createSignal<string[]>([]);
   const [minCredits, setMinCredits] = createSignal(0);
   const [maxCredits, setMaxCredits] = createSignal<number | undefined>(undefined);
   const [groups, setGroups] = createStore<RequirementGroup[]>([]);
@@ -51,9 +51,9 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
     if (props.subcategory) {
       setType(props.subcategory.type);
       if (props.subcategory.type === "required") {
-        setCourseIds(
+        setCourseNames(
           normalizeCourseIds(
-            [...(props.subcategory.courseIds ?? [])].map((id) => id.trim()).filter((id) => id),
+            [...(props.subcategory.courseNames ?? [])].map((id) => id.trim()).filter((id) => id),
           ),
         );
         setMinCredits(0);
@@ -65,7 +65,7 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
           ),
         );
       } else {
-        setCourseIds([]);
+        setCourseNames([]);
         setMinCredits(props.subcategory.minCredits);
         setMaxCredits(props.subcategory.maxCredits);
         setGroups(
@@ -77,7 +77,7 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
       }
     } else if (props.open) {
       setType("elective");
-      setCourseIds([]);
+      setCourseNames([]);
       setMinCredits(0);
       setMaxCredits(undefined);
       setGroups([]);
@@ -89,7 +89,7 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
       type() === "required"
         ? {
             type: type(),
-            courseIds: courseIds()
+            courseNames: courseNames()
               .map((value) => value.trim())
               .filter((value) => value),
             groups: groups.length > 0 ? JSON.parse(JSON.stringify(unwrap(groups))) : undefined,
@@ -117,7 +117,7 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
     if (!val) return;
     setType(val.value);
     if (val.value === "required") {
-      setCourseIds((prev) => normalizeCourseIds(prev));
+      setCourseNames((prev) => normalizeCourseIds(prev));
     }
   };
 
@@ -160,8 +160,8 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
 
           <Show when={type() === "required"}>
             <RequiredCoursesEditor
-              courseIds={courseIds}
-              setCourseIds={setCourseIds}
+              courseNames={courseNames}
+              setCourseNames={setCourseNames}
               groups={groups}
               setGroups={setGroups}
             />

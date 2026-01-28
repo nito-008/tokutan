@@ -21,18 +21,16 @@ export const GroupEditor: Component<GroupEditorProps> = (props) => {
         return {
           id: rule.id,
           type: "specific",
-          courseIds: "courseIds" in merged ? (merged.courseIds as string[]) : rule.courseIds,
           courseNames:
-            "courseNames" in merged
-              ? (merged.courseNames as string[] | undefined)
-              : rule.courseNames,
+            "courseNames" in merged ? (merged.courseNames as string[]) : rule.courseNames,
         } satisfies GroupRule;
       }
       if (rule.type === "exclude") {
         return {
           id: rule.id,
           type: "exclude",
-          courseIds: "courseIds" in merged ? (merged.courseIds as string[]) : rule.courseIds,
+          courseNames:
+            "courseNames" in merged ? (merged.courseNames as string[]) : rule.courseNames,
         } satisfies GroupRule;
       }
       if (rule.type === "category") {
@@ -64,7 +62,6 @@ export const GroupEditor: Component<GroupEditorProps> = (props) => {
     const newRule: GroupRule = {
       id: `rule-${Date.now()}`,
       type: "specific",
-      courseIds: [],
       courseNames: [],
     };
     props.onUpdate({ rules: [...props.group.rules, newRule] });
@@ -83,7 +80,7 @@ export const GroupEditor: Component<GroupEditorProps> = (props) => {
     const newRule: GroupRule = {
       id: `rule-${Date.now()}`,
       type: "exclude",
-      courseIds: [],
+      courseNames: [],
     };
     props.onUpdate({ rules: [...props.group.rules, newRule] });
   };

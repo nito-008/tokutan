@@ -96,7 +96,7 @@ export const GraduationChecker: Component = () => {
     const requirements = appState()?.requirements;
     if (!requirements) return;
 
-    const hasCourseIds = Object.hasOwn(updates, "courseIds");
+    const hasCourseNames = Object.hasOwn(updates, "courseNames");
     const hasMinCredits = Object.hasOwn(updates, "minCredits");
     const hasMaxCredits = Object.hasOwn(updates, "maxCredits");
     const hasGroups = Object.hasOwn(updates, "groups");
@@ -108,13 +108,13 @@ export const GraduationChecker: Component = () => {
       if (nextType === "required") {
         type RequiredUpdate = Partial<{
           type: "required";
-          courseIds: string[];
+          courseNames: string[];
           groups: RequirementGroup[];
         }>;
-        const courseIds = hasCourseIds
-          ? ((updates as RequiredUpdate).courseIds ?? [])
+        const courseNames = hasCourseNames
+          ? ((updates as RequiredUpdate).courseNames ?? [])
           : existing?.type === "required"
-            ? (existing.courseIds ?? [])
+            ? (existing.courseNames ?? [])
             : [];
         const groups = hasGroups
           ? ((updates as RequiredUpdate).groups ?? [])
@@ -124,7 +124,7 @@ export const GraduationChecker: Component = () => {
         return {
           id: existing?.id ?? `subcat-${Date.now()}`,
           type: "required",
-          courseIds,
+          courseNames,
           groups,
           notes,
         };

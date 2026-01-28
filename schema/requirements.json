@@ -51,7 +51,7 @@
                     "type": {
                       "const": "required"
                     },
-                    "courseIds": {
+                    "courseNames": {
                       "type": "array",
                       "items": {
                         "type": "string"
@@ -88,12 +88,6 @@
                                     "type": {
                                       "const": "specific"
                                     },
-                                    "courseIds": {
-                                      "type": "array",
-                                      "items": {
-                                        "type": "string"
-                                      }
-                                    },
                                     "courseNames": {
                                       "type": "array",
                                       "items": {
@@ -101,7 +95,7 @@
                                       }
                                     }
                                   },
-                                  "required": ["id", "type", "courseIds"]
+                                  "required": ["id", "type", "courseNames"]
                                 },
                                 {
                                   "type": "object",
@@ -130,12 +124,6 @@
                                     "type": {
                                       "const": "exclude"
                                     },
-                                    "courseIds": {
-                                      "type": "array",
-                                      "items": {
-                                        "type": "string"
-                                      }
-                                    },
                                     "courseNames": {
                                       "type": "array",
                                       "items": {
@@ -143,7 +131,7 @@
                                       }
                                     }
                                   },
-                                  "required": ["id", "type", "courseIds"]
+                                  "required": ["id", "type", "courseNames"]
                                 },
                                 {
                                   "type": "object",
@@ -229,12 +217,6 @@
                                     "type": {
                                       "const": "specific"
                                     },
-                                    "courseIds": {
-                                      "type": "array",
-                                      "items": {
-                                        "type": "string"
-                                      }
-                                    },
                                     "courseNames": {
                                       "type": "array",
                                       "items": {
@@ -242,7 +224,7 @@
                                       }
                                     }
                                   },
-                                  "required": ["id", "type", "courseIds"]
+                                  "required": ["id", "type", "courseNames"]
                                 },
                                 {
                                   "type": "object",
@@ -278,7 +260,7 @@
                                       }
                                     }
                                   },
-                                  "required": ["id", "type", "courseIds"]
+                                  "required": ["id", "type", "courseNames"]
                                 },
                                 {
                                   "type": "object",
@@ -371,7 +353,7 @@
                                       }
                                     }
                                   },
-                                  "required": ["id", "type", "courseIds"]
+                                  "required": ["id", "type", "courseNames"]
                                 },
                                 {
                                   "type": "object",
@@ -407,7 +389,7 @@
                                       }
                                     }
                                   },
-                                  "required": ["id", "type", "courseIds"]
+                                  "required": ["id", "type", "courseNames"]
                                 },
                                 {
                                   "type": "object",

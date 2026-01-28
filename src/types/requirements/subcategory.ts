@@ -23,7 +23,7 @@ const RequirementSubcategoryBaseSchema = v.object({
 const RequiredSubcategorySchema = v.object({
   ...RequirementSubcategoryBaseSchema.entries,
   type: v.literal("required"),
-  courseIds: v.array(v.string()),
+  courseNames: v.array(v.string()),
   groups: v.optional(v.array(RequirementGroupSchema)),
 });
 

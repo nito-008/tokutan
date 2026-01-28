@@ -23,8 +23,8 @@ function splitRequiredCourseGroup(value: string): string[] {
     .filter((id) => id);
 }
 
-function parseRequiredCourseGroups(courseIds: string[]): string[][] {
-  return courseIds.map(splitRequiredCourseGroup).filter((group) => group.length > 0);
+function parseRequiredCourseGroups(courseNames: string[]): string[][] {
+  return courseNames.map(splitRequiredCourseGroup).filter((group) => group.length > 0);
 }
 
 function normalizeCourseName(value: string | undefined): string {
@@ -60,7 +60,7 @@ function buildRequiredCourseExclusionSet(
   for (const category of requirements.categories) {
     for (const subcategory of category.subcategories) {
       if (subcategory.type !== "required") continue;
-      for (const rawCourse of subcategory.courseIds ?? []) {
+      for (const rawCourse of subcategory.courseNames ?? []) {
         const courseKey = rawCourse?.trim();
         if (!courseKey) continue;
         const normalizedCourseName = normalizeCourseName(courseKey);
@@ -190,7 +190,7 @@ export async function calculateRequirementStatus(
       const matchedCourses: MatchedCourse[] = [];
 
       if (subcategory.type === "required") {
-        const courseGroups = parseRequiredCourseGroups(subcategory.courseIds ?? []);
+        const courseGroups = parseRequiredCourseGroups(subcategory.courseNames ?? []);
         const requiredMatches = matchRequiredCourseGroups(
           courseGroups,
           courses,
@@ -385,9 +385,9 @@ function matchCoursesToGroup(
   const groupExcludedCourseIds = new Set<string>();
   for (const rule of group.rules) {
     if (rule.type !== "exclude") continue;
-    for (const courseId of rule.courseIds) {
-      if (!courseId) continue;
-      groupExcludedCourseIds.add(courseId);
+    for (const courseName of rule.courseNames) {
+      if (!courseName) continue;
+      groupExcludedCourseIds.add(courseName);
     }
   }
 
@@ -438,13 +438,7 @@ function matchCourseToRule(
       return false;
     case "specific": {
       const normalizedCourseName = normalizeCourseName(course.courseName);
-      for (const rawName of rule.courseNames ?? []) {
-        const normalizedRuleName = normalizeCourseName(rawName);
-        if (normalizedRuleName && normalizedRuleName === normalizedCourseName) {
-          return true;
-        }
-      }
-      for (const rawValue of rule.courseIds) {
+      for (const rawValue of rule.courseNames) {
         const specificKey = rawValue?.trim();
         if (!specificKey) continue;
         if (course.courseId === specificKey) {

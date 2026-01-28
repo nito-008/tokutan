@@ -82,10 +82,10 @@ export const RuleRow: Component<RuleRowProps> = (props) => {
         <Show when={props.rule.type === "exclude"}>
           <Input
             class="h-8"
-            value={(props.rule as Extract<GroupRule, { type: "exclude" }>).courseIds[0] ?? ""}
+            value={(props.rule as Extract<GroupRule, { type: "exclude" }>).courseNames[0] ?? ""}
             onInput={(e) => {
               const value = e.currentTarget.value.trim();
-              props.onUpdate({ courseIds: value ? [value] : [] } satisfies Partial<GroupRule>);
+              props.onUpdate({ courseNames: value ? [value] : [] } satisfies Partial<GroupRule>);
             }}
             placeholder="除外科目 (例: FG10101)"
           />

@@ -329,11 +329,10 @@ const formatGroupConditionLabel = (group?: RequirementGroup): string => {
             rule,
           ): rule is GroupRule & {
             type: "specific";
-            courseIds: string[];
-            courseNames?: string[];
+            courseNames: string[];
           } => rule.type === "specific",
         )
-        .flatMap((rule) => [...(rule.courseNames ?? []), ...rule.courseIds].filter(Boolean)),
+        .flatMap((rule) => rule.courseNames.filter(Boolean)),
     ),
   );
 
@@ -341,10 +340,10 @@ const formatGroupConditionLabel = (group?: RequirementGroup): string => {
     new Set(
       group.rules
         .filter(
-          (rule): rule is GroupRule & { type: "exclude"; courseIds: string[] } =>
+          (rule): rule is GroupRule & { type: "exclude"; courseNames: string[] } =>
             rule.type === "exclude",
         )
-        .flatMap((rule) => rule.courseIds.filter(Boolean)),
+        .flatMap((rule) => rule.courseNames.filter(Boolean)),
     ),
   );
 

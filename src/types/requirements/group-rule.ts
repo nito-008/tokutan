@@ -10,13 +10,12 @@ const GroupRuleBaseSchema = v.object({
 
 /**
  * 特定科目指定ルール
- * 指定された科目IDのリストから選択
+ * 指定された科目名のリストから選択
  */
 const SpecificRuleSchema = v.object({
   ...GroupRuleBaseSchema.entries,
   type: v.literal("specific"),
-  courseIds: v.array(v.string()),
-  courseNames: v.optional(v.array(v.string())),
+  courseNames: v.array(v.string()),
 });
 
 /**
@@ -31,12 +30,12 @@ const PrefixRuleSchema = v.object({
 
 /**
  * 除外ルール
- * 指定された科目IDを除外
+ * 指定された科目名を除外
  */
 const ExcludeRuleSchema = v.object({
   ...GroupRuleBaseSchema.entries,
   type: v.literal("exclude"),
-  courseIds: v.array(v.string()),
+  courseNames: v.array(v.string()),
 });
 
 /**

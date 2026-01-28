@@ -15,8 +15,8 @@ import { SortableCourseIdRow } from "./CourseIdRow/SortableCourseIdRow";
 import { RequiredGroupsEditor } from "./RequiredGroupsEditor";
 
 interface RequiredCoursesEditorProps {
-  courseIds: Accessor<string[]>;
-  setCourseIds: Setter<string[]>;
+  courseNames: Accessor<string[]>;
+  setCourseNames: Setter<string[]>;
   groups: RequirementGroup[];
   setGroups: SetStoreFunction<RequirementGroup[]>;
 }
@@ -24,7 +24,7 @@ interface RequiredCoursesEditorProps {
 export const RequiredCoursesEditor: Component<RequiredCoursesEditorProps> = (props) => {
   // ソート対象のID（プレースホルダー除外）
   const sortableIds = () => {
-    const ids = props.courseIds();
+    const ids = props.courseNames();
     return ids.length > 1 ? ids.slice(0, -1) : [];
   };
 
@@ -32,12 +32,12 @@ export const RequiredCoursesEditor: Component<RequiredCoursesEditorProps> = (pro
   const handleDragEnd = (event: DragEvent) => {
     const { draggable, droppable } = event;
     if (!draggable || !droppable) return;
-    const ids = props.courseIds();
+    const ids = props.courseNames();
     const fromIndex = ids.findIndex((id) => id === String(draggable.id));
     const toIndex = ids.findIndex((id) => id === String(droppable.id));
     if (fromIndex < 0 || toIndex < 0) return;
     if (fromIndex !== toIndex) {
-      props.setCourseIds((prev) => {
+      props.setCourseNames((prev) => {
         const items = [...prev];
         const sortable = items.slice(0, -1);
         const [moved] = sortable.splice(fromIndex, 1);
@@ -48,14 +48,14 @@ export const RequiredCoursesEditor: Component<RequiredCoursesEditorProps> = (pro
   };
 
   const handleUpdateCourseId = (index: number, value: string, skipNormalize = false) => {
-    props.setCourseIds((prev) => {
+    props.setCourseNames((prev) => {
       const updated = prev.map((id, i) => (i === index ? value : id));
       return skipNormalize ? updated : normalizeCourseIds(updated);
     });
   };
 
   const handleRemoveCourseId = (index: number) => {
-    props.setCourseIds((prev) => normalizeCourseIds(prev.filter((_, i) => i !== index)));
+    props.setCourseNames((prev) => normalizeCourseIds(prev.filter((_, i) => i !== index)));
   };
 
   return (
@@ -66,9 +66,9 @@ export const RequiredCoursesEditor: Component<RequiredCoursesEditorProps> = (pro
           <DragDropSensors />
           <SortableProvider ids={sortableIds()}>
             <div class="space-y-2">
-              <For each={props.courseIds()}>
+              <For each={props.courseNames()}>
                 {(id, index) => {
-                  const isPlaceholder = () => index() === props.courseIds().length - 1;
+                  const isPlaceholder = () => index() === props.courseNames().length - 1;
                   return (
                     <Show
                       when={!isPlaceholder()}
