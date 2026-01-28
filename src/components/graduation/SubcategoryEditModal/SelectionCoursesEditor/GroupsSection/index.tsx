@@ -19,14 +19,17 @@ export const GroupsSection: Component<GroupsSectionProps> = (props) => {
     if ("maxCredits" in updates) {
       props.setGroups(index, "maxCredits", updates.maxCredits);
     }
-    if ("rules" in updates) {
+    if ("includeRules" in updates) {
       props.setGroups(
         index,
-        "rules",
-        reconcile(updates.rules ?? [], {
+        "includeRules",
+        reconcile(updates.includeRules ?? [], {
           key: "id",
         }),
       );
+    }
+    if ("excludeRules" in updates) {
+      props.setGroups(index, "excludeRules", updates.excludeRules);
     }
   };
 
@@ -34,7 +37,7 @@ export const GroupsSection: Component<GroupsSectionProps> = (props) => {
     const newGroup: RequirementGroup = {
       id: `group-${Date.now()}`,
       minCredits: 0,
-      rules: [],
+      includeRules: [],
     };
     props.setGroups((prev) => [...prev, newGroup]);
   };

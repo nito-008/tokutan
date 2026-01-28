@@ -51,12 +51,6 @@
                     "type": {
                       "const": "required"
                     },
-                    "courseNames": {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
-                      }
-                    },
                     "groups": {
                       "type": "array",
                       "items": {
@@ -86,7 +80,7 @@
                                       "minLength": 1
                                     },
                                     "type": {
-                                      "const": "specific"
+                                      "const": "courses"
                                     },
                                     "courseNames": {
                                       "type": "array",
@@ -168,7 +162,7 @@
                                       "minLength": 1
                                     },
                                     "type": {
-                                      "const": "specific"
+                                      "const": "courses"
                                     },
                                     "courseNames": {
                                       "type": "array",
@@ -226,11 +220,11 @@
                             }
                           }
                         },
-                        "required": ["id", "minCredits", "includeRules"]
+                        "required": ["id", "includeRules"]
                       }
                     }
                   },
-                  "required": ["id", "type", "courseNames"]
+                  "required": ["id", "type", "groups"]
                 },
                 {
                   "type": "object",
@@ -282,7 +276,7 @@
                                       "minLength": 1
                                     },
                                     "type": {
-                                      "const": "specific"
+                                      "const": "courses"
                                     },
                                     "courseNames": {
                                       "type": "array",
@@ -364,7 +358,7 @@
                                       "minLength": 1
                                     },
                                     "type": {
-                                      "const": "specific"
+                                      "const": "courses"
                                     },
                                     "courseNames": {
                                       "type": "array",
@@ -478,7 +472,7 @@
                                       "minLength": 1
                                     },
                                     "type": {
-                                      "const": "specific"
+                                      "const": "courses"
                                     },
                                     "courseNames": {
                                       "type": "array",
@@ -560,7 +554,7 @@
                                       "minLength": 1
                                     },
                                     "type": {
-                                      "const": "specific"
+                                      "const": "courses"
                                     },
                                     "courseNames": {
                                       "type": "array",

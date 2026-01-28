@@ -24,8 +24,21 @@ function splitRequiredCourseGroup(value: string): string[] {
     .filter((id) => id);
 }
 
-function parseRequiredCourseGroups(courseNames: string[]): string[][] {
-  return courseNames.map(splitRequiredCourseGroup).filter((group) => group.length > 0);
+function parseRequiredCourseGroups(groups: RequirementGroup[]): string[][] {
+  const courseGroups: string[][] = [];
+  for (const group of groups) {
+    for (const rule of group.includeRules) {
+      if (rule.type === "courses") {
+        for (const courseName of rule.courseNames) {
+          const parsedGroup = splitRequiredCourseGroup(courseName);
+          if (parsedGroup.length > 0) {
+            courseGroups.push(parsedGroup);
+          }
+        }
+      }
+    }
+  }
+  return courseGroups;
 }
 
 function normalizeCourseName(value: string | undefined): string {
@@ -61,22 +74,30 @@ function buildRequiredCourseExclusionSet(
   for (const category of requirements.categories) {
     for (const subcategory of category.subcategories) {
       if (subcategory.type !== "required") continue;
-      for (const rawCourse of subcategory.courseNames ?? []) {
-        const courseKey = rawCourse?.trim();
-        if (!courseKey) continue;
-        const normalizedCourseName = normalizeCourseName(courseKey);
-        if (normalizedCourseName) {
-          exclusion.courseNames.add(normalizedCourseName);
-        }
 
-        if (kdbMap.has(courseKey)) {
-          exclusion.courseIds.add(courseKey);
-          continue;
-        }
+      // groupsのincludeRulesからtype: "courses"のルールを抽出
+      for (const group of subcategory.groups) {
+        for (const rule of group.includeRules) {
+          if (rule.type !== "courses") continue;
 
-        const mappedId = courseNameToIdMap.get(courseKey);
-        if (mappedId) {
-          exclusion.courseIds.add(mappedId);
+          for (const rawCourse of rule.courseNames) {
+            const courseKey = rawCourse?.trim();
+            if (!courseKey) continue;
+            const normalizedCourseName = normalizeCourseName(courseKey);
+            if (normalizedCourseName) {
+              exclusion.courseNames.add(normalizedCourseName);
+            }
+
+            if (kdbMap.has(courseKey)) {
+              exclusion.courseIds.add(courseKey);
+              continue;
+            }
+
+            const mappedId = courseNameToIdMap.get(courseKey);
+            if (mappedId) {
+              exclusion.courseIds.add(mappedId);
+            }
+          }
         }
       }
     }
@@ -191,7 +212,7 @@ export async function calculateRequirementStatus(
       const matchedCourses: MatchedCourse[] = [];
 
       if (subcategory.type === "required") {
-        const courseGroups = parseRequiredCourseGroups(subcategory.courseNames ?? []);
+        const courseGroups = parseRequiredCourseGroups(subcategory.groups);
         const requiredMatches = matchRequiredCourseGroups(
           courseGroups,
           courses,
@@ -200,64 +221,17 @@ export async function calculateRequirementStatus(
         );
         matchedCourses.push(...requiredMatches);
 
-        // groupsが存在する場合、追加条件として処理
-        if (subcategory.groups && subcategory.groups.length > 0) {
-          for (const group of subcategory.groups) {
-            const groupMatches = matchCoursesToGroup(
-              courses,
-              group,
-              usedCourseIds,
-              requiredCourseExclusion,
-              courseTypeMaster,
-              courseNameToIdMap,
-            );
-
-            const earnedCredits = groupMatches
-              .filter((m) => m.isPassed)
-              .reduce((sum, m) => sum + m.credits, 0);
-
-            const inProgressCredits = groupMatches
-              .filter((m) => m.isInProgress)
-              .reduce((sum, m) => sum + m.credits, 0);
-
-            const isSatisfied =
-              earnedCredits >= group.minCredits &&
-              (group.maxCredits === undefined || earnedCredits <= group.maxCredits);
-
-            groupStatuses.push({
-              groupId: group.id,
-              isSatisfied,
-              earnedCredits,
-              inProgressCredits,
-              requiredCredits: group.minCredits,
-              maxCredits: group.maxCredits,
-              matchedCourses: groupMatches,
-            });
-          }
-        }
-
-        const requiredEarnedCredits = requiredMatches
+        const earnedCredits = requiredMatches
           .filter((m) => m.isPassed)
           .reduce((sum, m) => sum + m.credits, 0);
-        const groupEarnedCredits = groupStatuses.reduce((sum, g) => sum + g.earnedCredits, 0);
-        const earnedCredits = requiredEarnedCredits + groupEarnedCredits;
 
-        const requiredInProgressCredits = requiredMatches
+        const inProgressCredits = requiredMatches
           .filter((m) => m.isInProgress)
           .reduce((sum, m) => sum + m.credits, 0);
-        const groupInProgressCredits = groupStatuses.reduce(
-          (sum, g) => sum + g.inProgressCredits,
-          0,
-        );
-        const inProgressCredits = requiredInProgressCredits + groupInProgressCredits;
 
-        const requiredCredits = requiredMatches.reduce((sum, m) => sum + m.credits, 0);
-        const groupRequiredCredits = groupStatuses.reduce((sum, g) => sum + g.requiredCredits, 0);
-        const totalRequiredCredits = requiredCredits + groupRequiredCredits;
+        const totalRequiredCredits = requiredMatches.reduce((sum, m) => sum + m.credits, 0);
 
-        const isSatisfied =
-          requiredMatches.every((m) => m.isPassed || m.isInProgress) &&
-          groupStatuses.every((g) => g.isSatisfied);
+        const isSatisfied = requiredMatches.every((m) => m.isPassed || m.isInProgress);
 
         return {
           subcategoryId: subcategory.id,
@@ -290,8 +264,9 @@ export async function calculateRequirementStatus(
           .filter((m) => m.isInProgress)
           .reduce((sum, m) => sum + m.credits, 0);
 
+        const minCredits = group.minCredits ?? 0;
         const isSatisfied =
-          earnedCredits >= group.minCredits &&
+          earnedCredits >= minCredits &&
           (group.maxCredits === undefined || earnedCredits <= group.maxCredits);
 
         groupStatuses.push({
@@ -299,7 +274,7 @@ export async function calculateRequirementStatus(
           isSatisfied,
           earnedCredits,
           inProgressCredits,
-          requiredCredits: group.minCredits,
+          requiredCredits: minCredits,
           maxCredits: group.maxCredits,
           matchedCourses: groupMatches,
         });
@@ -435,7 +410,7 @@ function matchCourseToRule(
     case "matchAll":
       return true;
 
-    case "specific": {
+    case "courses": {
       const normalizedCourseName = normalizeCourseName(course.courseName);
       for (const rawValue of rule.courseNames) {
         const specificKey = rawValue?.trim();

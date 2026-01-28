@@ -19,12 +19,12 @@ const RequirementSubcategoryBaseSchema = v.object({
 /**
  * 必修サブカテゴリ
  * 指定された全科目の履修が必須
+ * groupsのincludeRulesで必修科目を定義
  */
 const RequiredSubcategorySchema = v.object({
   ...RequirementSubcategoryBaseSchema.entries,
   type: v.literal("required"),
-  courseNames: v.array(v.string()),
-  groups: v.optional(v.array(RequirementGroupSchema)),
+  groups: v.array(RequirementGroupSchema),
 });
 
 /**

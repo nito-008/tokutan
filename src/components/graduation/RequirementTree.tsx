@@ -332,9 +332,9 @@ const formatGroupConditionLabel = (group?: RequirementGroup): string => {
           (
             rule,
           ): rule is IncludeRule & {
-            type: "specific";
+            type: "courses";
             courseNames: string[];
-          } => rule.type === "specific",
+          } => rule.type === "courses",
         )
         .flatMap((rule) => rule.courseNames.filter(Boolean)),
     ),
@@ -375,8 +375,8 @@ const formatGroupConditionLabel = (group?: RequirementGroup): string => {
     new Set(
       (group.excludeRules ?? [])
         .filter(
-          (rule): rule is ExcludeRule & { type: "specific"; courseNames: string[] } =>
-            rule.type === "specific",
+          (rule): rule is ExcludeRule & { type: "courses"; courseNames: string[] } =>
+            rule.type === "courses",
         )
         .flatMap((rule) => rule.courseNames.filter(Boolean)),
     ),

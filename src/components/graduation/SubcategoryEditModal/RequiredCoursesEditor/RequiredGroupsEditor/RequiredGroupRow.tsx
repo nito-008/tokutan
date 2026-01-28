@@ -14,7 +14,7 @@ interface RequiredGroupRowProps {
 
 export const RequiredGroupRow: Component<RequiredGroupRowProps> = (props) => {
   const categoryRule = () => {
-    const rule = props.group.rules[0];
+    const rule = props.group.includeRules[0];
     if (rule?.type === "category") {
       return rule;
     }
@@ -64,7 +64,7 @@ export const RequiredGroupRow: Component<RequiredGroupRowProps> = (props) => {
 
                 console.log("update", updates, currentRule);
 
-                props.onUpdate({ rules: [updatedRule] });
+                props.onUpdate({ includeRules: [updatedRule] });
               }}
             />
           </div>

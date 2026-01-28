@@ -17,18 +17,29 @@
         {
           "id": "specialized-required",
           "type": "required",
-          "courseNames": [
-            "プログラミング序論C",
-            "プログラミング序論D",
-            "工学システム基礎実験A",
-            "工学システム基礎実験B",
-            "知的・機能工学システム実験",
-            "卒業研究A",
-            "卒業研究B",
-            "工学者のための倫理",
-            "専門英語A",
-            "専門英語B",
-            "専門英語演習"
+          "groups": [
+            {
+              "id": "required-courses",
+              "includeRules": [
+                {
+                  "id": "required-courses-rule",
+                  "type": "courses",
+                  "courseNames": [
+                    "プログラミング序論C",
+                    "プログラミング序論D",
+                    "工学システム基礎実験A",
+                    "工学システム基礎実験B",
+                    "知的・機能工学システム実験",
+                    "卒業研究A",
+                    "卒業研究B",
+                    "工学者のための倫理",
+                    "専門英語A",
+                    "専門英語B",
+                    "専門英語演習"
+                  ]
+                }
+              ]
+            }
           ]
         },
         {
@@ -128,34 +139,45 @@
         {
           "id": "foundation-required",
           "type": "required",
-          "courseNames": [
-            "数学リテラシー1",
-            "数学リテラシー2",
-            "線形代数1",
-            "線形代数2",
-            "線形代数3",
-            "微積分1",
-            "微積分2",
-            "微積分3",
-            "力学1",
-            "力学2",
-            "力学3",
-            "電磁気学1",
-            "電磁気学2",
-            "電磁気学3",
-            "工学システム原論",
-            "線形代数総論A",
-            "線形代数総論B",
-            "解析学総論",
-            "常微分方程式",
-            "力学総論",
-            "電磁気学総論",
-            "材料力学基礎",
-            "熱力学基礎",
-            "流体力学基礎",
-            "複素解析",
-            "プログラミング序論A",
-            "プログラミング序論B"
+          "groups": [
+            {
+              "id": "required-courses",
+              "includeRules": [
+                {
+                  "id": "required-courses-rule",
+                  "type": "courses",
+                  "courseNames": [
+                    "数学リテラシー1",
+                    "数学リテラシー2",
+                    "線形代数1",
+                    "線形代数2",
+                    "線形代数3",
+                    "微積分1",
+                    "微積分2",
+                    "微積分3",
+                    "力学1",
+                    "力学2",
+                    "力学3",
+                    "電磁気学1",
+                    "電磁気学2",
+                    "電磁気学3",
+                    "工学システム原論",
+                    "線形代数総論A",
+                    "線形代数総論B",
+                    "解析学総論",
+                    "常微分方程式",
+                    "力学総論",
+                    "電磁気学総論",
+                    "材料力学基礎",
+                    "熱力学基礎",
+                    "流体力学基礎",
+                    "複素解析",
+                    "プログラミング序論A",
+                    "プログラミング序論B"
+                  ]
+                }
+              ]
+            }
           ]
         }
       ]
@@ -167,7 +189,18 @@
         {
           "id": "subcat-1769461547235",
           "type": "required",
-          "courseNames": []
+          "groups": [
+            {
+              "id": "required-courses",
+              "includeRules": [
+                {
+                  "id": "required-courses-rule",
+                  "type": "courses",
+                  "courseNames": []
+                }
+              ]
+            }
+          ]
         },
         {
           "id": "subcat-1769461553835",
@@ -273,7 +306,18 @@
         {
           "id": "subcat-1769461564785",
           "type": "required",
-          "courseNames": []
+          "groups": [
+            {
+              "id": "required-courses",
+              "includeRules": [
+                {
+                  "id": "required-courses-rule",
+                  "type": "courses",
+                  "courseNames": []
+                }
+              ]
+            }
+          ]
         },
         {
           "id": "subcat-1769461571505",
@@ -287,7 +331,7 @@
               "includeRules": [
                 {
                   "id": "rule-1769491000689",
-                  "type": "specific",
+                  "type": "courses",
                   "courseNames": ["工学システム概論"]
                 }
               ],

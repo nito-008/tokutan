@@ -9,14 +9,19 @@ const GroupRuleBaseSchema = v.object({
 });
 
 /**
- * 特定科目指定ルール
+ * 科目名指定ルール
  * 指定された科目名のリストから選択
  */
-const SpecificRuleSchema = v.object({
+const CoursesRuleSchema = v.object({
   ...GroupRuleBaseSchema.entries,
-  type: v.literal("specific"),
+  type: v.literal("courses"),
   courseNames: v.array(v.string()),
 });
+
+/**
+ * @deprecated "courses"に名称変更されました。CoursesRuleSchemaを使用してください
+ */
+const SpecificRuleSchema = CoursesRuleSchema;
 
 /**
  * プレフィックスルール
@@ -54,7 +59,7 @@ const MatchAllRuleSchema = v.object({
  * グループの対象となる科目を定義するルール
  */
 export const IncludeRuleSchema = v.variant("type", [
-  SpecificRuleSchema,
+  CoursesRuleSchema,
   PrefixRuleSchema,
   CategoryRuleSchema,
   MatchAllRuleSchema,
@@ -66,7 +71,7 @@ export const IncludeRuleSchema = v.variant("type", [
  * matchAllは含まない（すべて除外する意味がないため）
  */
 export const ExcludeRuleSchema = v.variant("type", [
-  SpecificRuleSchema,
+  CoursesRuleSchema,
   PrefixRuleSchema,
   CategoryRuleSchema,
 ]);
@@ -76,7 +81,7 @@ export const ExcludeRuleSchema = v.variant("type", [
  * @deprecated includeRules/excludeRulesを使用してください
  */
 export const GroupRuleSchema = v.variant("type", [
-  SpecificRuleSchema,
+  CoursesRuleSchema,
   PrefixRuleSchema,
   CategoryRuleSchema,
   MatchAllRuleSchema,
@@ -85,7 +90,11 @@ export const GroupRuleSchema = v.variant("type", [
 export type IncludeRule = v.InferOutput<typeof IncludeRuleSchema>;
 export type ExcludeRule = v.InferOutput<typeof ExcludeRuleSchema>;
 export type GroupRule = v.InferOutput<typeof GroupRuleSchema>;
-export type SpecificRule = v.InferOutput<typeof SpecificRuleSchema>;
+export type CoursesRule = v.InferOutput<typeof CoursesRuleSchema>;
+/**
+ * @deprecated CoursesRuleを使用してください
+ */
+export type SpecificRule = CoursesRule;
 export type PrefixRule = v.InferOutput<typeof PrefixRuleSchema>;
 export type CategoryRule = v.InferOutput<typeof CategoryRuleSchema>;
 export type MatchAllRule = v.InferOutput<typeof MatchAllRuleSchema>;

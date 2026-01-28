@@ -17,10 +17,10 @@ export const GroupEditor: Component<GroupEditorProps> = (props) => {
     const newRules = props.group.includeRules.map((rule, i) => {
       if (i !== index) return rule;
       const merged = { ...rule, ...updates };
-      if (rule.type === "specific") {
+      if (rule.type === "courses") {
         return {
           id: rule.id,
-          type: "specific",
+          type: "courses",
           courseNames:
             "courseNames" in merged ? (merged.courseNames as string[]) : rule.courseNames,
         } satisfies IncludeRule;
@@ -60,10 +60,10 @@ export const GroupEditor: Component<GroupEditorProps> = (props) => {
     const newRules = (props.group.excludeRules ?? []).map((rule, i) => {
       if (i !== index) return rule;
       const merged = { ...rule, ...updates };
-      if (rule.type === "specific") {
+      if (rule.type === "courses") {
         return {
           id: rule.id,
-          type: "specific",
+          type: "courses",
           courseNames:
             "courseNames" in merged ? (merged.courseNames as string[]) : rule.courseNames,
         } satisfies ExcludeRule;
@@ -96,7 +96,7 @@ export const GroupEditor: Component<GroupEditorProps> = (props) => {
   const addSpecificIncludeRule = () => {
     const newRule: IncludeRule = {
       id: `rule-${Date.now()}`,
-      type: "specific",
+      type: "courses",
       courseNames: [],
     };
     props.onUpdate({ includeRules: [...props.group.includeRules, newRule] });
@@ -131,7 +131,7 @@ export const GroupEditor: Component<GroupEditorProps> = (props) => {
   const addSpecificExcludeRule = () => {
     const newRule: ExcludeRule = {
       id: `rule-${Date.now()}`,
-      type: "specific",
+      type: "courses",
       courseNames: [],
     };
     props.onUpdate({ excludeRules: [...(props.group.excludeRules ?? []), newRule] });
@@ -254,7 +254,12 @@ export const GroupEditor: Component<GroupEditorProps> = (props) => {
           <Label class="text-sm font-semibold">除外条件</Label>
           <RuleList
             rules={props.group.excludeRules ?? []}
-            onUpdateRule={updateExcludeRule}
+            onUpdateRule={
+              updateExcludeRule as (
+                index: number,
+                updates: Partial<IncludeRule | ExcludeRule>,
+              ) => void
+            }
             onRemoveRule={removeExcludeRule}
             onMoveRule={moveExcludeRule}
           />

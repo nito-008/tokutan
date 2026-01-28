@@ -20,7 +20,7 @@ interface RuleRowProps {
 
 const ruleTypeLabel = (rule: IncludeRule | ExcludeRule) => {
   switch (rule.type) {
-    case "specific":
+    case "courses":
       return "特定科目";
     case "prefix":
       return "プレフィックス";
@@ -73,11 +73,11 @@ export const RuleRow: Component<RuleRowProps> = (props) => {
       </div>
 
       <div class="flex-1">
-        <Show when={props.rule.type === "specific"}>
+        <Show when={props.rule.type === "courses"}>
           <CourseNamesInput
             courseNames={
-              (props.rule as Extract<IncludeRule | ExcludeRule, { type: "specific" }>)
-                .courseNames ?? []
+              (props.rule as Extract<IncludeRule | ExcludeRule, { type: "courses" }>).courseNames ??
+              []
             }
             onUpdate={(courseNames) =>
               props.onUpdate({ courseNames } satisfies Partial<IncludeRule | ExcludeRule>)
