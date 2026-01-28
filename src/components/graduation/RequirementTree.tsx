@@ -24,6 +24,7 @@ import type {
   RequirementSubcategory,
   SubcategoryStatus,
 } from "~/types";
+import { CategoryEditModal } from "./CategoryEditModal";
 import { SubcategoryEditModal } from "./SubcategoryEditModal";
 
 interface RequirementTreeProps {
@@ -46,6 +47,7 @@ const formatCreditDisplay = (earned: number, min: number, max?: number): string 
 };
 
 export const RequirementTree: Component<RequirementTreeProps> = (props) => {
+  const [editingCategory, setEditingCategory] = createSignal<RequirementCategory | null>(null);
   const [editingSubcategory, setEditingSubcategory] = createSignal<{
     categoryId: string;
     subcategory: RequirementSubcategory;
@@ -96,6 +98,19 @@ export const RequirementTree: Component<RequirementTreeProps> = (props) => {
                   <div class="flex items-center gap-3 w-full">
                     <StatusIcon isSatisfied={category.isSatisfied} />
                     <span class="font-medium">{category.categoryName}</span>
+                    <Show when={props.editMode}>
+                      <button
+                        type="button"
+                        class="p-1 rounded hover:bg-muted text-muted-foreground hover:text-foreground"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          const cat = findCategory(category.categoryId);
+                          if (cat) setEditingCategory(cat);
+                        }}
+                      >
+                        <Pencil class="size-4" />
+                      </button>
+                    </Show>
                     <span class="text-sm text-muted-foreground ml-auto mr-4">
                       {formatCreditDisplay(category.earnedCredits, category.requiredCredits)}
                     </span>
@@ -170,6 +185,13 @@ export const RequirementTree: Component<RequirementTreeProps> = (props) => {
           </AccordionItem>
         </Show>
       </Accordion>
+
+      <CategoryEditModal
+        open={!!editingCategory()}
+        category={editingCategory()}
+        onClose={() => setEditingCategory(null)}
+        onSave={props.onCategoryUpdate ?? (() => {})}
+      />
 
       <SubcategoryEditModal
         open={!!editingSubcategory() || !!addingSubcategoryFor()}

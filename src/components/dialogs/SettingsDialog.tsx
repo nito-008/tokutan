@@ -1,4 +1,4 @@
-import { type Component, createSignal, Show } from "solid-js";
+import { type Component, createEffect, createSignal, Show } from "solid-js";
 import { Alert, AlertDescription } from "~/components/ui/alert";
 import { Button } from "~/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "~/components/ui/dialog";
@@ -31,11 +31,14 @@ export const SettingsDialog: Component<SettingsDialogProps> = (props) => {
     setRequirements(reqs);
   };
 
+  createEffect(() => {
+    if (!props.open) return;
+    setError(null);
+    void loadRequirements();
+  });
+
   const handleOpenChange = (open: boolean) => {
-    if (open) {
-      loadRequirements();
-      setError(null);
-    } else {
+    if (!open) {
       props.onClose();
     }
   };
