@@ -1,9 +1,10 @@
 import Plus from "lucide-solid/icons/plus";
 import Trash2 from "lucide-solid/icons/trash-2";
-import type { Component } from "solid-js";
+import { type Component, createSignal, Show } from "solid-js";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
+import { Switch, SwitchControl, SwitchLabel } from "~/components/ui/switch";
 import type { ExcludeRule, IncludeRule, RequirementGroup } from "~/types";
 import { RuleList } from "./RuleList";
 
@@ -14,6 +15,8 @@ interface GroupEditorProps {
 }
 
 export const GroupEditor: Component<GroupEditorProps> = (props) => {
+  const [isExcludeMode, setIsExcludeMode] = createSignal(false);
+
   const updateIncludeRule = (index: number, updates: Partial<IncludeRule>) => {
     const newRules = props.group.includeRules.map((rule, i) => {
       if (i !== index) return rule;
@@ -88,58 +91,43 @@ export const GroupEditor: Component<GroupEditorProps> = (props) => {
     props.onUpdate({ excludeRules: newRules });
   };
 
-  const addSpecificIncludeRule = () => {
-    const newRule: IncludeRule = {
+  const addCoursesRule = () => {
+    const newRule = {
       id: `rule-${Date.now()}`,
-      type: "courses",
+      type: "courses" as const,
       courseNames: [],
     };
-    props.onUpdate({ includeRules: [...props.group.includeRules, newRule] });
+    if (isExcludeMode()) {
+      props.onUpdate({ excludeRules: [...(props.group.excludeRules ?? []), newRule] });
+    } else {
+      props.onUpdate({ includeRules: [...props.group.includeRules, newRule] });
+    }
   };
 
-  const addPrefixIncludeRule = () => {
-    const newRule: IncludeRule = {
+  const addPrefixRule = () => {
+    const newRule = {
       id: `rule-${Date.now()}`,
-      type: "prefix",
+      type: "prefix" as const,
       prefixes: [""],
     };
-    props.onUpdate({ includeRules: [...props.group.includeRules, newRule] });
+    if (isExcludeMode()) {
+      props.onUpdate({ excludeRules: [...(props.group.excludeRules ?? []), newRule] });
+    } else {
+      props.onUpdate({ includeRules: [...props.group.includeRules, newRule] });
+    }
   };
 
-  const addCategoryIncludeRule = () => {
-    const newRule: IncludeRule = {
+  const addCategoryRule = () => {
+    const newRule = {
       id: `rule-${Date.now()}`,
-      type: "category",
+      type: "category" as const,
       majorCategory: "",
     };
-    props.onUpdate({ includeRules: [...props.group.includeRules, newRule] });
-  };
-
-  const addSpecificExcludeRule = () => {
-    const newRule: ExcludeRule = {
-      id: `rule-${Date.now()}`,
-      type: "courses",
-      courseNames: [],
-    };
-    props.onUpdate({ excludeRules: [...(props.group.excludeRules ?? []), newRule] });
-  };
-
-  const addPrefixExcludeRule = () => {
-    const newRule: ExcludeRule = {
-      id: `rule-${Date.now()}`,
-      type: "prefix",
-      prefixes: [""],
-    };
-    props.onUpdate({ excludeRules: [...(props.group.excludeRules ?? []), newRule] });
-  };
-
-  const addCategoryExcludeRule = () => {
-    const newRule: ExcludeRule = {
-      id: `rule-${Date.now()}`,
-      type: "category",
-      majorCategory: "",
-    };
-    props.onUpdate({ excludeRules: [...(props.group.excludeRules ?? []), newRule] });
+    if (isExcludeMode()) {
+      props.onUpdate({ excludeRules: [...(props.group.excludeRules ?? []), newRule] });
+    } else {
+      props.onUpdate({ includeRules: [...props.group.includeRules, newRule] });
+    }
   };
 
   const removeIncludeRule = (index: number) => {
@@ -211,55 +199,51 @@ export const GroupEditor: Component<GroupEditorProps> = (props) => {
       <div class="space-y-4">
         <div class="space-y-2">
           <Label class="text-sm font-semibold">対象科目</Label>
+
           <RuleList
             rules={props.group.includeRules}
             onUpdateRule={updateIncludeRule}
             onRemoveRule={removeIncludeRule}
             onMoveRule={moveIncludeRule}
           />
+          <Show when={(props.group.excludeRules ?? []).length > 0}>
+            <div class="border-l-4 border-destructive/30 pl-3 space-y-2">
+              <Label class="text-xs font-medium">除外</Label>
+              <RuleList
+                rules={props.group.excludeRules ?? []}
+                onUpdateRule={
+                  updateExcludeRule as (
+                    index: number,
+                    updates: Partial<IncludeRule | ExcludeRule>,
+                  ) => void
+                }
+                onRemoveRule={removeExcludeRule}
+                onMoveRule={moveExcludeRule}
+              />
+            </div>
+          </Show>
           <div class="grid grid-cols-1 gap-2 sm:grid-cols-3">
-            <Button variant="ghost" size="sm" onClick={addSpecificIncludeRule} class="h-8">
+            <Button variant="ghost" size="sm" onClick={addCoursesRule} class="h-8">
               <Plus class="size-4 mr-1" />
-              特定科目
+              {isExcludeMode() ? "特定科目を除外" : "特定科目"}
             </Button>
-            <Button variant="ghost" size="sm" onClick={addPrefixIncludeRule} class="h-8">
+            <Button variant="ghost" size="sm" onClick={addPrefixRule} class="h-8">
               <Plus class="size-4 mr-1" />
-              ～で始まる科目
+              {isExcludeMode() ? "～で始まる科目を除外" : "～で始まる科目"}
             </Button>
-            <Button variant="ghost" size="sm" onClick={addCategoryIncludeRule} class="h-8">
+            <Button variant="ghost" size="sm" onClick={addCategoryRule} class="h-8">
               <Plus class="size-4 mr-1" />
-              科目区分
+              {isExcludeMode() ? "科目区分を除外" : "科目区分"}
             </Button>
           </div>
-        </div>
-
-        <div class="space-y-2">
-          <Label class="text-sm font-semibold">除外条件</Label>
-          <RuleList
-            rules={props.group.excludeRules ?? []}
-            onUpdateRule={
-              updateExcludeRule as (
-                index: number,
-                updates: Partial<IncludeRule | ExcludeRule>,
-              ) => void
-            }
-            onRemoveRule={removeExcludeRule}
-            onMoveRule={moveExcludeRule}
-          />
-          <div class="grid grid-cols-1 gap-2 sm:grid-cols-3">
-            <Button variant="ghost" size="sm" onClick={addSpecificExcludeRule} class="h-8">
-              <Plus class="size-4 mr-1" />
-              特定科目を除外
-            </Button>
-            <Button variant="ghost" size="sm" onClick={addPrefixExcludeRule} class="h-8">
-              <Plus class="size-4 mr-1" />
-              ～で始まる科目を除外
-            </Button>
-            <Button variant="ghost" size="sm" onClick={addCategoryExcludeRule} class="h-8">
-              <Plus class="size-4 mr-1" />
-              科目区分を除外
-            </Button>
-          </div>
+          <Switch
+            checked={isExcludeMode()}
+            onChange={setIsExcludeMode}
+            class="flex items-center gap-2"
+          >
+            <SwitchControl />
+            <SwitchLabel>除外</SwitchLabel>
+          </Switch>
         </div>
       </div>
     </div>
