@@ -53,11 +53,11 @@ All data entities use a unique identifier following a consistent naming pattern:
 
 ### Entity Prefixes
 
-- `catg`: Category
-- `subc`: SubCategory
-- `greq`: GraduationRequirements
-- `prof`: UserProfile
+- `requ`: Requirement
+- `ctgy`: Category
+- `sbct`: SubCategory
 - `rule`: RequirementRule
+- `uspf`: UserProfile
 
 ### Generating IDs
 
