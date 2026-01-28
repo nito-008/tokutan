@@ -11,25 +11,6 @@ export interface ExportData {
   coursePlans: CoursePlan[];
 }
 
-// 全データをエクスポート
-export async function exportAllData(): Promise<ExportData> {
-  const [profiles, requirements, enrollment, coursePlans] = await Promise.all([
-    db.profiles.toArray(),
-    db.requirements.toArray(),
-    db.enrollment.toArray(),
-    db.coursePlans.toArray(),
-  ]);
-
-  return {
-    version: "1.0.0",
-    exportedAt: new Date().toISOString(),
-    profiles,
-    requirements,
-    enrollment,
-    coursePlans,
-  };
-}
-
 // JSONファイルとしてダウンロード
 export function downloadJson(data: unknown, filename: string): void {
   const json = JSON.stringify(data, null, 2);
@@ -43,13 +24,6 @@ export function downloadJson(data: unknown, filename: string): void {
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
-}
-
-// 全データをエクスポートしてダウンロード
-export async function exportAndDownload(): Promise<void> {
-  const data = await exportAllData();
-  const filename = `tokutan-backup-${new Date().toISOString().split("T")[0]}.json`;
-  downloadJson(data, filename);
 }
 
 // 要件のみエクスポート
