@@ -24,7 +24,7 @@ const ruleTypeLabel = (rule: IncludeRule | ExcludeRule) => {
     case "courses":
       return "特定科目";
     case "prefix":
-      return "プレフィックス";
+      return "で始まる科目";
     case "category":
       return "科目区分";
   }
@@ -101,7 +101,7 @@ export const RuleRow: Component<RuleRowProps> = (props) => {
                 : [""];
               props.onUpdate({ prefixes } satisfies Partial<IncludeRule | ExcludeRule>);
             }}
-            placeholder="プレフィックス (例: FG, FA, GB)"
+            placeholder="科目番号の先頭 (例: FG, FA, GB)"
           />
         </Show>
         <Show when={props.rule.type === "category"}>

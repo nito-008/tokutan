@@ -224,7 +224,7 @@ export const GroupEditor: Component<GroupEditorProps> = (props) => {
             </Button>
             <Button variant="ghost" size="sm" onClick={addPrefixIncludeRule} class="h-8">
               <Plus class="size-4 mr-1" />
-              プレフィックス
+              ～で始まる科目
             </Button>
             <Button variant="ghost" size="sm" onClick={addCategoryIncludeRule} class="h-8">
               <Plus class="size-4 mr-1" />
@@ -253,7 +253,7 @@ export const GroupEditor: Component<GroupEditorProps> = (props) => {
             </Button>
             <Button variant="ghost" size="sm" onClick={addPrefixExcludeRule} class="h-8">
               <Plus class="size-4 mr-1" />
-              プレフィックスを除外
+              ～で始まる科目を除外
             </Button>
             <Button variant="ghost" size="sm" onClick={addCategoryExcludeRule} class="h-8">
               <Plus class="size-4 mr-1" />
