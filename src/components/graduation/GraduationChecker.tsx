@@ -1,5 +1,5 @@
-﻿import { CircleCheck } from "lucide-solid";
-import { type Component, createEffect, createSignal, For, onCleanup, Show } from "solid-js";
+﻿import { type Component, createEffect, createSignal, For, onCleanup, Show } from "solid-js";
+import { Alert, AlertDescription, AlertTitle } from "~/components/ui/alert";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Switch, SwitchControl, SwitchLabel } from "~/components/ui/switch";
 import { calculateRequirementStatus } from "~/lib/calculator/requirements";
@@ -96,7 +96,6 @@ export const GraduationChecker: Component = () => {
     const requirements = appState()?.requirements;
     if (!requirements) return;
 
-    const hasCourseNames = Object.hasOwn(updates, "courseNames");
     const hasMinCredits = Object.hasOwn(updates, "minCredits");
     const hasMaxCredits = Object.hasOwn(updates, "maxCredits");
     const hasGroups = Object.hasOwn(updates, "groups");
@@ -108,14 +107,8 @@ export const GraduationChecker: Component = () => {
       if (nextType === "required") {
         type RequiredUpdate = Partial<{
           type: "required";
-          courseNames: string[];
           groups: RequirementGroup[];
         }>;
-        const courseNames = hasCourseNames
-          ? ((updates as RequiredUpdate).courseNames ?? [])
-          : existing?.type === "required"
-            ? (existing.courseNames ?? [])
-            : [];
         const groups = hasGroups
           ? ((updates as RequiredUpdate).groups ?? [])
           : existing?.type === "required"
@@ -124,7 +117,6 @@ export const GraduationChecker: Component = () => {
         return {
           id: existing?.id ?? `subcat-${Date.now()}`,
           type: "required",
-          courseNames,
           groups,
           notes,
         };
@@ -290,6 +282,11 @@ export const GraduationChecker: Component = () => {
             </CardContent>
           </Card>
         </div>
+        <Alert variant="destructive" class="mt-4 text-sm leading-relaxed bg-destructive-foreground">
+          <AlertDescription>
+            判定結果が正しいかどうかは必ず最新の履修要覧や支援室などで確認するようにしましょう。このツールを利用したことにより卒業に失敗したとしても、開発者は責任を負いません。
+          </AlertDescription>
+        </Alert>
       </Show>
     </div>
   );
