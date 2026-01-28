@@ -163,7 +163,7 @@
                       }
                     }
                   },
-                  "required": ["id", "type", "courseIds"]
+                  "required": ["id", "type", "courseNames"]
                 },
                 {
                   "type": "object",
@@ -253,7 +253,7 @@
                                     "type": {
                                       "const": "exclude"
                                     },
-                                    "courseIds": {
+                                    "courseNames": {
                                       "type": "array",
                                       "items": {
                                         "type": "string"
@@ -346,7 +346,7 @@
                                     "type": {
                                       "const": "specific"
                                     },
-                                    "courseIds": {
+                                    "courseNames": {
                                       "type": "array",
                                       "items": {
                                         "type": "string"
@@ -382,7 +382,7 @@
                                     "type": {
                                       "const": "exclude"
                                     },
-                                    "courseIds": {
+                                    "courseNames": {
                                       "type": "array",
                                       "items": {
                                         "type": "string"
