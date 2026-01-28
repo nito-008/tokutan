@@ -1,4 +1,4 @@
-import type { UserProfile } from "../types";
+import type { UserProfile } from "~/types";
 import { db } from "./index";
 import { getSetting, SettingKeys, setSetting } from "./settings";
 

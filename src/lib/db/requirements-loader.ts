@@ -1,4 +1,4 @@
-import type { GraduationRequirements } from "../types";
+import type { GraduationRequirements } from "~/types";
 
 const REQUIREMENTS_BASE_URL = "/data/requirements";
 

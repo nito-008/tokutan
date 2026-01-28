@@ -5,14 +5,14 @@ import { Switch, SwitchControl, SwitchLabel } from "~/components/ui/switch";
 import { calculateRequirementStatus } from "~/lib/calculator/requirements";
 import { getCachedKdb } from "~/lib/db/kdb";
 import { saveRequirements } from "~/lib/db/requirements";
+import { useAppState, useAppStateActions } from "~/stores/appState";
 import type {
   GraduationRequirements,
   RequirementCategory,
   RequirementGroup,
   RequirementStatus,
   RequirementSubcategory,
-} from "~/lib/types";
-import { useAppState, useAppStateActions } from "~/stores/appState";
+} from "~/types";
 import { DonutChart, getCategoryColor } from "./DonutChart";
 import { RequirementTree } from "./RequirementTree";
 

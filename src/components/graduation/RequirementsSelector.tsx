@@ -11,8 +11,8 @@ import {
 import { updateSelectedRequirements } from "~/lib/db/profiles";
 import { getAllRequirements } from "~/lib/db/requirements";
 import { getRequirementLabel } from "~/lib/requirements/label";
-import type { GraduationRequirements } from "~/lib/types";
 import { useAppState, useAppStateActions } from "~/stores/appState";
+import type { GraduationRequirements } from "~/types";
 
 export const RequirementsSelector: Component = () => {
   const appState = useAppState();

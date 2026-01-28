@@ -1,4 +1,4 @@
-import type { GraduationRequirements } from "../types";
+import type { GraduationRequirements } from "~/types";
 import type { ExportData } from "./export";
 import { db } from "./index";
 

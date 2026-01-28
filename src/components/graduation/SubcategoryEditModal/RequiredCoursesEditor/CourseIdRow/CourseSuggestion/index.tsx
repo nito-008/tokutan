@@ -2,7 +2,7 @@ import { Check } from "lucide-solid";
 import { type Accessor, type Component, For, Show } from "solid-js";
 import { PopoverContent } from "~/components/ui/popover";
 import { Tooltip, TooltipContent, TooltipTrigger } from "~/components/ui/tooltip";
-import type { Course } from "~/lib/types";
+import type { Course } from "~/types";
 
 interface CourseSuggestionDropdownProps {
   isVisible: Accessor<boolean>;

@@ -1,4 +1,4 @@
-import type { SubcategoryType } from "~/lib/types";
+import type { SubcategoryType } from "~/types";
 
 export type SubcategoryTypeOption = { value: SubcategoryType; label: string };
 

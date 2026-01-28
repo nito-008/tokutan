@@ -9,7 +9,7 @@ import {
   updateCourseInPlan,
 } from "~/lib/db/coursePlans";
 import { refreshKdbCache } from "~/lib/db/kdb";
-import type { CoursePlan, EnrollmentData, PlannedCourse, UserCourseRecord } from "~/lib/types";
+import type { CoursePlan, EnrollmentData, PlannedCourse, UserCourseRecord } from "~/types";
 import { SemesterView } from "./SemesterView";
 
 interface CourseManagerProps {

@@ -5,7 +5,7 @@ import type {
   EnrollmentData,
   GraduationRequirements,
   UserProfile,
-} from "../types";
+} from "~/types";
 
 // 設定の型
 export interface Setting {

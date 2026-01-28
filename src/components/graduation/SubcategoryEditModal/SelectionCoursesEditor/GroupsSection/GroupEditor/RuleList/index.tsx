@@ -6,7 +6,7 @@ import {
   SortableProvider,
 } from "@thisbeyond/solid-dnd";
 import { type Component, For } from "solid-js";
-import type { GroupRule } from "~/lib/types";
+import type { GroupRule } from "~/types";
 import { SortableRuleRow } from "./SortableRuleRow";
 
 interface RuleListProps {

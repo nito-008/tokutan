@@ -1,5 +1,5 @@
-import type { Course, KdbCourse } from "../types";
-import { convertKdbCourse } from "../types";
+import type { Course, KdbCourse } from "~/types";
+import { convertKdbCourse } from "~/types";
 import { db } from "./index";
 import { deleteSetting, getSetting, SettingKeys, setSetting } from "./settings";
 

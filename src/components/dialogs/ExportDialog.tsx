@@ -10,7 +10,7 @@ import {
 import { exportAndDownload, exportRequirementsAndDownload } from "~/lib/db/export";
 import { getAllRequirements } from "~/lib/db/requirements";
 import { getRequirementLabel } from "~/lib/requirements/label";
-import type { GraduationRequirements } from "~/lib/types";
+import type { GraduationRequirements } from "~/types";
 
 interface ExportDialogProps {
   open: boolean;

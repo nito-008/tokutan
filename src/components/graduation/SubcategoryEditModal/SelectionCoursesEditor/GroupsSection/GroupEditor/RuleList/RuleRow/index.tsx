@@ -2,7 +2,7 @@ import { GripVertical, Trash2 } from "lucide-solid";
 import { type Component, type JSX, Show } from "solid-js";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
-import type { GroupRule } from "~/lib/types";
+import type { GroupRule } from "~/types";
 import { CategoryRuleEditor } from "../CategoryRuleEditor";
 import { CourseNamesInput } from "../CourseNamesInput";
 

@@ -21,7 +21,7 @@ import {
   type SubcategoryTypeOption,
   subcategoryTypeOptions,
 } from "~/lib/requirements/subcategory";
-import type { RequirementGroup, RequirementSubcategory } from "~/lib/types";
+import type { RequirementGroup, RequirementSubcategory } from "~/types";
 import { RequiredCoursesEditor } from "./RequiredCoursesEditor";
 import { SelectionCoursesEditor } from "./SelectionCoursesEditor";
 import { normalizeCourseIds } from "./utils/courseGroup";

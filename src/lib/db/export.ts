@@ -1,5 +1,5 @@
 import { getRequirementLabel } from "~/lib/requirements/label";
-import type { CoursePlan, EnrollmentData, GraduationRequirements, UserProfile } from "../types";
+import type { CoursePlan, EnrollmentData, GraduationRequirements, UserProfile } from "~/types";
 import { db } from "./index";
 
 export interface ExportData {

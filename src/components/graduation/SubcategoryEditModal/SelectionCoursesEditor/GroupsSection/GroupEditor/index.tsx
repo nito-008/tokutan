@@ -3,7 +3,7 @@ import type { Component } from "solid-js";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
-import type { GroupRule, RequirementGroup } from "~/lib/types";
+import type { GroupRule, RequirementGroup } from "~/types";
 import { RuleList } from "./RuleList";
 
 interface GroupEditorProps {

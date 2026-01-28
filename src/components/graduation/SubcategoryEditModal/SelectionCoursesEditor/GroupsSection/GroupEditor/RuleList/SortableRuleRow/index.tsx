@@ -1,6 +1,6 @@
 import { createSortable } from "@thisbeyond/solid-dnd";
 import type { Component } from "solid-js";
-import type { GroupRule } from "~/lib/types";
+import type { GroupRule } from "~/types";
 import { RuleRow } from "../RuleRow";
 
 interface SortableRuleRowProps {

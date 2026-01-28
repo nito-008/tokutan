@@ -3,7 +3,7 @@ import { type Component, For, Show } from "solid-js";
 import type { SetStoreFunction } from "solid-js/store";
 import { reconcile } from "solid-js/store";
 import { Button } from "~/components/ui/button";
-import type { RequirementGroup } from "~/lib/types";
+import type { RequirementGroup } from "~/types";
 import { GroupEditor } from "./GroupEditor";
 
 interface GroupsSectionProps {

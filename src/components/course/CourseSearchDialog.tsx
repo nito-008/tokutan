@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "~/components/u
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
 import { searchKdb } from "~/lib/db/kdb";
-import type { Course, PlannedCourse } from "~/lib/types";
+import type { Course, PlannedCourse } from "~/types";
 
 interface CourseSearchDialogProps {
   open: boolean;

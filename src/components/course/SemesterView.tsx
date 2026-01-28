@@ -1,7 +1,7 @@
 import { type Component, createSignal, For, Show } from "solid-js";
 import { Button } from "~/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
-import type { PlannedCourse, SemesterPlan, UserCourseRecord } from "~/lib/types";
+import type { PlannedCourse, SemesterPlan, UserCourseRecord } from "~/types";
 import { CourseCard } from "./CourseCard";
 import { CourseSearchDialog } from "./CourseSearchDialog";
 

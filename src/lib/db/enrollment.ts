@@ -1,5 +1,5 @@
-import type { EnrollmentData, TwinsCourse, UserCourseRecord } from "../types";
-import { isInProgress, isPassed } from "../types";
+import type { EnrollmentData, TwinsCourse, UserCourseRecord } from "~/types";
+import { isInProgress, isPassed } from "~/types";
 import { db } from "./index";
 
 // プロファイルの履修データを取得

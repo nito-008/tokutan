@@ -19,7 +19,7 @@ import type {
   RequirementGroup,
   RequirementSubcategory,
   SubcategoryStatus,
-} from "~/lib/types";
+} from "~/types";
 import { SubcategoryEditModal } from "./SubcategoryEditModal";
 
 interface RequirementTreeProps {

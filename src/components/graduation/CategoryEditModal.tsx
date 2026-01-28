@@ -9,7 +9,7 @@ import {
 } from "~/components/ui/dialog";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
-import type { RequirementCategory } from "~/lib/types";
+import type { RequirementCategory } from "~/types";
 
 interface CategoryEditModalProps {
   open: boolean;

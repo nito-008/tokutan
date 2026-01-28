@@ -13,7 +13,7 @@ import {
 import { clearKdbCache } from "~/lib/db/kdb";
 import { getAllRequirements } from "~/lib/db/requirements";
 import { getRequirementLabel } from "~/lib/requirements/label";
-import type { GraduationRequirements } from "~/lib/types";
+import type { GraduationRequirements } from "~/types";
 
 interface SettingsDialogProps {
   open: boolean;

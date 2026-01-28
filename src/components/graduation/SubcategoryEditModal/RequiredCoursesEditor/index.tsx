@@ -8,7 +8,7 @@ import {
 import { type Accessor, type Component, For, type Setter, Show } from "solid-js";
 import type { SetStoreFunction } from "solid-js/store";
 import { Label } from "~/components/ui/label";
-import type { RequirementGroup } from "~/lib/types";
+import type { RequirementGroup } from "~/types";
 import { normalizeCourseIds } from "../utils/courseGroup";
 import { CourseIdRowContent } from "./CourseIdRow/CourseIdRowContent";
 import { SortableCourseIdRow } from "./CourseIdRow/SortableCourseIdRow";

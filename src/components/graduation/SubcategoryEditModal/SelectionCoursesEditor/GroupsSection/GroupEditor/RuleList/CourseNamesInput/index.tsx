@@ -1,7 +1,7 @@
 import { type Component, createEffect, createSignal } from "solid-js";
 import { Input } from "~/components/ui/input";
 import { Popover, PopoverAnchor } from "~/components/ui/popover";
-import type { Course } from "~/lib/types";
+import type { Course } from "~/types";
 import { CourseSuggestionDropdown } from "../../../../../RequiredCoursesEditor/CourseIdRow/CourseSuggestion";
 import { useSuggestionSearch } from "../../../../../RequiredCoursesEditor/CourseIdRow/CourseSuggestion/useSuggestionSearch";
 import {

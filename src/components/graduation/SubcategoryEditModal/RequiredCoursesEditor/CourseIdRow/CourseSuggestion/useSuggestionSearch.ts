@@ -1,6 +1,6 @@
 import { type Accessor, createSignal, onCleanup } from "solid-js";
 import { searchKdbWithRelatedName } from "~/lib/db/kdb";
-import type { Course } from "~/lib/types";
+import type { Course } from "~/types";
 
 interface UseSuggestionSearchReturn {
   suggestions: Accessor<Course[]>;

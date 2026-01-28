@@ -1,7 +1,7 @@
 import { type Component, Show } from "solid-js";
 import { Badge } from "~/components/ui/badge";
 import { Button } from "~/components/ui/button";
-import type { PlannedCourse } from "~/lib/types";
+import type { PlannedCourse } from "~/types";
 
 interface CourseCardProps {
   course: PlannedCourse;

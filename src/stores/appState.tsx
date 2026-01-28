@@ -7,7 +7,7 @@ import {
   useContext,
 } from "solid-js";
 import type { AppState } from "~/lib/init";
-import type { EnrollmentData, GraduationRequirements, UserProfile } from "~/lib/types";
+import type { EnrollmentData, GraduationRequirements, UserProfile } from "~/types";
 
 const AppStateContext = createContext<Accessor<AppState | null>>();
 const AppStateSetterContext = createContext<Setter<AppState | null>>();

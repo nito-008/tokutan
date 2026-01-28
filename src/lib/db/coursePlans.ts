@@ -1,4 +1,4 @@
-import type { CoursePlan, PlannedCourse, SemesterPlan } from "../types";
+import type { CoursePlan, PlannedCourse, SemesterPlan } from "~/types";
 import { db } from "./index";
 
 // 履修計画を取得

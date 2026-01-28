@@ -1,4 +1,4 @@
-import type { CourseCategory, Grade, TwinsCourse } from "../types";
+import type { CourseCategory, Grade, TwinsCourse } from "~/types";
 
 // CSVをパース
 export function parseTwinsCsv(csvContent: string): TwinsCourse[] {

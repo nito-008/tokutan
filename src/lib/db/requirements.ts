@@ -1,4 +1,4 @@
-import type { GraduationRequirements } from "../types";
+import type { GraduationRequirements } from "~/types";
 import { db } from "./index";
 
 // 全要件を取得

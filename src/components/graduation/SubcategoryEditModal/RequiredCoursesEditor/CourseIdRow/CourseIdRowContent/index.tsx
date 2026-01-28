@@ -11,7 +11,7 @@ import {
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Popover, PopoverAnchor } from "~/components/ui/popover";
-import type { Course } from "~/lib/types";
+import type { Course } from "~/types";
 import { CourseSuggestionDropdown } from "../CourseSuggestion";
 import { useSuggestionSearch } from "../CourseSuggestion/useSuggestionSearch";
 

@@ -7,7 +7,7 @@ import {
   Tooltip,
 } from "chart.js";
 import { type Component, createEffect, onCleanup, onMount } from "solid-js";
-import type { CategoryStatus } from "~/lib/types";
+import type { CategoryStatus } from "~/types";
 
 // Chart.jsのコンポーネントを登録
 Chart.register(DoughnutController, ArcElement, Tooltip, Legend);

@@ -1,3 +1,4 @@
+import type { EnrollmentData, GraduationRequirements, UserProfile } from "~/types";
 import { getEnrollment } from "./db/enrollment";
 import { ensureDefaultProfile } from "./db/profiles";
 import {
@@ -7,7 +8,6 @@ import {
   saveRequirements,
 } from "./db/requirements";
 import { loadAllRequirements } from "./db/requirements-loader";
-import type { EnrollmentData, GraduationRequirements, UserProfile } from "./types";
 
 export interface AppState {
   profile: UserProfile;

@@ -8,8 +8,8 @@ import {
   type ValidationResult,
   validateTwinsCourses,
 } from "~/lib/parsers/twins-csv";
-import type { TwinsCourse } from "~/lib/types";
 import { useAppState, useAppStateActions } from "~/stores/appState";
+import type { TwinsCourse } from "~/types";
 import { Button } from "../ui/button";
 import {
   Dialog,

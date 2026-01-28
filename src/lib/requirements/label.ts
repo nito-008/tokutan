@@ -1,4 +1,4 @@
-import type { GraduationRequirements } from "~/lib/types";
+import type { GraduationRequirements } from "~/types";
 
 const formatProgramLabel = (department: string, major?: string) => {
   if (!major) {

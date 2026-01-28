@@ -1,10 +1,6 @@
-﻿import {
-  type CourseTypeMasterNode,
-  getCourseIdsFromCategory,
-  getCourseTypeMaster,
-} from "../db/courseTypeMaster";
-import type {
+﻿import type {
   CategoryStatus,
+  Course,
   GraduationRequirements,
   GroupRule,
   GroupStatus,
@@ -13,8 +9,12 @@ import type {
   RequirementStatus,
   SubcategoryStatus,
   UserCourseRecord,
-} from "../types";
-import type { Course } from "../types/course";
+} from "~/types";
+import {
+  type CourseTypeMasterNode,
+  getCourseIdsFromCategory,
+  getCourseTypeMaster,
+} from "../db/courseTypeMaster";
 
 function splitRequiredCourseGroup(value: string): string[] {
   return value
