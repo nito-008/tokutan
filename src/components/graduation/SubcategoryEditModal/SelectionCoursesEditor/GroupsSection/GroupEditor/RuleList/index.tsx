@@ -6,12 +6,12 @@ import {
   SortableProvider,
 } from "@thisbeyond/solid-dnd";
 import { type Component, For } from "solid-js";
-import type { GroupRule } from "~/types";
+import type { ExcludeRule, IncludeRule } from "~/types";
 import { SortableRuleRow } from "./SortableRuleRow";
 
 interface RuleListProps {
-  rules: GroupRule[];
-  onUpdateRule: (index: number, updates: Partial<GroupRule>) => void;
+  rules: (IncludeRule | ExcludeRule)[];
+  onUpdateRule: (index: number, updates: Partial<IncludeRule | ExcludeRule>) => void;
   onRemoveRule: (index: number) => void;
   onMoveRule: (fromIndex: number, toIndex: number) => void;
 }

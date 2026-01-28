@@ -3,7 +3,7 @@ import type { Component } from "solid-js";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
-import type { GroupRule, RequirementGroup } from "~/types";
+import type { ExcludeRule, IncludeRule, RequirementGroup } from "~/types";
 import { RuleList } from "./RuleList";
 
 interface GroupEditorProps {
@@ -13,8 +13,8 @@ interface GroupEditorProps {
 }
 
 export const GroupEditor: Component<GroupEditorProps> = (props) => {
-  const updateRule = (index: number, updates: Partial<GroupRule>) => {
-    const newRules = props.group.rules.map((rule, i) => {
+  const updateIncludeRule = (index: number, updates: Partial<IncludeRule>) => {
+    const newRules = props.group.includeRules.map((rule, i) => {
       if (i !== index) return rule;
       const merged = { ...rule, ...updates };
       if (rule.type === "specific") {
@@ -23,15 +23,7 @@ export const GroupEditor: Component<GroupEditorProps> = (props) => {
           type: "specific",
           courseNames:
             "courseNames" in merged ? (merged.courseNames as string[]) : rule.courseNames,
-        } satisfies GroupRule;
-      }
-      if (rule.type === "exclude") {
-        return {
-          id: rule.id,
-          type: "exclude",
-          courseNames:
-            "courseNames" in merged ? (merged.courseNames as string[]) : rule.courseNames,
-        } satisfies GroupRule;
+        } satisfies IncludeRule;
       }
       if (rule.type === "category") {
         return {
@@ -47,63 +39,145 @@ export const GroupEditor: Component<GroupEditorProps> = (props) => {
             "minorCategory" in merged
               ? (merged.minorCategory as string | undefined)
               : rule.minorCategory,
-        } satisfies GroupRule;
+        } satisfies IncludeRule;
+      }
+      if (rule.type === "matchAll") {
+        return {
+          id: rule.id,
+          type: "matchAll",
+        } satisfies IncludeRule;
       }
       return {
         id: rule.id,
         type: "prefix",
-        prefix: "prefix" in merged ? (merged.prefix as string) : rule.prefix,
-      } satisfies GroupRule;
+        prefixes: "prefixes" in merged ? (merged.prefixes as string[]) : rule.prefixes,
+      } satisfies IncludeRule;
     });
-    props.onUpdate({ rules: newRules });
+    props.onUpdate({ includeRules: newRules });
   };
 
-  const addSpecificRule = () => {
-    const newRule: GroupRule = {
+  const updateExcludeRule = (index: number, updates: Partial<ExcludeRule>) => {
+    const newRules = (props.group.excludeRules ?? []).map((rule, i) => {
+      if (i !== index) return rule;
+      const merged = { ...rule, ...updates };
+      if (rule.type === "specific") {
+        return {
+          id: rule.id,
+          type: "specific",
+          courseNames:
+            "courseNames" in merged ? (merged.courseNames as string[]) : rule.courseNames,
+        } satisfies ExcludeRule;
+      }
+      if (rule.type === "category") {
+        return {
+          id: rule.id,
+          type: "category",
+          majorCategory:
+            "majorCategory" in merged ? (merged.majorCategory as string) : rule.majorCategory,
+          middleCategory:
+            "middleCategory" in merged
+              ? (merged.middleCategory as string | undefined)
+              : rule.middleCategory,
+          minorCategory:
+            "minorCategory" in merged
+              ? (merged.minorCategory as string | undefined)
+              : rule.minorCategory,
+        } satisfies ExcludeRule;
+      }
+      return {
+        id: rule.id,
+        type: "prefix",
+        prefixes: "prefixes" in merged ? (merged.prefixes as string[]) : rule.prefixes,
+      } satisfies ExcludeRule;
+    });
+    props.onUpdate({ excludeRules: newRules });
+  };
+
+  const addSpecificIncludeRule = () => {
+    const newRule: IncludeRule = {
       id: `rule-${Date.now()}`,
       type: "specific",
       courseNames: [],
     };
-    props.onUpdate({ rules: [...props.group.rules, newRule] });
+    props.onUpdate({ includeRules: [...props.group.includeRules, newRule] });
   };
 
-  const addPrefixRule = () => {
-    const newRule: GroupRule = {
+  const addPrefixIncludeRule = () => {
+    const newRule: IncludeRule = {
       id: `rule-${Date.now()}`,
       type: "prefix",
-      prefix: "",
+      prefixes: [""],
     };
-    props.onUpdate({ rules: [...props.group.rules, newRule] });
+    props.onUpdate({ includeRules: [...props.group.includeRules, newRule] });
   };
 
-  const addExcludeRule = () => {
-    const newRule: GroupRule = {
-      id: `rule-${Date.now()}`,
-      type: "exclude",
-      courseNames: [],
-    };
-    props.onUpdate({ rules: [...props.group.rules, newRule] });
-  };
-
-  const addCategoryRule = () => {
-    const newRule: GroupRule = {
+  const addCategoryIncludeRule = () => {
+    const newRule: IncludeRule = {
       id: `rule-${Date.now()}`,
       type: "category",
       majorCategory: "",
     };
-    props.onUpdate({ rules: [...props.group.rules, newRule] });
+    props.onUpdate({ includeRules: [...props.group.includeRules, newRule] });
   };
 
-  const removeRule = (index: number) => {
-    props.onUpdate({ rules: props.group.rules.filter((_, i) => i !== index) });
+  const addMatchAllRule = () => {
+    const newRule: IncludeRule = {
+      id: `rule-${Date.now()}`,
+      type: "matchAll",
+    };
+    props.onUpdate({ includeRules: [...props.group.includeRules, newRule] });
   };
 
-  const moveRule = (fromIndex: number, toIndex: number) => {
+  const addSpecificExcludeRule = () => {
+    const newRule: ExcludeRule = {
+      id: `rule-${Date.now()}`,
+      type: "specific",
+      courseNames: [],
+    };
+    props.onUpdate({ excludeRules: [...(props.group.excludeRules ?? []), newRule] });
+  };
+
+  const addPrefixExcludeRule = () => {
+    const newRule: ExcludeRule = {
+      id: `rule-${Date.now()}`,
+      type: "prefix",
+      prefixes: [""],
+    };
+    props.onUpdate({ excludeRules: [...(props.group.excludeRules ?? []), newRule] });
+  };
+
+  const addCategoryExcludeRule = () => {
+    const newRule: ExcludeRule = {
+      id: `rule-${Date.now()}`,
+      type: "category",
+      majorCategory: "",
+    };
+    props.onUpdate({ excludeRules: [...(props.group.excludeRules ?? []), newRule] });
+  };
+
+  const removeIncludeRule = (index: number) => {
+    props.onUpdate({ includeRules: props.group.includeRules.filter((_, i) => i !== index) });
+  };
+
+  const removeExcludeRule = (index: number) => {
+    const newRules = (props.group.excludeRules ?? []).filter((_, i) => i !== index);
+    props.onUpdate({ excludeRules: newRules.length > 0 ? newRules : undefined });
+  };
+
+  const moveIncludeRule = (fromIndex: number, toIndex: number) => {
     if (fromIndex === toIndex) return;
-    const nextRules = [...props.group.rules];
+    const nextRules = [...props.group.includeRules];
     const [moved] = nextRules.splice(fromIndex, 1);
     nextRules.splice(toIndex, 0, moved);
-    props.onUpdate({ rules: nextRules });
+    props.onUpdate({ includeRules: nextRules });
+  };
+
+  const moveExcludeRule = (fromIndex: number, toIndex: number) => {
+    if (fromIndex === toIndex) return;
+    const nextRules = [...(props.group.excludeRules ?? [])];
+    const [moved] = nextRules.splice(fromIndex, 1);
+    nextRules.splice(toIndex, 0, moved);
+    props.onUpdate({ excludeRules: nextRules });
   };
 
   return (
@@ -147,30 +221,58 @@ export const GroupEditor: Component<GroupEditorProps> = (props) => {
         </Button>
       </div>
 
-      <RuleList
-        rules={props.group.rules}
-        onUpdateRule={updateRule}
-        onRemoveRule={removeRule}
-        onMoveRule={moveRule}
-      />
+      <div class="space-y-4">
+        <div class="space-y-2">
+          <Label class="text-sm font-semibold">対象科目</Label>
+          <RuleList
+            rules={props.group.includeRules}
+            onUpdateRule={updateIncludeRule}
+            onRemoveRule={removeIncludeRule}
+            onMoveRule={moveIncludeRule}
+          />
+          <div class="grid grid-cols-2 gap-2 lg:grid-cols-4">
+            <Button variant="ghost" size="sm" onClick={addSpecificIncludeRule} class="h-8">
+              <Plus class="size-4 mr-1" />
+              特定科目
+            </Button>
+            <Button variant="ghost" size="sm" onClick={addPrefixIncludeRule} class="h-8">
+              <Plus class="size-4 mr-1" />
+              プレフィックス
+            </Button>
+            <Button variant="ghost" size="sm" onClick={addCategoryIncludeRule} class="h-8">
+              <Plus class="size-4 mr-1" />
+              科目区分
+            </Button>
+            <Button variant="ghost" size="sm" onClick={addMatchAllRule} class="h-8">
+              <Plus class="size-4 mr-1" />
+              すべての科目
+            </Button>
+          </div>
+        </div>
 
-      <div class="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-4">
-        <Button variant="ghost" size="sm" onClick={addSpecificRule} class="h-8">
-          <Plus class="size-4 mr-1" />
-          特定科目の追加
-        </Button>
-        <Button variant="ghost" size="sm" onClick={addPrefixRule} class="h-8">
-          <Plus class="size-4 mr-1" />
-          ～で始まる科目の追加
-        </Button>
-        <Button variant="ghost" size="sm" onClick={addCategoryRule} class="h-8">
-          <Plus class="size-4 mr-1" />
-          科目区分から追加
-        </Button>
-        <Button variant="ghost" size="sm" onClick={addExcludeRule} class="h-8">
-          <Plus class="size-4 mr-1" />
-          除外科目の追加
-        </Button>
+        <div class="space-y-2">
+          <Label class="text-sm font-semibold">除外条件</Label>
+          <RuleList
+            rules={props.group.excludeRules ?? []}
+            onUpdateRule={updateExcludeRule}
+            onRemoveRule={removeExcludeRule}
+            onMoveRule={moveExcludeRule}
+          />
+          <div class="grid grid-cols-1 gap-2 sm:grid-cols-3">
+            <Button variant="ghost" size="sm" onClick={addSpecificExcludeRule} class="h-8">
+              <Plus class="size-4 mr-1" />
+              特定科目を除外
+            </Button>
+            <Button variant="ghost" size="sm" onClick={addPrefixExcludeRule} class="h-8">
+              <Plus class="size-4 mr-1" />
+              プレフィックスを除外
+            </Button>
+            <Button variant="ghost" size="sm" onClick={addCategoryExcludeRule} class="h-8">
+              <Plus class="size-4 mr-1" />
+              科目区分を除外
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   );

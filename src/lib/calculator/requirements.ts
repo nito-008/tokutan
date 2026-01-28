@@ -1,9 +1,10 @@
 ﻿import type {
   CategoryStatus,
   Course,
+  ExcludeRule,
   GraduationRequirements,
-  GroupRule,
   GroupStatus,
+  IncludeRule,
   MatchedCourse,
   RequirementGroup,
   RequirementStatus,
@@ -382,43 +383,42 @@ function matchCoursesToGroup(
   courseNameToIdMap: Map<string, string>,
 ): MatchedCourse[] {
   const matches: MatchedCourse[] = [];
-  const groupExcludedCourseIds = new Set<string>();
-  for (const rule of group.rules) {
-    if (rule.type !== "exclude") continue;
-    for (const courseName of rule.courseNames) {
-      if (!courseName) continue;
-      groupExcludedCourseIds.add(courseName);
-    }
-  }
 
   for (const course of courses) {
     // 既に使用済みの科目はスキップ
     if (usedCourseIds.has(course.id)) continue;
-    if (groupExcludedCourseIds.has(course.courseId)) continue;
     if (isCourseExcludedByRequirements(course, excludedCourseIds)) continue;
 
-    let isMatch = false;
-
-    // グループ内のいずれかのルールにマッチするかチェック
-    for (const rule of group.rules) {
-      if (rule.type === "exclude") continue;
-      if (matchCourseToRule(course, rule, excludedCourseIds, courseTypeMaster, courseNameToIdMap)) {
-        isMatch = true;
+    // Step 1: includeRulesのいずれかにマッチするか
+    let isIncluded = false;
+    for (const rule of group.includeRules) {
+      if (matchCourseToRule(course, rule, courseTypeMaster, courseNameToIdMap)) {
+        isIncluded = true;
         break;
       }
     }
+    if (!isIncluded) continue;
 
-    if (isMatch) {
-      usedCourseIds.add(course.id);
-      matches.push({
-        courseId: course.courseId,
-        courseName: course.courseName,
-        credits: course.credits,
-        grade: course.grade,
-        isPassed: course.isPassed,
-        isInProgress: course.isInProgress,
-      });
+    // Step 2: excludeRulesのいずれかにマッチするか（除外）
+    let isExcluded = false;
+    for (const rule of group.excludeRules ?? []) {
+      if (matchCourseToRule(course, rule, courseTypeMaster, courseNameToIdMap)) {
+        isExcluded = true;
+        break;
+      }
     }
+    if (isExcluded) continue;
+
+    // マッチ成功
+    usedCourseIds.add(course.id);
+    matches.push({
+      courseId: course.courseId,
+      courseName: course.courseName,
+      credits: course.credits,
+      grade: course.grade,
+      isPassed: course.isPassed,
+      isInProgress: course.isInProgress,
+    });
   }
 
   return matches;
@@ -427,15 +427,14 @@ function matchCoursesToGroup(
 // 科目が単一ルールにマッチするかチェック
 function matchCourseToRule(
   course: UserCourseRecord,
-  rule: GroupRule,
-  excludedCourseIds: RequiredCourseExclusion,
+  rule: IncludeRule | ExcludeRule,
   courseTypeMaster: CourseTypeMasterNode[],
   courseNameToIdMap: Map<string, string>,
 ): boolean {
-  if (isCourseExcludedByRequirements(course, excludedCourseIds)) return false;
   switch (rule.type) {
-    case "exclude":
-      return false;
+    case "matchAll":
+      return true;
+
     case "specific": {
       const normalizedCourseName = normalizeCourseName(course.courseName);
       for (const rawValue of rule.courseNames) {
@@ -460,11 +459,8 @@ function matchCourseToRule(
     }
 
     case "prefix":
-      // 必修科目として定義されているものは除外
-      if (excludedCourseIds.courseIds.has(course.courseId)) {
-        return false;
-      }
-      return course.courseId.startsWith(rule.prefix);
+      // prefixes配列のいずれかで始まるかチェック
+      return rule.prefixes.some((prefix) => course.courseId.startsWith(prefix));
 
     case "category": {
       const categoryCourseIds = getCourseIdsFromCategory(

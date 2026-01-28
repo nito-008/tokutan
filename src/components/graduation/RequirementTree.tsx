@@ -11,9 +11,10 @@ import { Separator } from "~/components/ui/separator";
 import { getSubcategoryLabel } from "~/lib/requirements/subcategory";
 import type {
   CategoryStatus,
+  ExcludeRule,
   GraduationRequirements,
-  GroupRule,
   GroupStatus,
+  IncludeRule,
   MatchedCourse,
   RequirementCategory,
   RequirementGroup,
@@ -310,24 +311,27 @@ const formatGroupConditionLabel = (group?: RequirementGroup): string => {
     return "条件情報なし";
   }
 
+  // Include rules
+  const hasMatchAll = group.includeRules.some((rule) => rule.type === "matchAll");
+
   const prefixNames = Array.from(
     new Set(
-      group.rules
+      group.includeRules
         .filter(
-          (rule): rule is GroupRule & { type: "prefix"; prefix: string } => rule.type === "prefix",
+          (rule): rule is IncludeRule & { type: "prefix"; prefixes: string[] } =>
+            rule.type === "prefix",
         )
-        .map((rule) => rule.prefix?.trim())
-        .filter(Boolean),
+        .flatMap((rule) => rule.prefixes.filter(Boolean)),
     ),
   );
 
   const specificCourseNames = Array.from(
     new Set(
-      group.rules
+      group.includeRules
         .filter(
           (
             rule,
-          ): rule is GroupRule & {
+          ): rule is IncludeRule & {
             type: "specific";
             courseNames: string[];
           } => rule.type === "specific",
@@ -336,24 +340,55 @@ const formatGroupConditionLabel = (group?: RequirementGroup): string => {
     ),
   );
 
-  const excludeCourseIds = Array.from(
+  const categoryNames = Array.from(
     new Set(
-      group.rules
+      group.includeRules
         .filter(
-          (rule): rule is GroupRule & { type: "exclude"; courseNames: string[] } =>
-            rule.type === "exclude",
+          (
+            rule,
+          ): rule is IncludeRule & {
+            type: "category";
+            majorCategory?: string;
+            middleCategory?: string;
+            minorCategory?: string;
+          } => rule.type === "category",
+        )
+        .flatMap((rule) =>
+          [rule.majorCategory, rule.middleCategory, rule.minorCategory].filter(Boolean),
+        ),
+    ),
+  );
+
+  // Exclude rules
+  const excludePrefixes = Array.from(
+    new Set(
+      (group.excludeRules ?? [])
+        .filter(
+          (rule): rule is ExcludeRule & { type: "prefix"; prefixes: string[] } =>
+            rule.type === "prefix",
+        )
+        .flatMap((rule) => rule.prefixes.filter(Boolean)),
+    ),
+  );
+
+  const excludeCourseNames = Array.from(
+    new Set(
+      (group.excludeRules ?? [])
+        .filter(
+          (rule): rule is ExcludeRule & { type: "specific"; courseNames: string[] } =>
+            rule.type === "specific",
         )
         .flatMap((rule) => rule.courseNames.filter(Boolean)),
     ),
   );
 
-  const categoryNames = Array.from(
+  const excludeCategoryNames = Array.from(
     new Set(
-      group.rules
+      (group.excludeRules ?? [])
         .filter(
           (
             rule,
-          ): rule is GroupRule & {
+          ): rule is ExcludeRule & {
             type: "category";
             majorCategory?: string;
             middleCategory?: string;
@@ -368,21 +403,38 @@ const formatGroupConditionLabel = (group?: RequirementGroup): string => {
 
   const parts: string[] = [];
 
-  if (prefixNames.length) {
-    parts.push(`「${prefixNames.join(", ")}」で始まる科目`);
+  // Include conditions
+  if (hasMatchAll) {
+    parts.push("すべての科目");
+  } else {
+    if (prefixNames.length) {
+      parts.push(`「${prefixNames.join(", ")}」で始まる科目`);
+    }
+
+    if (categoryNames.length) {
+      const categoryText = categoryNames.join("、");
+      parts.push(parts.length ? `\n${categoryText}` : categoryText);
+    }
+
+    if (specificCourseNames.length) {
+      parts.push(specificCourseNames.join("、"));
+    }
   }
 
-  if (categoryNames.length) {
-    const categoryText = categoryNames.join("、");
-    parts.push(parts.length ? `\n${categoryText}` : categoryText);
+  // Exclude conditions
+  const excludeParts: string[] = [];
+  if (excludePrefixes.length) {
+    excludeParts.push(`「${excludePrefixes.join(", ")}」で始まる科目`);
+  }
+  if (excludeCategoryNames.length) {
+    excludeParts.push(excludeCategoryNames.join("、"));
+  }
+  if (excludeCourseNames.length) {
+    excludeParts.push(excludeCourseNames.join("、"));
   }
 
-  if (specificCourseNames.length) {
-    parts.push(specificCourseNames.join("、"));
-  }
-
-  if (excludeCourseIds.length) {
-    parts.push(`除外: ${excludeCourseIds.join("、")}`);
+  if (excludeParts.length > 0) {
+    parts.push(`除外: ${excludeParts.join("、")}`);
   }
 
   return parts.length > 0 ? parts.join(" ・ ") : `グループ ${group.id}`;

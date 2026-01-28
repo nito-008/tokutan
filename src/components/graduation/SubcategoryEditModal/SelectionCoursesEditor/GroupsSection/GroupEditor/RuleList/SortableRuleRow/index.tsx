@@ -1,13 +1,13 @@
 import { createSortable } from "@thisbeyond/solid-dnd";
 import type { Component } from "solid-js";
-import type { GroupRule } from "~/types";
+import type { ExcludeRule, IncludeRule } from "~/types";
 import { RuleRow } from "../RuleRow";
 
 interface SortableRuleRowProps {
-  rule: GroupRule;
+  rule: IncludeRule | ExcludeRule;
   index: number;
   sortableCount: number;
-  onUpdate: (updates: Partial<GroupRule>) => void;
+  onUpdate: (updates: Partial<IncludeRule | ExcludeRule>) => void;
   onRemove: () => void;
 }
 

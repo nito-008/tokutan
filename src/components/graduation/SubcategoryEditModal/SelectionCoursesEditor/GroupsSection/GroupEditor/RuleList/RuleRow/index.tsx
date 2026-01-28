@@ -2,13 +2,13 @@ import { GripVertical, Trash2 } from "lucide-solid";
 import { type Component, type JSX, Show } from "solid-js";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
-import type { GroupRule } from "~/types";
+import type { ExcludeRule, IncludeRule } from "~/types";
 import { CategoryRuleEditor } from "../CategoryRuleEditor";
 import { CourseNamesInput } from "../CourseNamesInput";
 
 interface RuleRowProps {
-  rule: GroupRule;
-  onUpdate: (updates: Partial<GroupRule>) => void;
+  rule: IncludeRule | ExcludeRule;
+  onUpdate: (updates: Partial<IncludeRule | ExcludeRule>) => void;
   onRemove: () => void;
   index: number;
   sortableCount: number;
@@ -18,16 +18,16 @@ interface RuleRowProps {
   dragActivators?: JSX.HTMLAttributes<HTMLElement>;
 }
 
-const ruleTypeLabel = (rule: GroupRule) => {
+const ruleTypeLabel = (rule: IncludeRule | ExcludeRule) => {
   switch (rule.type) {
     case "specific":
       return "特定科目";
     case "prefix":
-      return "で始まる科目";
-    case "exclude":
-      return "を除外";
+      return "プレフィックス";
     case "category":
       return "科目区分";
+    case "matchAll":
+      return "すべての科目";
   }
 };
 const ROW_HEIGHT = 56;
@@ -75,38 +75,55 @@ export const RuleRow: Component<RuleRowProps> = (props) => {
       <div class="flex-1">
         <Show when={props.rule.type === "specific"}>
           <CourseNamesInput
-            courseNames={(props.rule as Extract<GroupRule, { type: "specific" }>).courseNames ?? []}
-            onUpdate={(courseNames) => props.onUpdate({ courseNames } satisfies Partial<GroupRule>)}
-          />
-        </Show>
-        <Show when={props.rule.type === "exclude"}>
-          <Input
-            class="h-8"
-            value={(props.rule as Extract<GroupRule, { type: "exclude" }>).courseNames[0] ?? ""}
-            onInput={(e) => {
-              const value = e.currentTarget.value.trim();
-              props.onUpdate({ courseNames: value ? [value] : [] } satisfies Partial<GroupRule>);
-            }}
-            placeholder="除外科目 (例: FG10101)"
+            courseNames={
+              (props.rule as Extract<IncludeRule | ExcludeRule, { type: "specific" }>)
+                .courseNames ?? []
+            }
+            onUpdate={(courseNames) =>
+              props.onUpdate({ courseNames } satisfies Partial<IncludeRule | ExcludeRule>)
+            }
           />
         </Show>
         <Show when={props.rule.type === "prefix"}>
           <Input
             class="h-8"
-            value={(props.rule as Extract<GroupRule, { type: "prefix" }>).prefix}
-            onInput={(e) =>
-              props.onUpdate({ prefix: e.currentTarget.value } satisfies Partial<GroupRule>)
+            value={
+              (props.rule as Extract<IncludeRule | ExcludeRule, { type: "prefix" }>).prefixes.join(
+                ", ",
+              ) ?? ""
             }
-            placeholder="科目の最初の文字列 (例: FG)"
+            onInput={(e) => {
+              const value = e.currentTarget.value.trim();
+              const prefixes = value
+                ? value
+                    .split(",")
+                    .map((p) => p.trim())
+                    .filter((p) => p)
+                : [""];
+              props.onUpdate({ prefixes } satisfies Partial<IncludeRule | ExcludeRule>);
+            }}
+            placeholder="プレフィックス (例: FG, FA, GB)"
           />
         </Show>
         <Show when={props.rule.type === "category"}>
           <CategoryRuleEditor
-            majorCategory={(props.rule as Extract<GroupRule, { type: "category" }>).majorCategory}
-            middleCategory={(props.rule as Extract<GroupRule, { type: "category" }>).middleCategory}
-            minorCategory={(props.rule as Extract<GroupRule, { type: "category" }>).minorCategory}
-            onUpdate={(updates) => props.onUpdate(updates as Partial<GroupRule>)}
+            majorCategory={
+              (props.rule as Extract<IncludeRule | ExcludeRule, { type: "category" }>).majorCategory
+            }
+            middleCategory={
+              (props.rule as Extract<IncludeRule | ExcludeRule, { type: "category" }>)
+                .middleCategory
+            }
+            minorCategory={
+              (props.rule as Extract<IncludeRule | ExcludeRule, { type: "category" }>).minorCategory
+            }
+            onUpdate={(updates) => props.onUpdate(updates as Partial<IncludeRule | ExcludeRule>)}
           />
+        </Show>
+        <Show when={props.rule.type === "matchAll"}>
+          <div class="h-8 flex items-center text-sm text-muted-foreground">
+            すべての科目が対象になります
+          </div>
         </Show>
       </div>
 

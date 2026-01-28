@@ -3,7 +3,7 @@ import { type Component, For, Show } from "solid-js";
 import { reconcile, type SetStoreFunction } from "solid-js/store";
 import { Button } from "~/components/ui/button";
 import { Label } from "~/components/ui/label";
-import type { GroupRule, RequirementGroup } from "~/types";
+import type { IncludeRule, RequirementGroup } from "~/types";
 import { RequiredGroupRow } from "./RequiredGroupRow";
 
 interface RequiredGroupsEditorProps {
@@ -16,12 +16,12 @@ export const RequiredGroupsEditor: Component<RequiredGroupsEditorProps> = (props
     const newGroup: RequirementGroup = {
       id: `group-${Date.now()}`,
       minCredits: 0,
-      rules: [
+      includeRules: [
         {
           id: `rule-${Date.now()}`,
           type: "category",
           majorCategory: "",
-        } satisfies GroupRule,
+        } satisfies IncludeRule,
       ],
     };
 
@@ -35,11 +35,20 @@ export const RequiredGroupsEditor: Component<RequiredGroupsEditorProps> = (props
     if ("maxCredits" in updates) {
       props.setGroups(index, "maxCredits", updates.maxCredits);
     }
-    if ("rules" in updates) {
+    if ("includeRules" in updates) {
       props.setGroups(
         index,
-        "rules",
-        reconcile(updates.rules ?? [], {
+        "includeRules",
+        reconcile(updates.includeRules ?? [], {
+          key: "id",
+        }),
+      );
+    }
+    if ("excludeRules" in updates) {
+      props.setGroups(
+        index,
+        "excludeRules",
+        reconcile(updates.excludeRules ?? [], {
           key: "id",
         }),
       );
