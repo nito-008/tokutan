@@ -56,7 +56,7 @@ export const RequiredCoursesEditor: Component<RequiredCoursesEditorProps> = (pro
     if (!group || !group.includeRules || group.includeRules.length === 0) return [""];
     const rule = group.includeRules[0];
     if (rule?.type !== "courses") return [""];
-    return rule.courseNames.length > 0 ? rule.courseNames : [""];
+    return normalizeCourseIds(rule.courseNames.length > 0 ? rule.courseNames : [""]);
   };
 
   // ソート対象のID（プレースホルダー除外）

@@ -111,7 +111,7 @@ export const CourseIdRowContent: Component<CourseIdRowContentProps> = (props) =>
       }
     >
       {/* ドラッグハンドル */}
-      <Show when={!props.isPlaceholder} fallback={<div class="w-4" />}>
+      <Show when={!props.isPlaceholder}>
         <div
           {...(props.dragActivators as unknown as JSX.HTMLAttributes<HTMLDivElement>)}
           class="mt-2.5 cursor-grab text-muted-foreground hover:text-foreground active:cursor-grabbing"
@@ -170,7 +170,7 @@ export const CourseIdRowContent: Component<CourseIdRowContentProps> = (props) =>
       </div>
 
       {/* 削除ボタン */}
-      <Show when={!props.isPlaceholder} fallback={<div class="w-10" />}>
+      <Show when={!props.isPlaceholder}>
         <Button
           type="button"
           variant="ghost"
