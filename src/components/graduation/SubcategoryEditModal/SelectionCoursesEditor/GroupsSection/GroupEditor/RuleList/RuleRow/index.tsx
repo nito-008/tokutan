@@ -27,8 +27,6 @@ const ruleTypeLabel = (rule: IncludeRule | ExcludeRule) => {
       return "プレフィックス";
     case "category":
       return "科目区分";
-    case "matchAll":
-      return "すべての科目";
   }
 };
 const ROW_HEIGHT = 56;
@@ -120,11 +118,6 @@ export const RuleRow: Component<RuleRowProps> = (props) => {
             }
             onUpdate={(updates) => props.onUpdate(updates as Partial<IncludeRule | ExcludeRule>)}
           />
-        </Show>
-        <Show when={props.rule.type === "matchAll"}>
-          <div class="h-8 flex items-center text-sm text-muted-foreground">
-            すべての科目が対象になります
-          </div>
         </Show>
       </div>
 

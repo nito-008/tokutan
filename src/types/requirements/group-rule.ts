@@ -46,15 +46,6 @@ const CategoryRuleSchema = v.object({
 });
 
 /**
- * すべての科目にマッチするルール
- * 除外ルールと組み合わせて「〜以外」を表現する際に使用
- */
-const MatchAllRuleSchema = v.object({
-  ...GroupRuleBaseSchema.entries,
-  type: v.literal("matchAll"),
-});
-
-/**
  * IncludeRule（対象科目を定義）
  * グループの対象となる科目を定義するルール
  */
@@ -62,7 +53,6 @@ export const IncludeRuleSchema = v.variant("type", [
   CoursesRuleSchema,
   PrefixRuleSchema,
   CategoryRuleSchema,
-  MatchAllRuleSchema,
 ]);
 
 /**
@@ -84,7 +74,6 @@ export const GroupRuleSchema = v.variant("type", [
   CoursesRuleSchema,
   PrefixRuleSchema,
   CategoryRuleSchema,
-  MatchAllRuleSchema,
 ]);
 
 export type IncludeRule = v.InferOutput<typeof IncludeRuleSchema>;
@@ -97,4 +86,3 @@ export type CoursesRule = v.InferOutput<typeof CoursesRuleSchema>;
 export type SpecificRule = CoursesRule;
 export type PrefixRule = v.InferOutput<typeof PrefixRuleSchema>;
 export type CategoryRule = v.InferOutput<typeof CategoryRuleSchema>;
-export type MatchAllRule = v.InferOutput<typeof MatchAllRuleSchema>;

@@ -133,19 +133,6 @@
                                     }
                                   },
                                   "required": ["id", "type", "majorCategory"]
-                                },
-                                {
-                                  "type": "object",
-                                  "properties": {
-                                    "id": {
-                                      "type": "string",
-                                      "minLength": 1
-                                    },
-                                    "type": {
-                                      "const": "matchAll"
-                                    }
-                                  },
-                                  "required": ["id", "type"]
                                 }
                               ]
                             }
@@ -329,19 +316,6 @@
                                     }
                                   },
                                   "required": ["id", "type", "majorCategory"]
-                                },
-                                {
-                                  "type": "object",
-                                  "properties": {
-                                    "id": {
-                                      "type": "string",
-                                      "minLength": 1
-                                    },
-                                    "type": {
-                                      "const": "matchAll"
-                                    }
-                                  },
-                                  "required": ["id", "type"]
                                 }
                               ]
                             }
@@ -525,19 +499,6 @@
                                     }
                                   },
                                   "required": ["id", "type", "majorCategory"]
-                                },
-                                {
-                                  "type": "object",
-                                  "properties": {
-                                    "id": {
-                                      "type": "string",
-                                      "minLength": 1
-                                    },
-                                    "type": {
-                                      "const": "matchAll"
-                                    }
-                                  },
-                                  "required": ["id", "type"]
                                 }
                               ]
                             }

@@ -42,12 +42,6 @@ export const GroupEditor: Component<GroupEditorProps> = (props) => {
               : rule.minorCategory,
         } satisfies IncludeRule;
       }
-      if (rule.type === "matchAll") {
-        return {
-          id: rule.id,
-          type: "matchAll",
-        } satisfies IncludeRule;
-      }
       return {
         id: rule.id,
         type: "prefix",
@@ -117,14 +111,6 @@ export const GroupEditor: Component<GroupEditorProps> = (props) => {
       id: `rule-${Date.now()}`,
       type: "category",
       majorCategory: "",
-    };
-    props.onUpdate({ includeRules: [...props.group.includeRules, newRule] });
-  };
-
-  const addMatchAllRule = () => {
-    const newRule: IncludeRule = {
-      id: `rule-${Date.now()}`,
-      type: "matchAll",
     };
     props.onUpdate({ includeRules: [...props.group.includeRules, newRule] });
   };
@@ -231,7 +217,7 @@ export const GroupEditor: Component<GroupEditorProps> = (props) => {
             onRemoveRule={removeIncludeRule}
             onMoveRule={moveIncludeRule}
           />
-          <div class="grid grid-cols-2 gap-2 lg:grid-cols-4">
+          <div class="grid grid-cols-1 gap-2 sm:grid-cols-3">
             <Button variant="ghost" size="sm" onClick={addSpecificIncludeRule} class="h-8">
               <Plus class="size-4 mr-1" />
               特定科目
@@ -243,10 +229,6 @@ export const GroupEditor: Component<GroupEditorProps> = (props) => {
             <Button variant="ghost" size="sm" onClick={addCategoryIncludeRule} class="h-8">
               <Plus class="size-4 mr-1" />
               科目区分
-            </Button>
-            <Button variant="ghost" size="sm" onClick={addMatchAllRule} class="h-8">
-              <Plus class="size-4 mr-1" />
-              すべての科目
             </Button>
           </div>
         </div>

@@ -315,8 +315,6 @@ const formatGroupConditionLabel = (group?: RequirementGroup): string => {
   }
 
   // Include rules
-  const hasMatchAll = group.includeRules.some((rule) => rule.type === "matchAll");
-
   const prefixNames = Array.from(
     new Set(
       group.includeRules
@@ -407,21 +405,17 @@ const formatGroupConditionLabel = (group?: RequirementGroup): string => {
   const parts: string[] = [];
 
   // Include conditions
-  if (hasMatchAll) {
-    parts.push("すべての科目");
-  } else {
-    if (prefixNames.length) {
-      parts.push(`「${prefixNames.join(", ")}」で始まる科目`);
-    }
+  if (prefixNames.length) {
+    parts.push(`「${prefixNames.join(", ")}」で始まる科目`);
+  }
 
-    if (categoryNames.length) {
-      const categoryText = categoryNames.join("、");
-      parts.push(parts.length ? `\n${categoryText}` : categoryText);
-    }
+  if (categoryNames.length) {
+    const categoryText = categoryNames.join("、");
+    parts.push(parts.length ? `\n${categoryText}` : categoryText);
+  }
 
-    if (specificCourseNames.length) {
-      parts.push(specificCourseNames.join("、"));
-    }
+  if (specificCourseNames.length) {
+    parts.push(specificCourseNames.join("、"));
   }
 
   // Exclude conditions

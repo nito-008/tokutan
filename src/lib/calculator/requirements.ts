@@ -407,9 +407,6 @@ function matchCourseToRule(
   courseNameToIdMap: Map<string, string>,
 ): boolean {
   switch (rule.type) {
-    case "matchAll":
-      return true;
-
     case "courses": {
       const normalizedCourseName = normalizeCourseName(course.courseName);
       for (const rawValue of rule.courseNames) {
