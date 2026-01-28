@@ -9,7 +9,13 @@ import {
   updateCourseInPlan,
 } from "~/lib/db/coursePlans";
 import { refreshKdbCache } from "~/lib/db/kdb";
-import type { CoursePlan, EnrollmentData, PlannedCourse, UserCourseRecord } from "~/types";
+import type {
+  CoursePlan,
+  EnrollmentData,
+  PlannedCourse,
+  Semester,
+  UserCourseRecord,
+} from "~/types";
 import { SemesterView } from "./SemesterView";
 
 interface CourseManagerProps {
@@ -40,31 +46,20 @@ export const CourseManager: Component<CourseManagerProps> = (props) => {
   };
 
   // 選択した年度の履修データを取得
-  const getEnrolledCoursesForSemester = (
-    year: number,
-    _semester: "spring" | "fall",
-  ): UserCourseRecord[] => {
+  const getEnrolledCoursesForSemester = (year: number, _semester: Semester): UserCourseRecord[] => {
     if (!props.enrollment) return [];
     return props.enrollment.courses.filter((c) => c.year === year);
   };
 
   // 科目を追加
-  const handleAddCourse = async (
-    year: number,
-    semester: "spring" | "fall",
-    course: PlannedCourse,
-  ) => {
+  const handleAddCourse = async (year: number, semester: Semester, course: PlannedCourse) => {
     await addCourseToSemester(props.profileId, year, semester, course);
     const updated = await getCoursePlan(props.profileId);
     setPlan(updated || null);
   };
 
   // 科目を削除
-  const handleRemoveCourse = async (
-    year: number,
-    semester: "spring" | "fall",
-    courseId: string,
-  ) => {
+  const handleRemoveCourse = async (year: number, semester: Semester, courseId: string) => {
     await removeCourseFromSemester(props.profileId, year, semester, courseId);
     const updated = await getCoursePlan(props.profileId);
     setPlan(updated || null);
@@ -73,7 +68,7 @@ export const CourseManager: Component<CourseManagerProps> = (props) => {
   // 科目を更新
   const handleUpdateCourse = async (
     year: number,
-    semester: "spring" | "fall",
+    semester: Semester,
     courseId: string,
     updates: Partial<PlannedCourse>,
   ) => {

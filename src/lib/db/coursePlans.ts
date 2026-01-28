@@ -1,4 +1,4 @@
-import type { CoursePlan, PlannedCourse, SemesterPlan } from "~/types";
+import type { CoursePlan, PlannedCourse, Semester, SemesterPlan } from "~/types";
 import { db } from "./index";
 
 // 履修計画を取得
@@ -59,7 +59,7 @@ export async function ensureCoursePlan(
 export async function addCourseToSemester(
   profileId: string,
   year: number,
-  semester: "spring" | "fall",
+  semester: Semester,
   course: PlannedCourse,
 ): Promise<void> {
   const plan = await getCoursePlan(profileId);
@@ -80,7 +80,7 @@ export async function addCourseToSemester(
 export async function removeCourseFromSemester(
   profileId: string,
   year: number,
-  semester: "spring" | "fall",
+  semester: Semester,
   courseId: string,
 ): Promise<void> {
   const plan = await getCoursePlan(profileId);
@@ -97,7 +97,7 @@ export async function removeCourseFromSemester(
 export async function updateCourseInPlan(
   profileId: string,
   year: number,
-  semester: "spring" | "fall",
+  semester: Semester,
   courseId: string,
   updates: Partial<PlannedCourse>,
 ): Promise<void> {
@@ -118,9 +118,9 @@ export async function updateCourseInPlan(
 export async function moveCourseToSemester(
   profileId: string,
   fromYear: number,
-  fromSemester: "spring" | "fall",
+  fromSemester: Semester,
   toYear: number,
-  toSemester: "spring" | "fall",
+  toSemester: Semester,
   courseId: string,
 ): Promise<void> {
   const plan = await getCoursePlan(profileId);
