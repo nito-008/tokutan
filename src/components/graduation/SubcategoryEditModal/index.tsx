@@ -31,10 +31,9 @@ interface SubcategoryEditModalProps {
   categoryId: string;
   categoryName: string;
   onClose: () => void;
-  onDelete?: (categoryId: string, subcategoryId: string) => void;
   onSave: (
     categoryId: string,
-    subcategoryId: string | null,
+    subcategoryId: string,
     updates: Partial<RequirementSubcategory>,
   ) => void;
 }
@@ -76,6 +75,7 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
   });
 
   const handleSave = () => {
+    if (!props.subcategory) return;
     const updates: Partial<RequirementSubcategory> =
       type() === "required"
         ? {
@@ -89,7 +89,7 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
             groups: JSON.parse(JSON.stringify(unwrap(groups))),
           };
 
-    props.onSave(props.categoryId, props.subcategory?.id ?? null, updates);
+    props.onSave(props.categoryId, props.subcategory.id, updates);
     props.onClose();
   };
 
@@ -159,25 +159,11 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
           </Show>
         </div>
 
-        <DialogFooter class="sm:justify-between">
-          <Show when={props.subcategory && props.onDelete}>
-            <Button
-              variant="destructive"
-              onClick={() => {
-                if (!props.subcategory) return;
-                props.onDelete?.(props.categoryId, props.subcategory.id);
-                props.onClose();
-              }}
-            >
-              削除
-            </Button>
-          </Show>
-          <div class="flex gap-4">
-            <Button variant="outline" onClick={props.onClose}>
-              キャンセル
-            </Button>
-            <Button onClick={handleSave}>保存</Button>
-          </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={props.onClose}>
+            キャンセル
+          </Button>
+          <Button onClick={handleSave}>保存</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

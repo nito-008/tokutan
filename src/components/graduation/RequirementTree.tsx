@@ -1,7 +1,6 @@
 ﻿import Circle from "lucide-solid/icons/circle";
 import CircleCheck from "lucide-solid/icons/circle-check";
 import Pencil from "lucide-solid/icons/pencil";
-import Plus from "lucide-solid/icons/plus";
 import { type Component, createSignal, For, Show } from "solid-js";
 import {
   Accordion,
@@ -34,10 +33,9 @@ interface RequirementTreeProps {
   onCategoryUpdate?: (categoryId: string | null, updates: Partial<RequirementCategory>) => void;
   onSubcategoryUpdate?: (
     categoryId: string,
-    subcategoryId: string | null,
+    subcategoryId: string,
     updates: Partial<RequirementSubcategory>,
   ) => void;
-  onSubcategoryDelete?: (categoryId: string, subcategoryId: string) => void;
   editMode?: boolean;
 }
 
@@ -52,7 +50,6 @@ export const RequirementTree: Component<RequirementTreeProps> = (props) => {
     categoryId: string;
     subcategory: RequirementSubcategory;
   } | null>(null);
-  const [addingSubcategoryFor, setAddingSubcategoryFor] = createSignal<string | null>(null);
 
   const findCategory = (categoryId: string): RequirementCategory | undefined => {
     return props.requirements?.categories.find((c) => c.id === categoryId);
@@ -69,7 +66,7 @@ export const RequirementTree: Component<RequirementTreeProps> = (props) => {
 
   const handleSubcategorySave = (
     categoryId: string,
-    subcategoryId: string | null,
+    subcategoryId: string,
     updates: Partial<RequirementSubcategory>,
   ) => {
     props.onSubcategoryUpdate?.(categoryId, subcategoryId, updates);
@@ -79,10 +76,6 @@ export const RequirementTree: Component<RequirementTreeProps> = (props) => {
     const editing = editingSubcategory();
     if (editing) {
       return findCategory(editing.categoryId)?.name ?? "";
-    }
-    const adding = addingSubcategoryFor();
-    if (adding) {
-      return findCategory(adding)?.name ?? "";
     }
     return "";
   };
@@ -145,16 +138,6 @@ export const RequirementTree: Component<RequirementTreeProps> = (props) => {
                         );
                       }}
                     </For>
-                    <Show when={props.editMode && props.requirements && props.onSubcategoryUpdate}>
-                      <button
-                        type="button"
-                        class="flex items-center gap-2 w-full p-2 text-sm text-muted-foreground hover:text-foreground hover:bg-muted rounded mt-2"
-                        onClick={() => setAddingSubcategoryFor(category.categoryId)}
-                      >
-                        <Plus class="size-4" />
-                        サブカテゴリを追加
-                      </button>
-                    </Show>
                   </div>
                 </AccordionContent>
               </AccordionItem>
@@ -194,15 +177,13 @@ export const RequirementTree: Component<RequirementTreeProps> = (props) => {
       />
 
       <SubcategoryEditModal
-        open={!!editingSubcategory() || !!addingSubcategoryFor()}
+        open={!!editingSubcategory()}
         subcategory={editingSubcategory()?.subcategory ?? null}
-        categoryId={editingSubcategory()?.categoryId ?? addingSubcategoryFor() ?? ""}
+        categoryId={editingSubcategory()?.categoryId ?? ""}
         categoryName={currentCategoryName()}
         onClose={() => {
           setEditingSubcategory(null);
-          setAddingSubcategoryFor(null);
         }}
-        onDelete={props.onSubcategoryDelete}
         onSave={handleSubcategorySave}
       />
     </>

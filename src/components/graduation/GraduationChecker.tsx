@@ -90,7 +90,7 @@ export const GraduationChecker: Component = () => {
 
   const handleSubcategoryUpdate = async (
     categoryId: string,
-    subcategoryId: string | null,
+    subcategoryId: string,
     updates: Partial<RequirementSubcategory>,
   ) => {
     const requirements = appState()?.requirements;
@@ -115,7 +115,7 @@ export const GraduationChecker: Component = () => {
             ? (existing.groups ?? [])
             : [];
         return {
-          id: existing?.id ?? `subcat-${Date.now()}`,
+          id: existing?.id ?? subcategoryId,
           type: "required",
           groups,
           notes,
@@ -145,7 +145,7 @@ export const GraduationChecker: Component = () => {
           : [];
 
       return {
-        id: existing?.id ?? `subcat-${Date.now()}`,
+        id: existing?.id ?? subcategoryId,
         type: nextType,
         minCredits,
         maxCredits,
@@ -157,14 +157,6 @@ export const GraduationChecker: Component = () => {
     const updatedCategories = requirements.categories.map((cat) => {
       if (cat.id !== categoryId) return cat;
 
-      if (subcategoryId === null) {
-        const newSubcategory = buildSubcategory();
-        return {
-          ...cat,
-          subcategories: [...cat.subcategories, newSubcategory],
-        };
-      }
-
       return {
         ...cat,
         subcategories: cat.subcategories.map((sub) =>
@@ -172,28 +164,6 @@ export const GraduationChecker: Component = () => {
         ),
       };
     });
-
-    const updatedRequirements: GraduationRequirements = {
-      ...requirements,
-      categories: updatedCategories,
-    };
-
-    await saveRequirements(updatedRequirements);
-    updateRequirements(updatedRequirements);
-  };
-
-  const handleSubcategoryDelete = async (categoryId: string, subcategoryId: string) => {
-    const requirements = appState()?.requirements;
-    if (!requirements) return;
-
-    const updatedCategories = requirements.categories.map((cat) =>
-      cat.id === categoryId
-        ? {
-            ...cat,
-            subcategories: cat.subcategories.filter((sub) => sub.id !== subcategoryId),
-          }
-        : cat,
-    );
 
     const updatedRequirements: GraduationRequirements = {
       ...requirements,
@@ -276,7 +246,6 @@ export const GraduationChecker: Component = () => {
                 requirements={appState()?.requirements ?? undefined}
                 onCategoryUpdate={handleCategoryUpdate}
                 onSubcategoryUpdate={handleSubcategoryUpdate}
-                onSubcategoryDelete={handleSubcategoryDelete}
                 editMode={editMode()}
               />
             </CardContent>
