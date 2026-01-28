@@ -376,9 +376,12 @@ const formatGroupConditionLabel = (group?: RequirementGroup): string => {
             minorCategory?: string;
           } => rule.type === "category",
         )
-        .flatMap((rule) =>
-          [rule.majorCategory, rule.middleCategory, rule.minorCategory].filter(Boolean),
-        ),
+        .flatMap((rule) => {
+          if (rule.minorCategory) return [rule.minorCategory];
+          if (rule.middleCategory) return [rule.middleCategory];
+          if (rule.majorCategory) return [rule.majorCategory];
+          return [];
+        }),
     ),
   );
 
@@ -418,9 +421,12 @@ const formatGroupConditionLabel = (group?: RequirementGroup): string => {
             minorCategory?: string;
           } => rule.type === "category",
         )
-        .flatMap((rule) =>
-          [rule.majorCategory, rule.middleCategory, rule.minorCategory].filter(Boolean),
-        ),
+        .flatMap((rule) => {
+          if (rule.minorCategory) return [rule.minorCategory];
+          if (rule.middleCategory) return [rule.middleCategory];
+          if (rule.majorCategory) return [rule.majorCategory];
+          return [];
+        }),
     ),
   );
 
