@@ -8,19 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "~/components/ui/dialog";
-import { Label } from "~/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "~/components/ui/select";
-import {
-  getSubcategoryLabel,
-  type SubcategoryTypeOption,
-  subcategoryTypeOptions,
-} from "~/lib/requirements/subcategory";
+import { getSubcategoryLabel } from "~/lib/requirements/subcategory";
 import type { RequirementGroup, RequirementSubcategory } from "~/types";
 import { RequiredCoursesEditor } from "./RequiredCoursesEditor";
 import { SelectionCoursesEditor } from "./SelectionCoursesEditor";
@@ -99,13 +87,6 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
     }
   };
 
-  const selectedType = () => subcategoryTypeOptions.find((opt) => opt.value === type());
-
-  const handleTypeChange = (val: SubcategoryTypeOption | null) => {
-    if (!val) return;
-    setType(val.value);
-  };
-
   return (
     <Dialog open={props.open} onOpenChange={handleOpenChange}>
       <DialogContent
@@ -115,34 +96,11 @@ export const SubcategoryEditModal: Component<SubcategoryEditModalProps> = (props
         <DialogHeader>
           <DialogTitle>
             {props.subcategory
-              ? `${props.categoryName} > ${getSubcategoryLabel(props.subcategory.type)}`
+              ? `${props.categoryName} ${getSubcategoryLabel(props.subcategory.type)}`
               : "サブカテゴリを追加"}
           </DialogTitle>
         </DialogHeader>
         <div class="space-y-4 py-4">
-          <div class="space-y-2">
-            <Label>科目タイプ</Label>
-            <Select
-              value={selectedType()}
-              onChange={handleTypeChange}
-              options={subcategoryTypeOptions}
-              optionValue="value"
-              optionTextValue="label"
-              placeholder="科目タイプを選択"
-              disabled={props.subcategory !== null}
-              itemComponent={(itemProps) => (
-                <SelectItem item={itemProps.item}>{itemProps.item.rawValue.label}</SelectItem>
-              )}
-            >
-              <SelectTrigger>
-                <SelectValue<SubcategoryTypeOption>>
-                  {(state) => state.selectedOption().label}
-                </SelectValue>
-              </SelectTrigger>
-              <SelectContent />
-            </Select>
-          </div>
-
           <Show when={type() === "required"}>
             <RequiredCoursesEditor groups={groups} setGroups={setGroups} />
           </Show>
