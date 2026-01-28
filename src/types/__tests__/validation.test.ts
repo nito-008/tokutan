@@ -1,4 +1,4 @@
-import { parse, safeParse } from "valibot";
+import { safeParse } from "valibot";
 import { describe, expect, it } from "vitest";
 import { GradeSchema } from "../enrollment/grade";
 import { UserProfileSchema } from "../enrollment/user-profile";

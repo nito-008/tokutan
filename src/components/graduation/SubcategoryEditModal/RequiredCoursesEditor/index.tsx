@@ -70,8 +70,8 @@ export const RequiredCoursesEditor: Component<RequiredCoursesEditorProps> = (pro
     const { draggable, droppable } = event;
     if (!draggable || !droppable) return;
     const ids = courseNames();
-    const fromIndex = ids.findIndex((id) => id === String(draggable.id));
-    const toIndex = ids.findIndex((id) => id === String(droppable.id));
+    const fromIndex = ids.indexOf(String(draggable.id));
+    const toIndex = ids.indexOf(String(droppable.id));
     if (fromIndex < 0 || toIndex < 0) return;
     if (fromIndex !== toIndex) {
       const items = [...ids];

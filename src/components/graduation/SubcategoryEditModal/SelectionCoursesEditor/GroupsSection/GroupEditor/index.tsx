@@ -210,8 +210,7 @@ export const GroupEditor: Component<GroupEditorProps> = (props) => {
         </div>
         <Button
           variant="ghost"
-          size="sm"
-          class="text-destructive hover:text-destructive hover:bg-destructive/10"
+          class="size-8 text-destructive hover:text-destructive hover:bg-destructive/10"
           onClick={props.onRemove}
         >
           <Trash2 class="size-4" />

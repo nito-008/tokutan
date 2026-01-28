@@ -1,14 +1,6 @@
 import GripVertical from "lucide-solid/icons/grip-vertical";
 import Trash2 from "lucide-solid/icons/trash-2";
-import {
-  type Accessor,
-  type Component,
-  createEffect,
-  createSignal,
-  type JSX,
-  onCleanup,
-  Show,
-} from "solid-js";
+import { type Component, createEffect, createSignal, type JSX, Show } from "solid-js";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Popover, PopoverAnchor } from "~/components/ui/popover";

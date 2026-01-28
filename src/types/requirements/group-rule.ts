@@ -21,7 +21,7 @@ const CoursesRuleSchema = v.object({
 /**
  * @deprecated "courses"に名称変更されました。CoursesRuleSchemaを使用してください
  */
-const SpecificRuleSchema = CoursesRuleSchema;
+const _SpecificRuleSchema = CoursesRuleSchema;
 
 /**
  * プレフィックスルール

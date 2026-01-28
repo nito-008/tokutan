@@ -13,14 +13,7 @@ import {
 import { useAppState, useAppStateActions } from "~/stores/appState";
 import type { TwinsCourse } from "~/types";
 import { Button } from "../ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "../ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog";
 
 export const CsvUploadDialog: Component = () => {
   const appState = useAppState();

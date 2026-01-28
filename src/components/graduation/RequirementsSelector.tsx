@@ -1,5 +1,3 @@
-import { Button } from "@kobalte/core";
-import FilePlusCorner from "lucide-solid/icons/file-plus-corner";
 import { type Component, createEffect, createSignal, onMount, Show } from "solid-js";
 import {
   Select,

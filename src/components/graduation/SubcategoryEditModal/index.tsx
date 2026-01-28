@@ -24,7 +24,6 @@ import {
 import type { RequirementGroup, RequirementSubcategory } from "~/types";
 import { RequiredCoursesEditor } from "./RequiredCoursesEditor";
 import { SelectionCoursesEditor } from "./SelectionCoursesEditor";
-import { normalizeCourseIds } from "./utils/courseGroup";
 
 interface SubcategoryEditModalProps {
   open: boolean;
