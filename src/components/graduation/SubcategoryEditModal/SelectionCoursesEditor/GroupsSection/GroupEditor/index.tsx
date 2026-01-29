@@ -246,7 +246,7 @@ export const GroupEditor: Component<GroupEditorProps> = (props) => {
                         }
                       />
                     </div>
-                    <Show when={(props.group.includeRules.categories?.length ?? 0) > 1}>
+                    <Show when={(props.group.includeRules?.categories?.length ?? 0) > 1}>
                       <Button
                         variant="ghost"
                         size="sm"

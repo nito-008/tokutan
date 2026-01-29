@@ -1,4 +1,4 @@
-import { type Component, createEffect, createSignal } from "solid-js";
+﻿import { type Component, createEffect, createSignal } from "solid-js";
 import { Input } from "~/components/ui/input";
 
 interface PrefixInputProps {
@@ -18,7 +18,6 @@ export const PrefixInput: Component<PrefixInputProps> = (props) => {
   });
 
   const handleBlur = () => {
-    setIsFocused(false);
     const value = localValue().trim();
     const prefixes = value
       ? value
@@ -26,6 +25,7 @@ export const PrefixInput: Component<PrefixInputProps> = (props) => {
           .map((p) => p.trim())
           .filter((p) => p)
       : [""];
+    setIsFocused(false);
     props.onUpdate(prefixes);
   };
 
@@ -36,6 +36,12 @@ export const PrefixInput: Component<PrefixInputProps> = (props) => {
       onInput={(e) => setLocalValue(e.currentTarget.value)}
       onFocus={() => setIsFocused(true)}
       onBlur={handleBlur}
+      onKeyDown={(e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          e.currentTarget.blur();
+        }
+      }}
       placeholder="科目番号の先頭 (例: FG)"
     />
   );
