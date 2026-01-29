@@ -2,7 +2,6 @@ import Plus from "lucide-solid/icons/plus";
 import { type Component, For, Show } from "solid-js";
 import { reconcile, type SetStoreFunction } from "solid-js/store";
 import { Button } from "~/components/ui/button";
-import { Label } from "~/components/ui/label";
 import type { IncludeRule, RequirementGroup } from "~/types";
 import { RequiredGroupRow } from "./RequiredGroupRow";
 
@@ -20,7 +19,7 @@ export const RequiredGroupsEditor: Component<RequiredGroupsEditorProps> = (props
   const handleAddGroup = () => {
     const newGroup: RequirementGroup = {
       id: `group-${Date.now()}`,
-      minCredits: 0,
+      requiredCredits: 0,
       includeRules: [
         {
           id: `rule-${Date.now()}`,
@@ -34,6 +33,9 @@ export const RequiredGroupsEditor: Component<RequiredGroupsEditorProps> = (props
   };
 
   const handleUpdateGroup = (index: number, updates: Partial<RequirementGroup>) => {
+    if ("requiredCredits" in updates) {
+      props.setGroups(index, "requiredCredits", updates.requiredCredits ?? 0);
+    }
     if ("minCredits" in updates) {
       props.setGroups(index, "minCredits", updates.minCredits ?? 0);
     }
