@@ -1,16 +1,16 @@
+import Minus from "lucide-solid/icons/minus";
 import Plus from "lucide-solid/icons/plus";
 import Trash2 from "lucide-solid/icons/trash-2";
-import { type Component, createSignal, Show } from "solid-js";
+import { type Component, Show } from "solid-js";
 import { Button } from "~/components/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "~/components/ui/dropdown-menu";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "~/components/ui/select";
 import type { ExcludeRule, IncludeRule, RequirementGroup } from "~/types";
 import { RuleList } from "./RuleList";
 
@@ -20,31 +20,7 @@ interface GroupEditorProps {
   onRemove: () => void;
 }
 
-type RuleTypeOption = {
-  value: string;
-  label: string;
-};
-
-const ruleTypeOptions: RuleTypeOption[] = [
-  { value: "courses", label: "特定科目" },
-  { value: "prefix", label: "～で始まる科目" },
-  { value: "category", label: "科目区分" },
-  { value: "courses-exclude", label: "特定科目を除外" },
-  { value: "prefix-exclude", label: "～で始まる科目を除外" },
-  { value: "category-exclude", label: "科目区分を除外" },
-];
-
 export const GroupEditor: Component<GroupEditorProps> = (props) => {
-  const [selectedRuleTypeValue, setSelectedRuleTypeValue] = createSignal(ruleTypeOptions[0].value);
-
-  const selectedRuleType = () =>
-    ruleTypeOptions.find((opt) => opt.value === selectedRuleTypeValue());
-
-  const handleRuleTypeChange = (val: RuleTypeOption | null) => {
-    if (!val) return;
-    setSelectedRuleTypeValue(val.value);
-  };
-
   const updateIncludeRule = (index: number, updates: Partial<IncludeRule>) => {
     const newRules = props.group.includeRules.map((rule, i) => {
       if (i !== index) return rule;
@@ -119,8 +95,7 @@ export const GroupEditor: Component<GroupEditorProps> = (props) => {
     props.onUpdate({ excludeRules: newRules });
   };
 
-  const addRule = () => {
-    const ruleType = selectedRuleTypeValue();
+  const addRuleByType = (ruleType: string) => {
     const isExclude = ruleType.endsWith("-exclude");
     const baseType = isExclude ? ruleType.replace("-exclude", "") : ruleType;
 
@@ -236,28 +211,46 @@ export const GroupEditor: Component<GroupEditorProps> = (props) => {
           </Show>
           <div class="flex justify-between gap-2">
             <div class="flex gap-2">
-              <Select
-                value={selectedRuleType()}
-                onChange={handleRuleTypeChange}
-                options={ruleTypeOptions}
-                optionValue="value"
-                optionTextValue="label"
-                itemComponent={(itemProps) => (
-                  <SelectItem item={itemProps.item}>{itemProps.item.rawValue.label}</SelectItem>
-                )}
-                class="w-fit"
-              >
-                <SelectTrigger class="h-8">
-                  <SelectValue<RuleTypeOption>>
-                    {(state) => state.selectedOption().label}
-                  </SelectValue>
-                </SelectTrigger>
-                <SelectContent />
-              </Select>
-              <Button variant="outline" size="sm" onClick={addRule} class="h-8">
-                <Plus class="size-4 mr-1" />
-                ルールを追加
-              </Button>
+              <DropdownMenu>
+                <DropdownMenuTrigger as={Button} variant="outline" size="sm" class="h-8">
+                  <Plus class="size-4 mr-1" />
+                  条件を追加
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem onSelect={() => addRuleByType("courses")}>
+                    特定科目
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => addRuleByType("prefix")}>
+                    ～で始まる科目
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => addRuleByType("category")}>
+                    科目区分
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+
+              <DropdownMenu>
+                <DropdownMenuTrigger
+                  as={Button}
+                  variant="outline"
+                  size="sm"
+                  class="h-8 text-destructive hover:text-destructive"
+                >
+                  <Minus class="size-4 mr-1" />
+                  除外条件を追加
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                  <DropdownMenuItem onSelect={() => addRuleByType("courses-exclude")}>
+                    特定科目
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => addRuleByType("prefix-exclude")}>
+                    ～で始まる科目
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onSelect={() => addRuleByType("category-exclude")}>
+                    科目区分
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
             <Button
               variant="outline"
