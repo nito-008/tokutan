@@ -56,8 +56,8 @@ All data entities use a unique identifier following a consistent naming pattern:
 - `requ`: Requirement
 - `ctgy`: Category
 - `sbct`: SubCategory
+- `grup`: Group
 - `rule`: RequirementRule
-- `uspf`: UserProfile
 
 ### Generating IDs
 
