@@ -37,6 +37,41 @@ function normalizeCourseName(value: string | undefined): string {
   return (value ?? "").trim().toLowerCase();
 }
 
+/**
+ * サブカテゴリの最大単位数に合わせてマッチ結果を上限内に絞り込む
+ * @param matches マッチした科目一覧
+ * @param maxCredits サブカテゴリの最大単位数
+ * @returns 上限内に収まった科目と除外された科目
+ */
+function limitMatchedCoursesByMaxCredits(
+  matches: MatchedCourse[],
+  maxCredits: number | undefined,
+): { kept: MatchedCourse[]; dropped: MatchedCourse[]; remainingCredits: number | undefined } {
+  if (maxCredits === undefined) {
+    return { kept: matches, dropped: [], remainingCredits: undefined };
+  }
+
+  const kept: MatchedCourse[] = [];
+  const dropped: MatchedCourse[] = [];
+  let remainingCredits = maxCredits;
+
+  for (const match of matches) {
+    const countableCredits = match.isPassed || match.isInProgress ? match.credits : 0;
+    if (countableCredits > 0 && remainingCredits <= 0) {
+      dropped.push(match);
+      continue;
+    }
+    if (countableCredits > remainingCredits) {
+      dropped.push(match);
+      continue;
+    }
+    kept.push(match);
+    remainingCredits -= countableCredits;
+  }
+
+  return { kept, dropped, remainingCredits };
+}
+
 type RequiredCourseExclusion = {
   courseIds: Set<string>;
   courseNames: Set<string>;
@@ -190,6 +225,7 @@ export async function calculateRequirementStatus(
     kdbMap.set(course.id, course);
   }
   const courseNameToIdMap = buildCourseNameToIdMap(kdbMap);
+  const invalidCourses: MatchedCourse[] = [];
   // 全必修科目番号（および科目名）を収集
   const requiredCourseExclusion = buildRequiredCourseExclusionSet(
     requirements,
@@ -272,6 +308,8 @@ export async function calculateRequirementStatus(
         };
       }
 
+      let remainingMaxCredits = subcategory.maxCredits;
+
       for (const group of subcategory.groups) {
         const groupMatches = matchCoursesToGroup(
           courses,
@@ -282,11 +320,15 @@ export async function calculateRequirementStatus(
           courseNameToIdMap,
         );
 
-        const earnedCredits = groupMatches
+        const limitedMatches = limitMatchedCoursesByMaxCredits(groupMatches, remainingMaxCredits);
+        remainingMaxCredits = limitedMatches.remainingCredits;
+        invalidCourses.push(...limitedMatches.dropped);
+
+        const earnedCredits = limitedMatches.kept
           .filter((m) => m.isPassed)
           .reduce((sum, m) => sum + m.credits, 0);
 
-        const inProgressCredits = groupMatches
+        const inProgressCredits = limitedMatches.kept
           .filter((m) => m.isInProgress)
           .reduce((sum, m) => sum + m.credits, 0);
 
@@ -302,10 +344,10 @@ export async function calculateRequirementStatus(
           inProgressCredits,
           requiredCredits: minCredits,
           maxCredits: group.maxCredits,
-          matchedCourses: groupMatches,
+          matchedCourses: limitedMatches.kept,
         });
 
-        matchedCourses.push(...groupMatches);
+        matchedCourses.push(...limitedMatches.kept);
       }
 
       const earnedCredits = matchedCourses
@@ -347,16 +389,19 @@ export async function calculateRequirementStatus(
     };
   });
 
-  const unmatchedCourses: MatchedCourse[] = courses
-    .filter((course) => !usedCourseIds.has(course.id))
-    .map((course) => ({
-      courseId: course.courseId,
-      courseName: course.courseName,
-      credits: course.credits,
-      grade: course.grade,
-      isPassed: course.isPassed,
-      isInProgress: course.isInProgress,
-    }));
+  const unmatchedCourses: MatchedCourse[] = [
+    ...invalidCourses,
+    ...courses
+      .filter((course) => !usedCourseIds.has(course.id))
+      .map((course) => ({
+        courseId: course.courseId,
+        courseName: course.courseName,
+        credits: course.credits,
+        grade: course.grade,
+        isPassed: course.isPassed,
+        isInProgress: course.isInProgress,
+      })),
+  ];
 
   const totalEarnedCredits = categoryStatuses.reduce((sum, c) => sum + c.earnedCredits, 0);
   const totalInProgressCredits = categoryStatuses.reduce((sum, c) => sum + c.inProgressCredits, 0);
