@@ -65,8 +65,7 @@ export const RequiredGroupsEditor: Component<RequiredGroupsEditorProps> = (props
   };
 
   return (
-    <div class="space-y-4">
-      <Label>科目区分グループ</Label>
+    <>
       <Show when={categoryGroups().length > 0}>
         <div class="space-y-2">
           <For each={categoryGroups()}>
@@ -85,6 +84,6 @@ export const RequiredGroupsEditor: Component<RequiredGroupsEditorProps> = (props
         <Plus class="size-4 mr-1" />
         グループを追加
       </Button>
-    </div>
+    </>
   );
 };

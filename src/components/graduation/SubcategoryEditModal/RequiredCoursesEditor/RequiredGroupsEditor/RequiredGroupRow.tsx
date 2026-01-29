@@ -26,7 +26,7 @@ export const RequiredGroupRow: Component<RequiredGroupRowProps> = (props) => {
       <div class="flex items-start gap-2">
         <div class="flex-1 space-y-3">
           <div class="space-y-1">
-            <Label class="text-xs">単位数</Label>
+            <Label class="text-xs">必要単位数</Label>
             <Input
               class="h-8"
               type="number"
