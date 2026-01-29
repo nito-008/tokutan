@@ -1,0 +1,399 @@
+{
+  "$schema": "https://raw.githubusercontent.com/nito-008/tokutan/refs/heads/main/schema/requirements.json",
+  "id": "esys-2024-eme",
+  "year": 2024,
+  "department": "工学システム学類",
+  "major": "エネルギー・メカニクス主専攻",
+  "totalCredits": 125,
+  "version": "1.0.0",
+  "isDefault": false,
+  "createdAt": "2026-01-29T15:14:59.132Z",
+  "updatedAt": "2026-01-29T15:14:59.132Z",
+  "categories": [
+    {
+      "id": "specialized",
+      "name": "専門科目",
+      "subcategories": [
+        {
+          "id": "specialized-required",
+          "type": "required",
+          "groups": [
+            {
+              "id": "required-courses",
+              "includeRules": {
+                "courseNames": [
+                  "工学システム基礎実験A",
+                  "工学システム基礎実験B",
+                  "エネルギー・メカニクス専門実験",
+                  "エネルギー・メカニクス応用実験",
+                  "卒業研究A",
+                  "卒業研究B",
+                  "工学者のための倫理",
+                  "専門英語A",
+                  "専門英語B",
+                  "専門英語演習",
+                  "数値計算法"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "specialized-elective",
+          "type": "elective",
+          "minCredits": 40,
+          "maxCredits": 49,
+          "groups": [
+            {
+              "id": "fg-ff-gb-group",
+              "minCredits": 1,
+              "includeRules": {
+                "prefixes": ["FG11", "FG41"]
+              }
+            },
+            {
+              "id": "group-1769460882009",
+              "minCredits": 1,
+              "includeRules": {
+                "prefixes": ["FG12", "FG42"]
+              }
+            },
+            {
+              "id": "group-1769460901959",
+              "minCredits": 1,
+              "includeRules": {
+                "prefixes": ["FG13", "FG43"]
+              }
+            },
+            {
+              "id": "group-1769460916548",
+              "minCredits": 23,
+              "includeRules": {
+                "prefixes": ["FG17", "FG44", "FG45"]
+              }
+            },
+            {
+              "id": "group-1769460932698",
+              "minCredits": 0,
+              "includeRules": {
+                "prefixes": [
+                  "FG",
+                  "FF2",
+                  "FF3",
+                  "FF4",
+                  "FF5",
+                  "GB2",
+                  "GB3",
+                  "GB4",
+                  "FA00",
+                  "FH",
+                  "YA",
+                  "YB",
+                  "FJ"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "foundation",
+      "name": "専門基礎科目",
+      "subcategories": [
+        {
+          "id": "foundation-required",
+          "type": "required",
+          "groups": [
+            {
+              "id": "required-courses",
+              "includeRules": {
+                "courseNames": [
+                  "数学リテラシー1",
+                  "数学リテラシー2",
+                  "線形代数1",
+                  "線形代数2",
+                  "線形代数3",
+                  "微積分1",
+                  "微積分2",
+                  "微積分3",
+                  "力学1",
+                  "力学2",
+                  "力学3",
+                  "電磁気学1",
+                  "電磁気学2",
+                  "電磁気学3",
+                  "工学システム原論",
+                  "線形代数総論A",
+                  "線形代数総論B",
+                  "解析学総論",
+                  "常微分方程式",
+                  "力学総論",
+                  "電磁気学総論",
+                  "材料力学基礎",
+                  "熱力学基礎",
+                  "流体力学基礎",
+                  "複素解析",
+                  "プログラミング序論A",
+                  "プログラミング序論B"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "common",
+      "name": "基礎科目共通科目",
+      "subcategories": [
+        {
+          "id": "subcat-1769461547235",
+          "type": "required",
+          "groups": [
+            {
+              "id": "required-courses"
+            },
+            {
+              "id": "group-1769690334977",
+              "requiredCredits": 2,
+              "includeRules": {
+                "categories": [
+                  {
+                    "majorCategory": "総合科目",
+                    "middleCategory": "ファーストイヤーセミナー"
+                  },
+                  {
+                    "majorCategory": "総合科目",
+                    "middleCategory": "学問への誘い"
+                  }
+                ]
+              }
+            },
+            {
+              "id": "group-1769690391095",
+              "requiredCredits": 3,
+              "includeRules": {
+                "categories": [
+                  {
+                    "majorCategory": "体育",
+                    "middleCategory": "人文、比文、日日、応理、工シス、社工、総学1,2組（春学期1年次）"
+                  },
+                  {
+                    "majorCategory": "体育",
+                    "middleCategory": "人文、比文、日日、応理、工シス、社工、総学1,2組（秋学期1年次）"
+                  },
+                  {
+                    "majorCategory": "体育",
+                    "middleCategory": "国際、生物、地球、応理、工シス、看護（春学期2年次）"
+                  },
+                  {
+                    "majorCategory": "体育",
+                    "middleCategory": "国際、生物、地球、応理、工シス、看護（秋学期2年次）"
+                  },
+                  {
+                    "majorCategory": "体育",
+                    "middleCategory": "工シス、応理（春学期3年次）"
+                  },
+                  {
+                    "majorCategory": "体育",
+                    "middleCategory": "工シス、応理（秋学期3年次）"
+                  },
+                  {
+                    "majorCategory": "体育",
+                    "middleCategory": "工シス、応理3年次（必修・集中）"
+                  }
+                ]
+              }
+            },
+            {
+              "id": "group-1769690452574",
+              "requiredCredits": 4,
+              "includeRules": {
+                "categories": [
+                  {
+                    "majorCategory": "外国語",
+                    "middleCategory": "英語"
+                  }
+                ]
+              }
+            },
+            {
+              "id": "group-1769690466434",
+              "requiredCredits": 4,
+              "includeRules": {
+                "categories": [
+                  {
+                    "majorCategory": "情報"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "subcat-1769461553835",
+          "type": "elective",
+          "minCredits": 1,
+          "maxCredits": 10,
+          "groups": [
+            {
+              "id": "group-1769490412309",
+              "minCredits": 1,
+              "includeRules": {
+                "categories": [
+                  {
+                    "majorCategory": "総合科目",
+                    "middleCategory": "学士基盤科目"
+                  },
+                  {
+                    "majorCategory": "総合科目",
+                    "middleCategory": "学士基盤科目-高年次向け-"
+                  }
+                ]
+              },
+              "maxCredits": 3
+            },
+            {
+              "id": "group-1769490435346",
+              "minCredits": 0,
+              "includeRules": {
+                "categories": [
+                  {
+                    "majorCategory": "体育",
+                    "middleCategory": "全学年対象自由科目（講義）"
+                  }
+                ]
+              },
+              "maxCredits": 1
+            },
+            {
+              "id": "group-1769490790479",
+              "minCredits": 0,
+              "includeRules": {
+                "categories": [
+                  {
+                    "majorCategory": "外国語"
+                  }
+                ]
+              },
+              "maxCredits": 4
+            },
+            {
+              "id": "group-1769490807117",
+              "minCredits": 0,
+              "includeRules": {
+                "categories": [
+                  {
+                    "majorCategory": "芸術"
+                  }
+                ]
+              },
+              "maxCredits": 1
+            },
+            {
+              "id": "group-1769490833766",
+              "minCredits": 0,
+              "includeRules": {
+                "categories": [
+                  {
+                    "majorCategory": "国語"
+                  }
+                ]
+              },
+              "maxCredits": 1
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "basic",
+      "name": "基礎科目関連科目",
+      "subcategories": [
+        {
+          "id": "subcat-1769461564785",
+          "type": "required",
+          "groups": [
+            {
+              "id": "required-courses",
+              "includeRules": {
+                "courseNames": []
+              }
+            }
+          ]
+        },
+        {
+          "id": "subcat-1769461571505",
+          "type": "elective",
+          "minCredits": 6,
+          "maxCredits": 15,
+          "groups": [
+            {
+              "id": "group-1769494514703",
+              "minCredits": 0,
+              "excludeRules": {
+                "prefixes": [
+                  "FA",
+                  "FG",
+                  "FF2",
+                  "FF3",
+                  "FF4",
+                  "FF5",
+                  "GB2",
+                  "GB3",
+                  "GB4",
+                  "FBA14",
+                  "FBA15",
+                  "FBA16",
+                  "GA15"
+                ]
+              }
+            },
+            {
+              "id": "group-1769490983361",
+              "minCredits": 0,
+              "includeRules": {
+                "courseNames": ["工学システム概論"]
+              },
+              "maxCredits": 1
+            },
+            {
+              "id": "group-1769491020908",
+              "minCredits": 0,
+              "includeRules": {
+                "categories": [
+                  {
+                    "majorCategory": "博物館"
+                  }
+                ]
+              }
+            },
+            {
+              "id": "group-1769491030034",
+              "minCredits": 0,
+              "includeRules": {
+                "categories": [
+                  {
+                    "majorCategory": "教職"
+                  }
+                ]
+              }
+            },
+            {
+              "id": "group-1769491041512",
+              "minCredits": 0,
+              "includeRules": {
+                "categories": [
+                  {
+                    "majorCategory": "自由科目（特設）"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
