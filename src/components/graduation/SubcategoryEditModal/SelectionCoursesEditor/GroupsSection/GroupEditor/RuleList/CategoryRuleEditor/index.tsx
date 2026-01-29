@@ -87,17 +87,16 @@ export const CategoryRuleEditor: Component<CategoryRuleEditorProps> = (props) =>
       <Show when={!loading()} fallback={<div class="text-sm text-muted-foreground">読込中...</div>}>
         <div class="flex gap-2">
           <Select
-            value={props.majorCategory || "すべて"}
+            placeholder="区分を選択"
+            value={props.majorCategory || undefined}
             onChange={(value) => {
-              if (value == null) return;
-              const normalizedMajor = value === "すべて" ? "" : value;
               props.onUpdate({
-                majorCategory: normalizedMajor,
+                majorCategory: value || "",
                 middleCategory: undefined,
                 minorCategory: undefined,
               });
             }}
-            options={["すべて", ...majorCategories()]}
+            options={majorCategories()}
             itemComponent={(props) => (
               <SelectItem item={props.item}>{props.item.rawValue}</SelectItem>
             )}
@@ -106,7 +105,7 @@ export const CategoryRuleEditor: Component<CategoryRuleEditorProps> = (props) =>
               <SelectValue<string>>
                 {(state) => {
                   const selected = state.selectedOption() as string | undefined;
-                  return selected ?? "すべて";
+                  return selected ?? "区分を選択";
                 }}
               </SelectValue>
             </SelectTrigger>
