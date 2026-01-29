@@ -2,10 +2,10 @@ import GripVertical from "lucide-solid/icons/grip-vertical";
 import Trash2 from "lucide-solid/icons/trash-2";
 import { type Component, type JSX, Show } from "solid-js";
 import { Button } from "~/components/ui/button";
-import { Input } from "~/components/ui/input";
 import type { ExcludeRule, IncludeRule } from "~/types";
 import { CategoryRuleEditor } from "../CategoryRuleEditor";
 import { CourseNamesInput } from "../CourseNamesInput";
+import { PrefixInput } from "../PrefixInput";
 
 interface RuleRowProps {
   rule: IncludeRule | ExcludeRule;
@@ -84,24 +84,13 @@ export const RuleRow: Component<RuleRowProps> = (props) => {
           />
         </Show>
         <Show when={props.rule.type === "prefix"}>
-          <Input
-            class="h-8"
-            value={
-              (props.rule as Extract<IncludeRule | ExcludeRule, { type: "prefix" }>).prefixes.join(
-                ", ",
-              ) ?? ""
+          <PrefixInput
+            prefixes={
+              (props.rule as Extract<IncludeRule | ExcludeRule, { type: "prefix" }>).prefixes
             }
-            onInput={(e) => {
-              const value = e.currentTarget.value.trim();
-              const prefixes = value
-                ? value
-                    .split(",")
-                    .map((p) => p.trim())
-                    .filter((p) => p)
-                : [""];
-              props.onUpdate({ prefixes } satisfies Partial<IncludeRule | ExcludeRule>);
-            }}
-            placeholder="科目番号の先頭 (例: FG, FA, GB)"
+            onUpdate={(prefixes) =>
+              props.onUpdate({ prefixes } satisfies Partial<IncludeRule | ExcludeRule>)
+            }
           />
         </Show>
         <Show when={props.rule.type === "category"}>
