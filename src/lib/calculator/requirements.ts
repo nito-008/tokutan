@@ -212,26 +212,71 @@ export async function calculateRequirementStatus(
       const matchedCourses: MatchedCourse[] = [];
 
       if (subcategory.type === "required") {
-        const courseGroups = parseRequiredCourseGroups(subcategory.groups);
-        const requiredMatches = matchRequiredCourseGroups(
-          courseGroups,
-          courses,
-          usedCourseIds,
-          kdbMap,
-        );
-        matchedCourses.push(...requiredMatches);
+        // 各グループを処理
+        for (const group of subcategory.groups) {
+          // type: "courses" ルールを抽出して処理（未履修表示のため別処理が必要）
+          const courseRules = group.includeRules.filter((r) => r.type === "courses");
+          if (courseRules.length > 0) {
+            const courseGroups: string[][] = [];
+            for (const rule of courseRules) {
+              for (const courseName of rule.courseNames) {
+                const parsedGroup = splitRequiredCourseGroup(courseName);
+                if (parsedGroup.length > 0) {
+                  courseGroups.push(parsedGroup);
+                }
+              }
+            }
+            const requiredMatches = matchRequiredCourseGroups(
+              courseGroups,
+              courses,
+              usedCourseIds,
+              kdbMap,
+            );
+            matchedCourses.push(...requiredMatches);
+          }
 
-        const earnedCredits = requiredMatches
+          // type: "category" ルールを処理（新規追加）
+          const categoryRules = group.includeRules.filter((r) => r.type === "category");
+          if (categoryRules.length > 0) {
+            const tempGroup = { ...group, includeRules: categoryRules };
+            const groupMatches = matchCoursesToGroup(
+              courses,
+              tempGroup,
+              usedCourseIds,
+              requiredCourseExclusion,
+              courseTypeMaster,
+              courseNameToIdMap,
+            );
+            matchedCourses.push(...groupMatches);
+          }
+
+          // type: "prefix" ルールを処理（追加サポート）
+          const prefixRules = group.includeRules.filter((r) => r.type === "prefix");
+          if (prefixRules.length > 0) {
+            const tempGroup = { ...group, includeRules: prefixRules };
+            const groupMatches = matchCoursesToGroup(
+              courses,
+              tempGroup,
+              usedCourseIds,
+              requiredCourseExclusion,
+              courseTypeMaster,
+              courseNameToIdMap,
+            );
+            matchedCourses.push(...groupMatches);
+          }
+        }
+
+        const earnedCredits = matchedCourses
           .filter((m) => m.isPassed)
           .reduce((sum, m) => sum + m.credits, 0);
 
-        const inProgressCredits = requiredMatches
+        const inProgressCredits = matchedCourses
           .filter((m) => m.isInProgress)
           .reduce((sum, m) => sum + m.credits, 0);
 
-        const totalRequiredCredits = requiredMatches.reduce((sum, m) => sum + m.credits, 0);
+        const totalRequiredCredits = matchedCourses.reduce((sum, m) => sum + m.credits, 0);
 
-        const isSatisfied = requiredMatches.every((m) => m.isPassed || m.isInProgress);
+        const isSatisfied = matchedCourses.every((m) => m.isPassed || m.isInProgress);
 
         return {
           subcategoryId: subcategory.id,
