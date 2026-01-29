@@ -14,7 +14,7 @@ export const RequiredGroupsEditor: Component<RequiredGroupsEditorProps> = (props
   const categoryGroups = () =>
     props.groups
       .map((group, index) => ({ group, originalIndex: index }))
-      .filter(({ group }) => (group.includeRules.categories?.length ?? 0) > 0);
+      .filter(({ group }) => (group.includeRules?.categories?.length ?? 0) > 0);
 
   const handleAddGroup = () => {
     const newGroup: RequirementGroup = {

@@ -17,6 +17,15 @@ import {
   getCourseTypeMaster,
 } from "../db/courseTypeMaster";
 
+// includeRules/excludeRules が実質的に空かどうかを判定
+function isRulesEmpty(rules: IncludeRules | ExcludeRules | undefined): boolean {
+  if (!rules) return true;
+  const hasNames = rules.courseNames?.some((n) => n.trim() !== "");
+  const hasPrefixes = rules.prefixes && rules.prefixes.length > 0;
+  const hasCategories = rules.categories && rules.categories.length > 0;
+  return !hasNames && !hasPrefixes && !hasCategories;
+}
+
 function splitRequiredCourseGroup(value: string): string[] {
   return value
     .split(",")
@@ -60,7 +69,7 @@ function buildRequiredCourseExclusionSet(
 
       // groupsのincludeRulesからcourseNamesを抽出
       for (const group of subcategory.groups) {
-        const courseNames = group.includeRules.courseNames;
+        const courseNames = group.includeRules?.courseNames;
         if (!courseNames) continue;
 
         for (const rawCourse of courseNames) {
@@ -197,7 +206,7 @@ export async function calculateRequirementStatus(
         // 各グループを処理
         for (const group of subcategory.groups) {
           // courseNames の処理（未履修表示のため別処理が必要）
-          const courseNames = group.includeRules.courseNames;
+          const courseNames = group.includeRules?.courseNames;
           if (courseNames && courseNames.length > 0) {
             const courseGroups: string[][] = [];
             for (const courseName of courseNames) {
@@ -217,13 +226,13 @@ export async function calculateRequirementStatus(
 
           // categories / prefixes の処理（courseNamesを除外したルールで実行）
           const hasCategoriesOrPrefixes =
-            (group.includeRules.categories && group.includeRules.categories.length > 0) ||
-            (group.includeRules.prefixes && group.includeRules.prefixes.length > 0);
+            (group.includeRules?.categories && group.includeRules.categories.length > 0) ||
+            (group.includeRules?.prefixes && group.includeRules.prefixes.length > 0);
 
           if (hasCategoriesOrPrefixes) {
             const nonCourseRules: IncludeRules = {
-              prefixes: group.includeRules.prefixes,
-              categories: group.includeRules.categories,
+              prefixes: group.includeRules?.prefixes,
+              categories: group.includeRules?.categories,
             };
             const tempGroup = { ...group, includeRules: nonCourseRules };
             const groupMatches = matchCoursesToGroup(
@@ -381,14 +390,17 @@ function matchCoursesToGroup(
     if (usedCourseIds.has(course.id)) continue;
     if (isCourseExcludedByRequirements(course, excludedCourseIds)) continue;
 
-    // Step 1: includeRulesのいずれかにマッチするか
-    const isIncluded = matchCourseToRules(
-      course,
-      group.includeRules,
-      courseTypeMaster,
-      courseNameToIdMap,
-    );
-    if (!isIncluded) continue;
+    // Step 1: includeRulesが設定されている場合はホワイトリスト方式でチェック
+    // 未設定または空の場合は全科目を対象（ブラックリスト方式）
+    if (group.includeRules && !isRulesEmpty(group.includeRules)) {
+      const isIncluded = matchCourseToRules(
+        course,
+        group.includeRules,
+        courseTypeMaster,
+        courseNameToIdMap,
+      );
+      if (!isIncluded) continue;
+    }
 
     // Step 2: excludeRulesのいずれかにマッチするか（除外）
     if (group.excludeRules) {

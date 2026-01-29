@@ -145,7 +145,7 @@
                             "required": []
                           }
                         },
-                        "required": ["id", "includeRules"]
+                        "required": ["id"]
                       }
                     }
                   },
@@ -266,7 +266,7 @@
                             "required": []
                           }
                         },
-                        "required": ["id", "includeRules"]
+                        "required": ["id"]
                       }
                     }
                   },
@@ -387,7 +387,7 @@
                             "required": []
                           }
                         },
-                        "required": ["id", "includeRules"]
+                        "required": ["id"]
                       }
                     }
                   },

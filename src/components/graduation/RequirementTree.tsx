@@ -319,9 +319,9 @@ const formatGroupConditionLabel = (group?: RequirementGroup): string => {
   const exclude = group.excludeRules;
 
   // Include conditions
-  const prefixNames = (rules.prefixes ?? []).filter(Boolean);
-  const specificCourseNames = (rules.courseNames ?? []).filter(Boolean);
-  const categoryNames = (rules.categories ?? []).flatMap((cat) => {
+  const prefixNames = (rules?.prefixes ?? []).filter(Boolean);
+  const specificCourseNames = (rules?.courseNames ?? []).filter(Boolean);
+  const categoryNames = (rules?.categories ?? []).flatMap((cat) => {
     if (cat.minorCategory) return [cat.minorCategory];
     if (cat.middleCategory) return [cat.middleCategory];
     if (cat.majorCategory) return [cat.majorCategory];

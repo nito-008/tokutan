@@ -47,13 +47,13 @@ export const GroupEditor: Component<GroupEditorProps> = (props) => {
       if (isExclude) {
         updateExcludeField("courseNames", [...(props.group.excludeRules?.courseNames ?? [])]);
       } else {
-        updateIncludeField("courseNames", [...(props.group.includeRules.courseNames ?? [])]);
+        updateIncludeField("courseNames", [...(props.group.includeRules?.courseNames ?? [])]);
       }
     } else if (baseField === "prefixes") {
       if (isExclude) {
         updateExcludeField("prefixes", [...(props.group.excludeRules?.prefixes ?? []), ""]);
       } else {
-        updateIncludeField("prefixes", [...(props.group.includeRules.prefixes ?? []), ""]);
+        updateIncludeField("prefixes", [...(props.group.includeRules?.prefixes ?? []), ""]);
       }
     } else if (baseField === "categories") {
       const newEntry: CategoryEntry = { majorCategory: "" };
@@ -64,7 +64,7 @@ export const GroupEditor: Component<GroupEditorProps> = (props) => {
         ]);
       } else {
         updateIncludeField("categories", [
-          ...(props.group.includeRules.categories ?? []),
+          ...(props.group.includeRules?.categories ?? []),
           newEntry,
         ]);
       }
@@ -72,7 +72,7 @@ export const GroupEditor: Component<GroupEditorProps> = (props) => {
   };
 
   const removeIncludeField = (field: keyof IncludeRules) => {
-    const updated = { ...props.group.includeRules };
+    const updated = { ...(props.group.includeRules ?? {}) };
     delete updated[field];
     props.onUpdate({ includeRules: updated });
   };
@@ -167,7 +167,7 @@ export const GroupEditor: Component<GroupEditorProps> = (props) => {
       <div class="space-y-4">
         <div class="space-y-2">
           {/* Include: courseNames */}
-          <Show when={props.group.includeRules.courseNames}>
+          <Show when={props.group.includeRules?.courseNames}>
             <div class="space-y-1">
               <div class="flex items-center justify-between">
                 <span class="rounded bg-muted px-2 py-1 text-xs text-muted-foreground">
@@ -183,14 +183,14 @@ export const GroupEditor: Component<GroupEditorProps> = (props) => {
                 </Button>
               </div>
               <CourseNamesInput
-                courseNames={props.group.includeRules.courseNames ?? []}
+                courseNames={props.group.includeRules?.courseNames ?? []}
                 onUpdate={(courseNames) => updateIncludeField("courseNames", courseNames)}
               />
             </div>
           </Show>
 
           {/* Include: prefixes */}
-          <Show when={props.group.includeRules.prefixes}>
+          <Show when={props.group.includeRules?.prefixes}>
             <div class="space-y-1">
               <div class="flex items-center justify-between">
                 <span class="rounded bg-muted px-2 py-1 text-xs text-muted-foreground">
@@ -206,14 +206,14 @@ export const GroupEditor: Component<GroupEditorProps> = (props) => {
                 </Button>
               </div>
               <PrefixInput
-                prefixes={props.group.includeRules.prefixes ?? []}
+                prefixes={props.group.includeRules?.prefixes ?? []}
                 onUpdate={(prefixes) => updateIncludeField("prefixes", prefixes)}
               />
             </div>
           </Show>
 
           {/* Include: categories */}
-          <Show when={props.group.includeRules.categories}>
+          <Show when={props.group.includeRules?.categories}>
             <div class="space-y-1">
               <div class="flex items-center justify-between">
                 <span class="rounded bg-muted px-2 py-1 text-xs text-muted-foreground">
@@ -228,7 +228,7 @@ export const GroupEditor: Component<GroupEditorProps> = (props) => {
                   <Trash2 class="size-4" />
                 </Button>
               </div>
-              <For each={props.group.includeRules.categories}>
+              <For each={props.group.includeRules?.categories}>
                 {(cat, index) => (
                   <div class="flex items-start gap-2">
                     <div class="flex-1">
@@ -238,7 +238,7 @@ export const GroupEditor: Component<GroupEditorProps> = (props) => {
                         minorCategory={cat.minorCategory}
                         onUpdate={(updates) =>
                           updateCategory(
-                            props.group.includeRules.categories ?? [],
+                            props.group.includeRules?.categories ?? [],
                             index(),
                             updates,
                             false,
@@ -252,7 +252,7 @@ export const GroupEditor: Component<GroupEditorProps> = (props) => {
                         size="sm"
                         class="h-8 w-8 p-0 text-destructive hover:bg-destructive/10 hover:text-destructive"
                         onClick={() =>
-                          removeCategory(props.group.includeRules.categories ?? [], index(), false)
+                          removeCategory(props.group.includeRules?.categories ?? [], index(), false)
                         }
                       >
                         <Trash2 class="size-4" />

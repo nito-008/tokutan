@@ -14,10 +14,10 @@ interface RequiredGroupRowProps {
 }
 
 export const RequiredGroupRow: Component<RequiredGroupRowProps> = (props) => {
-  const categories = () => props.group.includeRules.categories ?? [];
+  const categories = () => props.group.includeRules?.categories ?? [];
 
   const handleAddCategoryRule = () => {
-    const current = props.group.includeRules.categories ?? [];
+    const current = props.group.includeRules?.categories ?? [];
     props.onUpdate({
       includeRules: {
         ...props.group.includeRules,

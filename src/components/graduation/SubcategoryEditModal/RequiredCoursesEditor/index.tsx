@@ -33,7 +33,7 @@ export const RequiredCoursesEditor: Component<RequiredCoursesEditorProps> = (pro
       ]);
     } else if (
       props.groups[0] &&
-      (!props.groups[0].includeRules.courseNames ||
+      (!props.groups[0].includeRules?.courseNames ||
         props.groups[0].includeRules.courseNames.length === 0)
     ) {
       props.setGroups(0, "includeRules", { ...props.groups[0].includeRules, courseNames: [""] });
@@ -43,7 +43,7 @@ export const RequiredCoursesEditor: Component<RequiredCoursesEditorProps> = (pro
   const courseNames = () => {
     const group = props.groups[0];
     if (!group) return [""];
-    const names = group.includeRules.courseNames;
+    const names = group.includeRules?.courseNames;
     if (!names || names.length === 0) return [""];
     return normalizeCourseIds(names);
   };

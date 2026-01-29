@@ -13,7 +13,7 @@ export const RequirementGroupSchema = v.object({
   requiredCredits: v.optional(v.pipe(v.number(), v.minValue(0))),
   minCredits: v.optional(v.pipe(v.number(), v.minValue(0))),
   maxCredits: v.optional(v.pipe(v.number(), v.minValue(0))),
-  includeRules: IncludeRulesSchema,
+  includeRules: v.optional(IncludeRulesSchema),
   excludeRules: v.optional(ExcludeRulesSchema),
 });
 

@@ -269,8 +269,7 @@
               "includeRules": {
                 "categories": [
                   {
-                    "majorCategory": "外国語",
-                    "middleCategory": "英語"
+                    "majorCategory": "外国語"
                   }
                 ]
               },
@@ -327,6 +326,27 @@
           "maxCredits": 15,
           "groups": [
             {
+              "id": "group-1769494514703",
+              "minCredits": 0,
+              "excludeRules": {
+                "prefixes": [
+                  "FA",
+                  "FG",
+                  "FF2",
+                  "FF3",
+                  "FF4",
+                  "FF5",
+                  "GB2",
+                  "GB3",
+                  "GB4",
+                  "FBA14",
+                  "FBA15",
+                  "FBA16",
+                  "GA15"
+                ]
+              }
+            },
+            {
               "id": "group-1769490983361",
               "minCredits": 0,
               "includeRules": {
@@ -363,17 +383,6 @@
                 "categories": [
                   {
                     "majorCategory": "自由科目（特設）"
-                  }
-                ]
-              }
-            },
-            {
-              "id": "group-1769494514703",
-              "minCredits": 0,
-              "includeRules": {
-                "categories": [
-                  {
-                    "majorCategory": "外国語"
                   }
                 ]
               }
