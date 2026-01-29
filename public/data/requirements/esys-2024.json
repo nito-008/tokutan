@@ -8,7 +8,7 @@
   "version": "1.0.0",
   "isDefault": true,
   "createdAt": "2026-01-26T19:29:51.029Z",
-  "updatedAt": "2026-01-28T00:00:00.000Z",
+  "updatedAt": "2026-01-29T12:41:13.834Z",
   "categories": [
     {
       "id": "specialized",
@@ -140,7 +140,82 @@
             {
               "id": "required-courses",
               "includeRules": {
-                "courseNames": []
+                "courseNames": [""]
+              }
+            },
+            {
+              "id": "group-1769690334977",
+              "requiredCredits": 2,
+              "includeRules": {
+                "categories": [
+                  {
+                    "majorCategory": "総合科目",
+                    "middleCategory": "ファーストイヤーセミナー"
+                  },
+                  {
+                    "majorCategory": "総合科目",
+                    "middleCategory": "学問への誘い"
+                  }
+                ]
+              }
+            },
+            {
+              "id": "group-1769690391095",
+              "requiredCredits": 3,
+              "includeRules": {
+                "categories": [
+                  {
+                    "majorCategory": "体育",
+                    "middleCategory": "人文、比文、日日、応理、工シス、社工、総学1,2組（春学期1年次）"
+                  },
+                  {
+                    "majorCategory": "体育",
+                    "middleCategory": "人文、比文、日日、応理、工シス、社工、総学1,2組（秋学期1年次）"
+                  },
+                  {
+                    "majorCategory": "体育",
+                    "middleCategory": "国際、生物、地球、応理、工シス、看護（春学期2年次）"
+                  },
+                  {
+                    "majorCategory": "体育",
+                    "middleCategory": "国際、生物、地球、応理、工シス、看護（秋学期2年次）"
+                  },
+                  {
+                    "majorCategory": "体育",
+                    "middleCategory": "工シス、応理（春学期3年次）"
+                  },
+                  {
+                    "majorCategory": "体育",
+                    "middleCategory": "工シス、応理（秋学期3年次）"
+                  },
+                  {
+                    "majorCategory": "体育",
+                    "middleCategory": "工シス、応理3年次（必修・集中）"
+                  }
+                ]
+              }
+            },
+            {
+              "id": "group-1769690452574",
+              "requiredCredits": 4,
+              "includeRules": {
+                "categories": [
+                  {
+                    "majorCategory": "外国語",
+                    "middleCategory": "英語"
+                  }
+                ]
+              }
+            },
+            {
+              "id": "group-1769690466434",
+              "requiredCredits": 4,
+              "includeRules": {
+                "categories": [
+                  {
+                    "majorCategory": "情報"
+                  }
+                ]
               }
             }
           ]
@@ -156,8 +231,10 @@
               "minCredits": 1,
               "includeRules": {
                 "categories": [
-                  { "majorCategory": "総合科目", "middleCategory": "学士基盤科目" },
-                  { "majorCategory": "総合科目", "middleCategory": "学士基盤科目-高年次向け-" }
+                  {
+                    "majorCategory": "総合科目",
+                    "middleCategory": "学士基盤科目-高年次向け-"
+                  }
                 ]
               },
               "maxCredits": 3
@@ -167,19 +244,35 @@
               "minCredits": 0,
               "includeRules": {
                 "categories": [
-                  { "majorCategory": "体育", "middleCategory": "全学年対象自由科目（講義）" },
-                  { "majorCategory": "体育", "middleCategory": "全学年対象自由科目（演習）" },
-                  { "majorCategory": "体育", "middleCategory": "全学年対象自由科目（通年実技）" },
-                  { "majorCategory": "体育", "middleCategory": "全学年対象自由科目（集中実技）" }
-                ]
+                  {
+                    "majorCategory": "体育",
+                    "middleCategory": "全学年対象自由科目（講義）"
+                  }
+                ],
+                "courseNames": [],
+                "prefixes": [""]
               },
-              "maxCredits": 1
+              "maxCredits": 1,
+              "excludeRules": {
+                "prefixes": [""],
+                "courseNames": [],
+                "categories": [
+                  {
+                    "majorCategory": ""
+                  }
+                ]
+              }
             },
             {
               "id": "group-1769490790479",
               "minCredits": 0,
               "includeRules": {
-                "categories": [{ "majorCategory": "外国語", "middleCategory": "英語" }]
+                "categories": [
+                  {
+                    "majorCategory": "外国語",
+                    "middleCategory": "英語"
+                  }
+                ]
               },
               "maxCredits": 4
             },
@@ -187,7 +280,11 @@
               "id": "group-1769490807117",
               "minCredits": 0,
               "includeRules": {
-                "categories": [{ "majorCategory": "芸術" }]
+                "categories": [
+                  {
+                    "majorCategory": "芸術"
+                  }
+                ]
               },
               "maxCredits": 1
             },
@@ -195,7 +292,11 @@
               "id": "group-1769490833766",
               "minCredits": 0,
               "includeRules": {
-                "categories": [{ "majorCategory": "国語" }]
+                "categories": [
+                  {
+                    "majorCategory": "国語"
+                  }
+                ]
               },
               "maxCredits": 1
             }
@@ -237,28 +338,44 @@
               "id": "group-1769491020908",
               "minCredits": 0,
               "includeRules": {
-                "categories": [{ "majorCategory": "博物館" }]
+                "categories": [
+                  {
+                    "majorCategory": "博物館"
+                  }
+                ]
               }
             },
             {
               "id": "group-1769491030034",
               "minCredits": 0,
               "includeRules": {
-                "categories": [{ "majorCategory": "教職" }]
+                "categories": [
+                  {
+                    "majorCategory": "教職"
+                  }
+                ]
               }
             },
             {
               "id": "group-1769491041512",
               "minCredits": 0,
               "includeRules": {
-                "categories": [{ "majorCategory": "自由科目（特設）" }]
+                "categories": [
+                  {
+                    "majorCategory": "自由科目（特設）"
+                  }
+                ]
               }
             },
             {
               "id": "group-1769494514703",
               "minCredits": 0,
               "includeRules": {
-                "categories": [{ "majorCategory": "外国語" }]
+                "categories": [
+                  {
+                    "majorCategory": "外国語"
+                  }
+                ]
               }
             }
           ]
