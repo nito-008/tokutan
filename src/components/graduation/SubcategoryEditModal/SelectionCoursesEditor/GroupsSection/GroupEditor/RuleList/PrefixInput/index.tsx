@@ -36,7 +36,7 @@ export const PrefixInput: Component<PrefixInputProps> = (props) => {
       onInput={(e) => setLocalValue(e.currentTarget.value)}
       onFocus={() => setIsFocused(true)}
       onBlur={handleBlur}
-      placeholder="科目番号の先頭 (例: FG, FA, GB)"
+      placeholder="科目番号の先頭 (例: FG)"
     />
   );
 };

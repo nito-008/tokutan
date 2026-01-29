@@ -1,9 +1,3 @@
-export const parseCourseGroup = (value: string) =>
-  value
-    .split(",")
-    .map((id) => id.trim())
-    .filter((id) => id);
-
 export const uniqueCourseIds = (ids: string[]) => {
   const seen = new Set<string>();
   const result: string[] = [];
@@ -13,25 +7,6 @@ export const uniqueCourseIds = (ids: string[]) => {
     result.push(id);
   }
   return result;
-};
-
-export const formatCourseGroup = (ids: string[]) => ids.join(", ");
-
-export const normalizeCourseGroup = (value: string) =>
-  formatCourseGroup(uniqueCourseIds(parseCourseGroup(value)));
-
-export const extractSuggestionToken = (value: string) => {
-  const parts = value.split(",");
-  return (parts[parts.length - 1] ?? "").trim();
-};
-
-export const dropSearchToken = (value: string) => {
-  const parts = value.split(",").map((part) => part.trim());
-  const lastToken = parts[parts.length - 1] ?? "";
-  if (lastToken) {
-    parts.pop();
-  }
-  return parts.filter((part) => part);
 };
 
 export const normalizeCourseIds = (ids: string[]) => {
@@ -57,11 +32,10 @@ export const formatCourseLabel = (courseId: string, courseNames: Map<string, str
 };
 
 export const formatCourseGroupLabel = (
-  value: string,
+  ids: string[],
   courseNames: Map<string, string>,
   isLookupLoading: boolean,
 ) => {
-  const ids = parseCourseGroup(value);
   if (ids.length === 0) return "";
 
   // グループ内の科目名を取得
