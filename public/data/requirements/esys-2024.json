@@ -8,7 +8,7 @@
   "version": "1.0.0",
   "isDefault": true,
   "createdAt": "2026-01-26T19:29:51.029Z",
-  "updatedAt": "2026-01-29T12:41:13.834Z",
+  "updatedAt": "2026-01-29T14:53:40.837Z",
   "categories": [
     {
       "id": "specialized",
@@ -231,6 +231,10 @@
               "minCredits": 1,
               "includeRules": {
                 "categories": [
+                  {
+                    "majorCategory": "総合科目",
+                    "middleCategory": "学士基盤科目"
+                  },
                   {
                     "majorCategory": "総合科目",
                     "middleCategory": "学士基盤科目-高年次向け-"
