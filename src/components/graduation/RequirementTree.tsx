@@ -197,6 +197,9 @@ interface SubcategoryPanelProps {
 
 const SubcategoryPanel: Component<SubcategoryPanelProps> = (props) => {
   const groupDefinitions: RequirementGroup[] = props.definition?.groups ?? [];
+  const hasCourseNamesRule = (group?: RequirementGroup): boolean => {
+    return Array.isArray(group?.includeRules?.courseNames);
+  };
 
   return (
     <div class="border border-border rounded-xl p-3 space-y-4">
@@ -229,34 +232,38 @@ const SubcategoryPanel: Component<SubcategoryPanelProps> = (props) => {
       <div class="space-y-4">
         {props.subcategory.subcategoryType === "required" ? (
           <div class="space-y-4">
-            {/* 必修科目リスト */}
-            <div class="space-y-2">
-              <Separator />
-              <div class="space-y-1">
-                <For each={props.subcategory.matchedCourses}>
-                  {(course) => <CourseItem course={course} />}
-                </For>
-                <Show
-                  when={
-                    props.subcategory.matchedCourses.length === 0 &&
-                    props.subcategory.groupStatuses.length === 0
-                  }
-                >
-                  <p class="text-sm text-muted-foreground">該当する科目がありません</p>
-                </Show>
-              </div>
-            </div>
-            {/* グループ条件 */}
-            <For each={props.subcategory.groupStatuses}>
-              {(groupStatus) => (
-                <ConditionBlock
-                  groupStatus={groupStatus}
-                  groupDefinition={groupDefinitions.find(
+            <Show
+              when={props.subcategory.groupStatuses.length > 0}
+              fallback={
+                <div class="space-y-2">
+                  <Separator />
+                  <div class="space-y-1">
+                    <For each={props.subcategory.matchedCourses}>
+                      {(course) => <CourseItem course={course} />}
+                    </For>
+                    <Show when={props.subcategory.matchedCourses.length === 0}>
+                      <p class="text-sm text-muted-foreground">該当する科目がありません</p>
+                    </Show>
+                  </div>
+                </div>
+              }
+            >
+              <For each={props.subcategory.groupStatuses}>
+                {(groupStatus) => {
+                  const groupDefinition = groupDefinitions.find(
                     (group) => group.id === groupStatus.groupId,
-                  )}
-                />
-              )}
-            </For>
+                  );
+                  const showHeader = !hasCourseNamesRule(groupDefinition);
+                  return (
+                    <ConditionBlock
+                      groupStatus={groupStatus}
+                      groupDefinition={groupDefinition}
+                      showHeader={showHeader}
+                    />
+                  );
+                }}
+              </For>
+            </Show>
           </div>
         ) : (
           <div class="space-y-4">
@@ -280,6 +287,7 @@ const SubcategoryPanel: Component<SubcategoryPanelProps> = (props) => {
 interface ConditionBlockProps {
   groupStatus: GroupStatus;
   groupDefinition?: RequirementGroup;
+  showHeader?: boolean;
 }
 
 const ConditionBlock: Component<ConditionBlockProps> = (props) => {
@@ -287,17 +295,19 @@ const ConditionBlock: Component<ConditionBlockProps> = (props) => {
 
   return (
     <div class="space-y-2">
-      <div class="flex items-center gap-3 text-sm">
-        <span class="whitespace-pre-line">{description}</span>
-        <span class="text-xs text-muted-foreground ml-auto mr-4">
-          {formatCreditDisplay(
-            props.groupStatus.earnedCredits,
-            props.groupStatus.requiredCredits,
-            props.groupStatus.maxCredits,
-          )}
-        </span>
-      </div>
-      <Separator />
+      <Show when={props.showHeader !== false}>
+        <div class="flex items-center gap-3 text-sm">
+          <span class="whitespace-pre-line">{description}</span>
+          <span class="text-xs text-muted-foreground ml-auto mr-4">
+            {formatCreditDisplay(
+              props.groupStatus.earnedCredits,
+              props.groupStatus.requiredCredits,
+              props.groupStatus.maxCredits,
+            )}
+          </span>
+        </div>
+        <Separator />
+      </Show>
       <div class="space-y-1">
         <For each={props.groupStatus.matchedCourses}>
           {(course) => <CourseItem course={course} />}
