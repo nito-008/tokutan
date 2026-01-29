@@ -20,25 +20,21 @@
           "groups": [
             {
               "id": "required-courses",
-              "includeRules": [
-                {
-                  "id": "required-courses-rule",
-                  "type": "courses",
-                  "courseNames": [
-                    "プログラミング序論C",
-                    "プログラミング序論D",
-                    "工学システム基礎実験A",
-                    "工学システム基礎実験B",
-                    "知的・機能工学システム実験",
-                    "卒業研究A",
-                    "卒業研究B",
-                    "工学者のための倫理",
-                    "専門英語A",
-                    "専門英語B",
-                    "専門英語演習"
-                  ]
-                }
-              ]
+              "includeRules": {
+                "courseNames": [
+                  "プログラミング序論C",
+                  "プログラミング序論D",
+                  "工学システム基礎実験A",
+                  "工学システム基礎実験B",
+                  "知的・機能工学システム実験",
+                  "卒業研究A",
+                  "卒業研究B",
+                  "工学者のための倫理",
+                  "専門英語A",
+                  "専門英語B",
+                  "専門英語演習"
+                ]
+              }
             }
           ]
         },
@@ -51,82 +47,37 @@
             {
               "id": "fg-ff-gb-group",
               "minCredits": 6,
-              "includeRules": [
-                {
-                  "id": "fg-prefix",
-                  "type": "prefix",
-                  "prefixes": ["FG11"]
-                },
-                {
-                  "id": "ff-prefix",
-                  "type": "prefix",
-                  "prefixes": ["FG21"]
-                }
-              ]
+              "includeRules": {
+                "prefixes": ["FG11", "FG21"]
+              }
             },
             {
               "id": "group-1769460882009",
               "minCredits": 1,
-              "includeRules": [
-                {
-                  "id": "rule-1769460893189",
-                  "type": "prefix",
-                  "prefixes": ["FG12"]
-                },
-                {
-                  "id": "rule-1769460893869",
-                  "type": "prefix",
-                  "prefixes": ["FG22"]
-                }
-              ]
+              "includeRules": {
+                "prefixes": ["FG12", "FG22"]
+              }
             },
             {
               "id": "group-1769460901959",
               "minCredits": 1,
-              "includeRules": [
-                {
-                  "id": "rule-1769460906269",
-                  "type": "prefix",
-                  "prefixes": ["FG13"]
-                },
-                {
-                  "id": "rule-1769460910639",
-                  "type": "prefix",
-                  "prefixes": ["FG23"]
-                }
-              ]
+              "includeRules": {
+                "prefixes": ["FG13", "FG23"]
+              }
             },
             {
               "id": "group-1769460916548",
               "minCredits": 16,
-              "includeRules": [
-                {
-                  "id": "rule-1769460922138",
-                  "type": "prefix",
-                  "prefixes": ["FG17"]
-                },
-                {
-                  "id": "rule-1769460925348",
-                  "type": "prefix",
-                  "prefixes": ["FG24"]
-                },
-                {
-                  "id": "rule-1769460928658",
-                  "type": "prefix",
-                  "prefixes": ["FG25"]
-                }
-              ]
+              "includeRules": {
+                "prefixes": ["FG17", "FG24", "FG25"]
+              }
             },
             {
               "id": "group-1769460932698",
               "minCredits": 0,
-              "includeRules": [
-                {
-                  "id": "rule-1769460953608",
-                  "type": "prefix",
-                  "prefixes": ["FG", "FF2", "FF3", "FF4", "FF5", "GB2", "GB3", "GB4", "FA00"]
-                }
-              ]
+              "includeRules": {
+                "prefixes": ["FG", "FF2", "FF3", "FF4", "FF5", "GB2", "GB3", "GB4", "FA00"]
+              }
             }
           ]
         }
@@ -142,41 +93,37 @@
           "groups": [
             {
               "id": "required-courses",
-              "includeRules": [
-                {
-                  "id": "required-courses-rule",
-                  "type": "courses",
-                  "courseNames": [
-                    "数学リテラシー1",
-                    "数学リテラシー2",
-                    "線形代数1",
-                    "線形代数2",
-                    "線形代数3",
-                    "微積分1",
-                    "微積分2",
-                    "微積分3",
-                    "力学1",
-                    "力学2",
-                    "力学3",
-                    "電磁気学1",
-                    "電磁気学2",
-                    "電磁気学3",
-                    "工学システム原論",
-                    "線形代数総論A",
-                    "線形代数総論B",
-                    "解析学総論",
-                    "常微分方程式",
-                    "力学総論",
-                    "電磁気学総論",
-                    "材料力学基礎",
-                    "熱力学基礎",
-                    "流体力学基礎",
-                    "複素解析",
-                    "プログラミング序論A",
-                    "プログラミング序論B"
-                  ]
-                }
-              ]
+              "includeRules": {
+                "courseNames": [
+                  "数学リテラシー1",
+                  "数学リテラシー2",
+                  "線形代数1",
+                  "線形代数2",
+                  "線形代数3",
+                  "微積分1",
+                  "微積分2",
+                  "微積分3",
+                  "力学1",
+                  "力学2",
+                  "力学3",
+                  "電磁気学1",
+                  "電磁気学2",
+                  "電磁気学3",
+                  "工学システム原論",
+                  "線形代数総論A",
+                  "線形代数総論B",
+                  "解析学総論",
+                  "常微分方程式",
+                  "力学総論",
+                  "電磁気学総論",
+                  "材料力学基礎",
+                  "熱力学基礎",
+                  "流体力学基礎",
+                  "複素解析",
+                  "プログラミング序論A",
+                  "プログラミング序論B"
+                ]
+              }
             }
           ]
         }
@@ -192,13 +139,9 @@
           "groups": [
             {
               "id": "required-courses",
-              "includeRules": [
-                {
-                  "id": "required-courses-rule",
-                  "type": "courses",
-                  "courseNames": []
-                }
-              ]
+              "includeRules": {
+                "courseNames": []
+              }
             }
           ]
         },
@@ -211,88 +154,49 @@
             {
               "id": "group-1769490412309",
               "minCredits": 1,
-              "includeRules": [
-                {
-                  "id": "rule-1769490413726",
-                  "type": "category",
-                  "majorCategory": "総合科目",
-                  "middleCategory": "学士基盤科目"
-                },
-                {
-                  "id": "rule-1769490427117",
-                  "type": "category",
-                  "majorCategory": "総合科目",
-                  "middleCategory": "学士基盤科目-高年次向け-"
-                }
-              ],
+              "includeRules": {
+                "categories": [
+                  { "majorCategory": "総合科目", "middleCategory": "学士基盤科目" },
+                  { "majorCategory": "総合科目", "middleCategory": "学士基盤科目-高年次向け-" }
+                ]
+              },
               "maxCredits": 3
             },
             {
               "id": "group-1769490435346",
               "minCredits": 0,
-              "includeRules": [
-                {
-                  "id": "rule-1769490437267",
-                  "type": "category",
-                  "majorCategory": "体育",
-                  "middleCategory": "全学年対象自由科目（講義）"
-                },
-                {
-                  "id": "rule-1769490737428",
-                  "type": "category",
-                  "majorCategory": "体育",
-                  "middleCategory": "全学年対象自由科目（演習）"
-                },
-                {
-                  "id": "rule-1769490746446",
-                  "type": "category",
-                  "majorCategory": "体育",
-                  "middleCategory": "全学年対象自由科目（通年実技）"
-                },
-                {
-                  "id": "rule-1769490747142",
-                  "type": "category",
-                  "majorCategory": "体育",
-                  "middleCategory": "全学年対象自由科目（集中実技）"
-                }
-              ],
+              "includeRules": {
+                "categories": [
+                  { "majorCategory": "体育", "middleCategory": "全学年対象自由科目（講義）" },
+                  { "majorCategory": "体育", "middleCategory": "全学年対象自由科目（演習）" },
+                  { "majorCategory": "体育", "middleCategory": "全学年対象自由科目（通年実技）" },
+                  { "majorCategory": "体育", "middleCategory": "全学年対象自由科目（集中実技）" }
+                ]
+              },
               "maxCredits": 1
             },
             {
               "id": "group-1769490790479",
               "minCredits": 0,
-              "includeRules": [
-                {
-                  "id": "rule-1769490795835",
-                  "type": "category",
-                  "majorCategory": "外国語",
-                  "middleCategory": "英語"
-                }
-              ],
+              "includeRules": {
+                "categories": [{ "majorCategory": "外国語", "middleCategory": "英語" }]
+              },
               "maxCredits": 4
             },
             {
               "id": "group-1769490807117",
               "minCredits": 0,
-              "includeRules": [
-                {
-                  "id": "rule-1769490829838",
-                  "type": "category",
-                  "majorCategory": "芸術"
-                }
-              ],
+              "includeRules": {
+                "categories": [{ "majorCategory": "芸術" }]
+              },
               "maxCredits": 1
             },
             {
               "id": "group-1769490833766",
               "minCredits": 0,
-              "includeRules": [
-                {
-                  "id": "rule-1769490837749",
-                  "type": "category",
-                  "majorCategory": "国語"
-                }
-              ],
+              "includeRules": {
+                "categories": [{ "majorCategory": "国語" }]
+              },
               "maxCredits": 1
             }
           ]
@@ -309,13 +213,9 @@
           "groups": [
             {
               "id": "required-courses",
-              "includeRules": [
-                {
-                  "id": "required-courses-rule",
-                  "type": "courses",
-                  "courseNames": []
-                }
-              ]
+              "includeRules": {
+                "courseNames": []
+              }
             }
           ]
         },
@@ -328,58 +228,38 @@
             {
               "id": "group-1769490983361",
               "minCredits": 0,
-              "includeRules": [
-                {
-                  "id": "rule-1769491000689",
-                  "type": "courses",
-                  "courseNames": ["工学システム概論"]
-                }
-              ],
+              "includeRules": {
+                "courseNames": ["工学システム概論"]
+              },
               "maxCredits": 1
             },
             {
               "id": "group-1769491020908",
               "minCredits": 0,
-              "includeRules": [
-                {
-                  "id": "rule-1769491024959",
-                  "type": "category",
-                  "majorCategory": "博物館"
-                }
-              ]
+              "includeRules": {
+                "categories": [{ "majorCategory": "博物館" }]
+              }
             },
             {
               "id": "group-1769491030034",
               "minCredits": 0,
-              "includeRules": [
-                {
-                  "id": "rule-1769491032730",
-                  "type": "category",
-                  "majorCategory": "教職"
-                }
-              ]
+              "includeRules": {
+                "categories": [{ "majorCategory": "教職" }]
+              }
             },
             {
               "id": "group-1769491041512",
               "minCredits": 0,
-              "includeRules": [
-                {
-                  "id": "rule-1769491044941",
-                  "type": "category",
-                  "majorCategory": "自由科目（特設）"
-                }
-              ]
+              "includeRules": {
+                "categories": [{ "majorCategory": "自由科目（特設）" }]
+              }
             },
             {
               "id": "group-1769494514703",
               "minCredits": 0,
-              "includeRules": [
-                {
-                  "id": "rule-1769494526690",
-                  "type": "category",
-                  "majorCategory": "外国語"
-                }
-              ]
+              "includeRules": {
+                "categories": [{ "majorCategory": "外国語" }]
+              }
             }
           ]
         }

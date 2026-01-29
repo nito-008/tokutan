@@ -106,16 +106,15 @@ import { GraduationRequirementsSchema, type GraduationRequirements } from "@/typ
 
 ### ユニオン型のサポート
 
-Valibotの `variant` を使用して、判別可能なユニオン型を定義：
+IncludeRules / ExcludeRules はフラットなオブジェクト構造：
 
 ```typescript
-// GroupRule: 4種類のルール
-export const GroupRuleSchema = v.variant("type", [
-  SpecificRuleSchema,    // type: "specific"
-  PrefixRuleSchema,      // type: "prefix"
-  ExcludeRuleSchema,     // type: "exclude"
-  CategoryRuleSchema,    // type: "category"
-]);
+// IncludeRules: 対象科目を定義するルールオブジェクト
+export const IncludeRulesSchema = v.object({
+  courseNames: v.optional(v.array(v.string())),
+  prefixes: v.optional(v.array(v.string())),
+  categories: v.optional(v.array(CategoryEntrySchema)),
+});
 ```
 
 ### バリデーションルール

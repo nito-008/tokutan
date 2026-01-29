@@ -1,7 +1,6 @@
 import Plus from "lucide-solid/icons/plus";
 import { type Component, For, Show } from "solid-js";
 import type { SetStoreFunction } from "solid-js/store";
-import { reconcile } from "solid-js/store";
 import { Button } from "~/components/ui/button";
 import type { RequirementGroup } from "~/types";
 import { GroupEditor } from "./GroupEditor";
@@ -19,14 +18,8 @@ export const GroupsSection: Component<GroupsSectionProps> = (props) => {
     if ("maxCredits" in updates) {
       props.setGroups(index, "maxCredits", updates.maxCredits);
     }
-    if ("includeRules" in updates) {
-      props.setGroups(
-        index,
-        "includeRules",
-        reconcile(updates.includeRules ?? [], {
-          key: "id",
-        }),
-      );
+    if ("includeRules" in updates && updates.includeRules) {
+      props.setGroups(index, "includeRules", updates.includeRules);
     }
     if ("excludeRules" in updates) {
       props.setGroups(index, "excludeRules", updates.excludeRules);
@@ -37,7 +30,7 @@ export const GroupsSection: Component<GroupsSectionProps> = (props) => {
     const newGroup: RequirementGroup = {
       id: `group-${Date.now()}`,
       minCredits: 0,
-      includeRules: [],
+      includeRules: {},
     };
     props.setGroups((prev) => [...prev, newGroup]);
   };

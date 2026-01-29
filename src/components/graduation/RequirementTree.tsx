@@ -13,10 +13,8 @@ import { Separator } from "~/components/ui/separator";
 import { getSubcategoryLabel } from "~/lib/requirements/subcategory";
 import type {
   CategoryStatus,
-  ExcludeRule,
   GraduationRequirements,
   GroupStatus,
-  IncludeRule,
   MatchedCourse,
   RequirementCategory,
   RequirementGroup,
@@ -317,99 +315,28 @@ const formatGroupConditionLabel = (group?: RequirementGroup): string => {
     return "条件情報なし";
   }
 
-  // Include rules
-  const prefixNames = Array.from(
-    new Set(
-      group.includeRules
-        .filter(
-          (rule): rule is IncludeRule & { type: "prefix"; prefixes: string[] } =>
-            rule.type === "prefix",
-        )
-        .flatMap((rule) => rule.prefixes.filter(Boolean)),
-    ),
-  );
+  const rules = group.includeRules;
+  const exclude = group.excludeRules;
 
-  const specificCourseNames = Array.from(
-    new Set(
-      group.includeRules
-        .filter(
-          (
-            rule,
-          ): rule is IncludeRule & {
-            type: "courses";
-            courseNames: string[];
-          } => rule.type === "courses",
-        )
-        .flatMap((rule) => rule.courseNames.filter(Boolean)),
-    ),
-  );
+  // Include conditions
+  const prefixNames = (rules.prefixes ?? []).filter(Boolean);
+  const specificCourseNames = (rules.courseNames ?? []).filter(Boolean);
+  const categoryNames = (rules.categories ?? []).flatMap((cat) => {
+    if (cat.minorCategory) return [cat.minorCategory];
+    if (cat.middleCategory) return [cat.middleCategory];
+    if (cat.majorCategory) return [cat.majorCategory];
+    return [];
+  });
 
-  const categoryNames = Array.from(
-    new Set(
-      group.includeRules
-        .filter(
-          (
-            rule,
-          ): rule is IncludeRule & {
-            type: "category";
-            majorCategory?: string;
-            middleCategory?: string;
-            minorCategory?: string;
-          } => rule.type === "category",
-        )
-        .flatMap((rule) => {
-          if (rule.minorCategory) return [rule.minorCategory];
-          if (rule.middleCategory) return [rule.middleCategory];
-          if (rule.majorCategory) return [rule.majorCategory];
-          return [];
-        }),
-    ),
-  );
-
-  // Exclude rules
-  const excludePrefixes = Array.from(
-    new Set(
-      (group.excludeRules ?? [])
-        .filter(
-          (rule): rule is ExcludeRule & { type: "prefix"; prefixes: string[] } =>
-            rule.type === "prefix",
-        )
-        .flatMap((rule) => rule.prefixes.filter(Boolean)),
-    ),
-  );
-
-  const excludeCourseNames = Array.from(
-    new Set(
-      (group.excludeRules ?? [])
-        .filter(
-          (rule): rule is ExcludeRule & { type: "courses"; courseNames: string[] } =>
-            rule.type === "courses",
-        )
-        .flatMap((rule) => rule.courseNames.filter(Boolean)),
-    ),
-  );
-
-  const excludeCategoryNames = Array.from(
-    new Set(
-      (group.excludeRules ?? [])
-        .filter(
-          (
-            rule,
-          ): rule is ExcludeRule & {
-            type: "category";
-            majorCategory?: string;
-            middleCategory?: string;
-            minorCategory?: string;
-          } => rule.type === "category",
-        )
-        .flatMap((rule) => {
-          if (rule.minorCategory) return [rule.minorCategory];
-          if (rule.middleCategory) return [rule.middleCategory];
-          if (rule.majorCategory) return [rule.majorCategory];
-          return [];
-        }),
-    ),
-  );
+  // Exclude conditions
+  const excludePrefixes = (exclude?.prefixes ?? []).filter(Boolean);
+  const excludeCourseNames = (exclude?.courseNames ?? []).filter(Boolean);
+  const excludeCategoryNames = (exclude?.categories ?? []).flatMap((cat) => {
+    if (cat.minorCategory) return [cat.minorCategory];
+    if (cat.middleCategory) return [cat.middleCategory];
+    if (cat.majorCategory) return [cat.majorCategory];
+    return [];
+  });
 
   const parts: string[] = [];
 

@@ -26,37 +26,26 @@ export const RequiredCoursesEditor: Component<RequiredCoursesEditorProps> = (pro
       props.setGroups([
         {
           id: "required-courses",
-          includeRules: [
-            {
-              id: "required-courses-rule",
-              type: "courses",
-              courseNames: [""],
-            },
-          ],
+          includeRules: {
+            courseNames: [""],
+          },
         },
       ]);
     } else if (
       props.groups[0] &&
-      (!props.groups[0].includeRules ||
-        props.groups[0].includeRules.length === 0 ||
-        props.groups[0].includeRules[0]?.type !== "courses")
+      (!props.groups[0].includeRules.courseNames ||
+        props.groups[0].includeRules.courseNames.length === 0)
     ) {
-      props.setGroups(0, "includeRules", [
-        {
-          id: "required-courses-rule",
-          type: "courses",
-          courseNames: [""],
-        },
-      ]);
+      props.setGroups(0, "includeRules", { ...props.groups[0].includeRules, courseNames: [""] });
     }
   });
 
   const courseNames = () => {
     const group = props.groups[0];
-    if (!group || !group.includeRules || group.includeRules.length === 0) return [""];
-    const rule = group.includeRules[0];
-    if (rule?.type !== "courses") return [""];
-    return normalizeCourseIds(rule.courseNames.length > 0 ? rule.courseNames : [""]);
+    if (!group) return [""];
+    const names = group.includeRules.courseNames;
+    if (!names || names.length === 0) return [""];
+    return normalizeCourseIds(names);
   };
 
   // ソート対象のID（プレースホルダー除外）
@@ -78,9 +67,9 @@ export const RequiredCoursesEditor: Component<RequiredCoursesEditorProps> = (pro
       const sortable = items.slice(0, -1);
       const [moved] = sortable.splice(fromIndex, 1);
       sortable.splice(toIndex, 0, moved);
-      const rule = props.groups[0]?.includeRules[0];
-      if (rule && rule.type === "courses") {
-        props.setGroups(0, "includeRules", 0, { ...rule, courseNames: [...sortable, ""] });
+      const rules = props.groups[0]?.includeRules;
+      if (rules) {
+        props.setGroups(0, "includeRules", { ...rules, courseNames: [...sortable, ""] });
       }
     }
   };
@@ -88,17 +77,17 @@ export const RequiredCoursesEditor: Component<RequiredCoursesEditorProps> = (pro
   const handleUpdateCourseId = (index: number, value: string, skipNormalize = false) => {
     const updated = courseNames().map((id, i) => (i === index ? value : id));
     const normalized = skipNormalize ? updated : normalizeCourseIds(updated);
-    const rule = props.groups[0]?.includeRules[0];
-    if (rule && rule.type === "courses") {
-      props.setGroups(0, "includeRules", 0, { ...rule, courseNames: normalized });
+    const rules = props.groups[0]?.includeRules;
+    if (rules) {
+      props.setGroups(0, "includeRules", { ...rules, courseNames: normalized });
     }
   };
 
   const handleRemoveCourseId = (index: number) => {
     const filtered = courseNames().filter((_, i) => i !== index);
-    const rule = props.groups[0]?.includeRules[0];
-    if (rule && rule.type === "courses") {
-      props.setGroups(0, "includeRules", 0, { ...rule, courseNames: normalizeCourseIds(filtered) });
+    const rules = props.groups[0]?.includeRules;
+    if (rules) {
+      props.setGroups(0, "includeRules", { ...rules, courseNames: normalizeCourseIds(filtered) });
     }
   };
 

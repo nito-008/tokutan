@@ -1,8 +1,8 @@
 import Plus from "lucide-solid/icons/plus";
 import { type Component, For, Show } from "solid-js";
-import { reconcile, type SetStoreFunction } from "solid-js/store";
+import type { SetStoreFunction } from "solid-js/store";
 import { Button } from "~/components/ui/button";
-import type { IncludeRule, RequirementGroup } from "~/types";
+import type { RequirementGroup } from "~/types";
 import { RequiredGroupRow } from "./RequiredGroupRow";
 
 interface RequiredGroupsEditorProps {
@@ -14,19 +14,15 @@ export const RequiredGroupsEditor: Component<RequiredGroupsEditorProps> = (props
   const categoryGroups = () =>
     props.groups
       .map((group, index) => ({ group, originalIndex: index }))
-      .filter(({ group }) => group.includeRules[0]?.type === "category");
+      .filter(({ group }) => (group.includeRules.categories?.length ?? 0) > 0);
 
   const handleAddGroup = () => {
     const newGroup: RequirementGroup = {
       id: `group-${Date.now()}`,
       requiredCredits: 0,
-      includeRules: [
-        {
-          id: `rule-${Date.now()}`,
-          type: "category",
-          majorCategory: "",
-        } satisfies IncludeRule,
-      ],
+      includeRules: {
+        categories: [{ majorCategory: "" }],
+      },
     };
 
     props.setGroups((prev) => [...prev, newGroup]);
@@ -42,23 +38,11 @@ export const RequiredGroupsEditor: Component<RequiredGroupsEditorProps> = (props
     if ("maxCredits" in updates) {
       props.setGroups(index, "maxCredits", updates.maxCredits);
     }
-    if ("includeRules" in updates) {
-      props.setGroups(
-        index,
-        "includeRules",
-        reconcile(updates.includeRules ?? [], {
-          key: "id",
-        }),
-      );
+    if ("includeRules" in updates && updates.includeRules) {
+      props.setGroups(index, "includeRules", updates.includeRules);
     }
     if ("excludeRules" in updates) {
-      props.setGroups(
-        index,
-        "excludeRules",
-        reconcile(updates.excludeRules ?? [], {
-          key: "id",
-        }),
-      );
+      props.setGroups(index, "excludeRules", updates.excludeRules);
     }
   };
 

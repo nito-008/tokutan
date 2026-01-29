@@ -1,7 +1,7 @@
 import Minus from "lucide-solid/icons/minus";
 import Plus from "lucide-solid/icons/plus";
 import Trash2 from "lucide-solid/icons/trash-2";
-import { type Component, Show } from "solid-js";
+import { type Component, For, Show } from "solid-js";
 import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
@@ -11,8 +11,10 @@ import {
 } from "~/components/ui/dropdown-menu";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
-import type { ExcludeRule, IncludeRule, RequirementGroup } from "~/types";
-import { RuleList } from "./RuleList";
+import type { CategoryEntry, ExcludeRules, IncludeRules, RequirementGroup } from "~/types";
+import { CategoryRuleEditor } from "./RuleList/CategoryRuleEditor";
+import { CourseNamesInput } from "./RuleList/CourseNamesInput";
+import { PrefixInput } from "./RuleList/PrefixInput";
 
 interface GroupEditorProps {
   group: RequirementGroup;
@@ -21,135 +23,112 @@ interface GroupEditorProps {
 }
 
 export const GroupEditor: Component<GroupEditorProps> = (props) => {
-  const updateIncludeRule = (index: number, updates: Partial<IncludeRule>) => {
-    const newRules = props.group.includeRules.map((rule, i) => {
-      if (i !== index) return rule;
-      const merged = { ...rule, ...updates };
-      if (rule.type === "courses") {
-        return {
-          id: rule.id,
-          type: "courses",
-          courseNames:
-            "courseNames" in merged ? (merged.courseNames as string[]) : rule.courseNames,
-        } satisfies IncludeRule;
-      }
-      if (rule.type === "category") {
-        return {
-          id: rule.id,
-          type: "category",
-          majorCategory:
-            "majorCategory" in merged ? (merged.majorCategory as string) : rule.majorCategory,
-          middleCategory:
-            "middleCategory" in merged
-              ? (merged.middleCategory as string | undefined)
-              : rule.middleCategory,
-          minorCategory:
-            "minorCategory" in merged
-              ? (merged.minorCategory as string | undefined)
-              : rule.minorCategory,
-        } satisfies IncludeRule;
-      }
-      return {
-        id: rule.id,
-        type: "prefix",
-        prefixes: "prefixes" in merged ? (merged.prefixes as string[]) : rule.prefixes,
-      } satisfies IncludeRule;
+  const updateIncludeField = <K extends keyof IncludeRules>(field: K, value: IncludeRules[K]) => {
+    props.onUpdate({
+      includeRules: { ...props.group.includeRules, [field]: value },
     });
-    props.onUpdate({ includeRules: newRules });
   };
 
-  const updateExcludeRule = (index: number, updates: Partial<ExcludeRule>) => {
-    const newRules = (props.group.excludeRules ?? []).map((rule, i) => {
-      if (i !== index) return rule;
-      const merged = { ...rule, ...updates };
-      if (rule.type === "courses") {
-        return {
-          id: rule.id,
-          type: "courses",
-          courseNames:
-            "courseNames" in merged ? (merged.courseNames as string[]) : rule.courseNames,
-        } satisfies ExcludeRule;
-      }
-      if (rule.type === "category") {
-        return {
-          id: rule.id,
-          type: "category",
-          majorCategory:
-            "majorCategory" in merged ? (merged.majorCategory as string) : rule.majorCategory,
-          middleCategory:
-            "middleCategory" in merged
-              ? (merged.middleCategory as string | undefined)
-              : rule.middleCategory,
-          minorCategory:
-            "minorCategory" in merged
-              ? (merged.minorCategory as string | undefined)
-              : rule.minorCategory,
-        } satisfies ExcludeRule;
-      }
-      return {
-        id: rule.id,
-        type: "prefix",
-        prefixes: "prefixes" in merged ? (merged.prefixes as string[]) : rule.prefixes,
-      } satisfies ExcludeRule;
-    });
-    props.onUpdate({ excludeRules: newRules });
+  const updateExcludeField = <K extends keyof ExcludeRules>(field: K, value: ExcludeRules[K]) => {
+    const current = props.group.excludeRules ?? {};
+    const updated = { ...current, [field]: value };
+    const hasContent =
+      (updated.courseNames && updated.courseNames.length > 0) ||
+      (updated.prefixes && updated.prefixes.length > 0) ||
+      (updated.categories && updated.categories.length > 0);
+    props.onUpdate({ excludeRules: hasContent ? updated : undefined });
   };
 
-  const addRuleByType = (ruleType: string) => {
-    const isExclude = ruleType.endsWith("-exclude");
-    const baseType = isExclude ? ruleType.replace("-exclude", "") : ruleType;
+  const addField = (field: string) => {
+    const isExclude = field.endsWith("-exclude");
+    const baseField = isExclude ? field.replace("-exclude", "") : field;
 
-    let newRule: IncludeRule | ExcludeRule;
-    if (baseType === "courses") {
-      newRule = {
-        id: `rule-${Date.now()}`,
-        type: "courses" as const,
-        courseNames: [],
-      };
-    } else if (baseType === "prefix") {
-      newRule = {
-        id: `rule-${Date.now()}`,
-        type: "prefix" as const,
-        prefixes: [""],
-      };
-    } else {
-      newRule = {
-        id: `rule-${Date.now()}`,
-        type: "category" as const,
-        majorCategory: "",
-      };
+    if (baseField === "courseNames") {
+      if (isExclude) {
+        updateExcludeField("courseNames", [...(props.group.excludeRules?.courseNames ?? [])]);
+      } else {
+        updateIncludeField("courseNames", [...(props.group.includeRules.courseNames ?? [])]);
+      }
+    } else if (baseField === "prefixes") {
+      if (isExclude) {
+        updateExcludeField("prefixes", [...(props.group.excludeRules?.prefixes ?? []), ""]);
+      } else {
+        updateIncludeField("prefixes", [...(props.group.includeRules.prefixes ?? []), ""]);
+      }
+    } else if (baseField === "categories") {
+      const newEntry: CategoryEntry = { majorCategory: "" };
+      if (isExclude) {
+        updateExcludeField("categories", [
+          ...(props.group.excludeRules?.categories ?? []),
+          newEntry,
+        ]);
+      } else {
+        updateIncludeField("categories", [
+          ...(props.group.includeRules.categories ?? []),
+          newEntry,
+        ]);
+      }
     }
+  };
 
+  const removeIncludeField = (field: keyof IncludeRules) => {
+    const updated = { ...props.group.includeRules };
+    delete updated[field];
+    props.onUpdate({ includeRules: updated });
+  };
+
+  const removeExcludeField = (field: keyof ExcludeRules) => {
+    const current = props.group.excludeRules;
+    if (!current) return;
+    const updated = { ...current };
+    delete updated[field];
+    const hasContent =
+      (updated.courseNames && updated.courseNames.length > 0) ||
+      (updated.prefixes && updated.prefixes.length > 0) ||
+      (updated.categories && updated.categories.length > 0);
+    props.onUpdate({ excludeRules: hasContent ? updated : undefined });
+  };
+
+  const updateCategory = (
+    categories: CategoryEntry[],
+    index: number,
+    updates: Partial<CategoryEntry>,
+    isExclude: boolean,
+  ) => {
+    const newCats = [...categories];
+    newCats[index] = { ...newCats[index], ...updates };
     if (isExclude) {
-      props.onUpdate({ excludeRules: [...(props.group.excludeRules ?? []), newRule] });
+      updateExcludeField("categories", newCats);
     } else {
-      props.onUpdate({ includeRules: [...props.group.includeRules, newRule] });
+      updateIncludeField("categories", newCats);
     }
   };
 
-  const removeIncludeRule = (index: number) => {
-    props.onUpdate({ includeRules: props.group.includeRules.filter((_, i) => i !== index) });
+  const removeCategory = (categories: CategoryEntry[], index: number, isExclude: boolean) => {
+    const newCats = categories.filter((_, i) => i !== index);
+    if (isExclude) {
+      if (newCats.length > 0) {
+        updateExcludeField("categories", newCats);
+      } else {
+        removeExcludeField("categories");
+      }
+    } else {
+      if (newCats.length > 0) {
+        updateIncludeField("categories", newCats);
+      } else {
+        removeIncludeField("categories");
+      }
+    }
   };
 
-  const removeExcludeRule = (index: number) => {
-    const newRules = (props.group.excludeRules ?? []).filter((_, i) => i !== index);
-    props.onUpdate({ excludeRules: newRules.length > 0 ? newRules : undefined });
-  };
-
-  const moveIncludeRule = (fromIndex: number, toIndex: number) => {
-    if (fromIndex === toIndex) return;
-    const nextRules = [...props.group.includeRules];
-    const [moved] = nextRules.splice(fromIndex, 1);
-    nextRules.splice(toIndex, 0, moved);
-    props.onUpdate({ includeRules: nextRules });
-  };
-
-  const moveExcludeRule = (fromIndex: number, toIndex: number) => {
-    if (fromIndex === toIndex) return;
-    const nextRules = [...(props.group.excludeRules ?? [])];
-    const [moved] = nextRules.splice(fromIndex, 1);
-    nextRules.splice(toIndex, 0, moved);
-    props.onUpdate({ excludeRules: nextRules });
+  const hasExcludeRules = () => {
+    const ex = props.group.excludeRules;
+    if (!ex) return false;
+    return (
+      (ex.courseNames && ex.courseNames.length > 0) ||
+      (ex.prefixes && ex.prefixes.length > 0) ||
+      (ex.categories && ex.categories.length > 0)
+    );
   };
 
   return (
@@ -187,28 +166,231 @@ export const GroupEditor: Component<GroupEditorProps> = (props) => {
 
       <div class="space-y-4">
         <div class="space-y-2">
-          <RuleList
-            rules={props.group.includeRules}
-            onUpdateRule={updateIncludeRule}
-            onRemoveRule={removeIncludeRule}
-            onMoveRule={moveIncludeRule}
-          />
-          <Show when={(props.group.excludeRules ?? []).length > 0}>
-            <div class="border-l-4 border-destructive/30 pl-3 space-y-2">
-              <Label class="text-xs font-medium">除外</Label>
-              <RuleList
-                rules={props.group.excludeRules ?? []}
-                onUpdateRule={
-                  updateExcludeRule as (
-                    index: number,
-                    updates: Partial<IncludeRule | ExcludeRule>,
-                  ) => void
-                }
-                onRemoveRule={removeExcludeRule}
-                onMoveRule={moveExcludeRule}
+          {/* Include: courseNames */}
+          <Show when={props.group.includeRules.courseNames}>
+            <div class="space-y-1">
+              <div class="flex items-center justify-between">
+                <span class="rounded bg-muted px-2 py-1 text-xs text-muted-foreground">
+                  特定科目
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  class="h-8 w-8 p-0 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                  onClick={() => removeIncludeField("courseNames")}
+                >
+                  <Trash2 class="size-4" />
+                </Button>
+              </div>
+              <CourseNamesInput
+                courseNames={props.group.includeRules.courseNames ?? []}
+                onUpdate={(courseNames) => updateIncludeField("courseNames", courseNames)}
               />
             </div>
           </Show>
+
+          {/* Include: prefixes */}
+          <Show when={props.group.includeRules.prefixes}>
+            <div class="space-y-1">
+              <div class="flex items-center justify-between">
+                <span class="rounded bg-muted px-2 py-1 text-xs text-muted-foreground">
+                  で始まる科目
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  class="h-8 w-8 p-0 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                  onClick={() => removeIncludeField("prefixes")}
+                >
+                  <Trash2 class="size-4" />
+                </Button>
+              </div>
+              <PrefixInput
+                prefixes={props.group.includeRules.prefixes ?? []}
+                onUpdate={(prefixes) => updateIncludeField("prefixes", prefixes)}
+              />
+            </div>
+          </Show>
+
+          {/* Include: categories */}
+          <Show when={props.group.includeRules.categories}>
+            <div class="space-y-1">
+              <div class="flex items-center justify-between">
+                <span class="rounded bg-muted px-2 py-1 text-xs text-muted-foreground">
+                  科目区分
+                </span>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  class="h-8 w-8 p-0 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                  onClick={() => removeIncludeField("categories")}
+                >
+                  <Trash2 class="size-4" />
+                </Button>
+              </div>
+              <For each={props.group.includeRules.categories}>
+                {(cat, index) => (
+                  <div class="flex items-start gap-2">
+                    <div class="flex-1">
+                      <CategoryRuleEditor
+                        majorCategory={cat.majorCategory}
+                        middleCategory={cat.middleCategory}
+                        minorCategory={cat.minorCategory}
+                        onUpdate={(updates) =>
+                          updateCategory(
+                            props.group.includeRules.categories ?? [],
+                            index(),
+                            updates,
+                            false,
+                          )
+                        }
+                      />
+                    </div>
+                    <Show when={(props.group.includeRules.categories?.length ?? 0) > 1}>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        class="h-8 w-8 p-0 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                        onClick={() =>
+                          removeCategory(props.group.includeRules.categories ?? [], index(), false)
+                        }
+                      >
+                        <Trash2 class="size-4" />
+                      </Button>
+                    </Show>
+                  </div>
+                )}
+              </For>
+              <Button
+                variant="outline"
+                size="sm"
+                class="h-7 text-xs"
+                onClick={() => addField("categories")}
+              >
+                <Plus class="size-3 mr-1" />
+                科目区分を追加
+              </Button>
+            </div>
+          </Show>
+
+          {/* Exclude rules */}
+          <Show when={hasExcludeRules()}>
+            <div class="border-l-4 border-destructive/30 pl-3 space-y-2">
+              <Label class="text-xs font-medium">除外</Label>
+
+              {/* Exclude: courseNames */}
+              <Show when={props.group.excludeRules?.courseNames}>
+                <div class="space-y-1">
+                  <div class="flex items-center justify-between">
+                    <span class="rounded bg-muted px-2 py-1 text-xs text-muted-foreground">
+                      特定科目
+                    </span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      class="h-8 w-8 p-0 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                      onClick={() => removeExcludeField("courseNames")}
+                    >
+                      <Trash2 class="size-4" />
+                    </Button>
+                  </div>
+                  <CourseNamesInput
+                    courseNames={props.group.excludeRules?.courseNames ?? []}
+                    onUpdate={(courseNames) => updateExcludeField("courseNames", courseNames)}
+                  />
+                </div>
+              </Show>
+
+              {/* Exclude: prefixes */}
+              <Show when={props.group.excludeRules?.prefixes}>
+                <div class="space-y-1">
+                  <div class="flex items-center justify-between">
+                    <span class="rounded bg-muted px-2 py-1 text-xs text-muted-foreground">
+                      で始まる科目
+                    </span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      class="h-8 w-8 p-0 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                      onClick={() => removeExcludeField("prefixes")}
+                    >
+                      <Trash2 class="size-4" />
+                    </Button>
+                  </div>
+                  <PrefixInput
+                    prefixes={props.group.excludeRules?.prefixes ?? []}
+                    onUpdate={(prefixes) => updateExcludeField("prefixes", prefixes)}
+                  />
+                </div>
+              </Show>
+
+              {/* Exclude: categories */}
+              <Show when={props.group.excludeRules?.categories}>
+                <div class="space-y-1">
+                  <div class="flex items-center justify-between">
+                    <span class="rounded bg-muted px-2 py-1 text-xs text-muted-foreground">
+                      科目区分
+                    </span>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      class="h-8 w-8 p-0 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                      onClick={() => removeExcludeField("categories")}
+                    >
+                      <Trash2 class="size-4" />
+                    </Button>
+                  </div>
+                  <For each={props.group.excludeRules?.categories}>
+                    {(cat, index) => (
+                      <div class="flex items-start gap-2">
+                        <div class="flex-1">
+                          <CategoryRuleEditor
+                            majorCategory={cat.majorCategory}
+                            middleCategory={cat.middleCategory}
+                            minorCategory={cat.minorCategory}
+                            onUpdate={(updates) =>
+                              updateCategory(
+                                props.group.excludeRules?.categories ?? [],
+                                index(),
+                                updates,
+                                true,
+                              )
+                            }
+                          />
+                        </div>
+                        <Show when={(props.group.excludeRules?.categories?.length ?? 0) > 1}>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            class="h-8 w-8 p-0 text-destructive hover:bg-destructive/10 hover:text-destructive"
+                            onClick={() =>
+                              removeCategory(
+                                props.group.excludeRules?.categories ?? [],
+                                index(),
+                                true,
+                              )
+                            }
+                          >
+                            <Trash2 class="size-4" />
+                          </Button>
+                        </Show>
+                      </div>
+                    )}
+                  </For>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    class="h-7 text-xs"
+                    onClick={() => addField("categories-exclude")}
+                  >
+                    <Plus class="size-3 mr-1" />
+                    科目区分を追加
+                  </Button>
+                </div>
+              </Show>
+            </div>
+          </Show>
+
           <div class="flex justify-between gap-2">
             <div class="flex gap-2">
               <DropdownMenu>
@@ -217,13 +399,13 @@ export const GroupEditor: Component<GroupEditorProps> = (props) => {
                   条件を追加
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
-                  <DropdownMenuItem onSelect={() => addRuleByType("courses")}>
+                  <DropdownMenuItem onSelect={() => addField("courseNames")}>
                     特定科目
                   </DropdownMenuItem>
-                  <DropdownMenuItem onSelect={() => addRuleByType("prefix")}>
+                  <DropdownMenuItem onSelect={() => addField("prefixes")}>
                     ～で始まる科目
                   </DropdownMenuItem>
-                  <DropdownMenuItem onSelect={() => addRuleByType("category")}>
+                  <DropdownMenuItem onSelect={() => addField("categories")}>
                     科目区分
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -240,13 +422,13 @@ export const GroupEditor: Component<GroupEditorProps> = (props) => {
                   除外条件を追加
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
-                  <DropdownMenuItem onSelect={() => addRuleByType("courses-exclude")}>
+                  <DropdownMenuItem onSelect={() => addField("courseNames-exclude")}>
                     特定科目
                   </DropdownMenuItem>
-                  <DropdownMenuItem onSelect={() => addRuleByType("prefix-exclude")}>
+                  <DropdownMenuItem onSelect={() => addField("prefixes-exclude")}>
                     ～で始まる科目
                   </DropdownMenuItem>
-                  <DropdownMenuItem onSelect={() => addRuleByType("category-exclude")}>
+                  <DropdownMenuItem onSelect={() => addField("categories-exclude")}>
                     科目区分
                   </DropdownMenuItem>
                 </DropdownMenuContent>

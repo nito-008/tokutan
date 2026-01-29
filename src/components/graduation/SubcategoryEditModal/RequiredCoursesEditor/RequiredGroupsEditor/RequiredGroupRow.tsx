@@ -4,7 +4,7 @@ import { type Component, For, Show } from "solid-js";
 import { Button } from "~/components/ui/button";
 import { Input } from "~/components/ui/input";
 import { Label } from "~/components/ui/label";
-import type { IncludeRule, RequirementGroup } from "~/types";
+import type { CategoryEntry, RequirementGroup } from "~/types";
 import { CategoryRuleEditor } from "../../SelectionCoursesEditor/GroupsSection/GroupEditor/RuleList/CategoryRuleEditor";
 
 interface RequiredGroupRowProps {
@@ -14,47 +14,43 @@ interface RequiredGroupRowProps {
 }
 
 export const RequiredGroupRow: Component<RequiredGroupRowProps> = (props) => {
-  const categoryRules = () => props.group.includeRules.filter((rule) => rule.type === "category");
+  const categories = () => props.group.includeRules.categories ?? [];
 
   const handleAddCategoryRule = () => {
-    const newRule: IncludeRule = {
-      id: `rule-${Date.now()}`,
-      type: "category",
-      majorCategory: "",
-    };
+    const current = props.group.includeRules.categories ?? [];
     props.onUpdate({
-      includeRules: [...props.group.includeRules, newRule],
+      includeRules: {
+        ...props.group.includeRules,
+        categories: [...current, { majorCategory: "" }],
+      },
     });
   };
 
-  const handleUpdateRule = (
-    index: number,
-    updates: {
-      majorCategory?: string;
-      middleCategory?: string;
-      minorCategory?: string;
-    },
-  ) => {
-    const updatedRules = [...props.group.includeRules];
-    const currentRule = updatedRules[index];
-    if (currentRule?.type === "category") {
-      updatedRules[index] = {
-        ...currentRule,
-        majorCategory: updates.majorCategory ?? currentRule.majorCategory,
-        middleCategory:
-          updates.middleCategory !== undefined
-            ? updates.middleCategory
-            : currentRule.middleCategory,
-        minorCategory:
-          updates.minorCategory !== undefined ? updates.minorCategory : currentRule.minorCategory,
-      };
-      props.onUpdate({ includeRules: updatedRules });
-    }
+  const handleUpdateRule = (index: number, updates: Partial<CategoryEntry>) => {
+    const current = [...categories()];
+    const cat = current[index];
+    if (!cat) return;
+    current[index] = {
+      ...cat,
+      majorCategory: updates.majorCategory ?? cat.majorCategory,
+      middleCategory:
+        updates.middleCategory !== undefined ? updates.middleCategory : cat.middleCategory,
+      minorCategory:
+        updates.minorCategory !== undefined ? updates.minorCategory : cat.minorCategory,
+    };
+    props.onUpdate({
+      includeRules: { ...props.group.includeRules, categories: current },
+    });
   };
 
   const handleRemoveRule = (index: number) => {
-    const updatedRules = props.group.includeRules.filter((_, i) => i !== index);
-    props.onUpdate({ includeRules: updatedRules });
+    const current = categories().filter((_, i) => i !== index);
+    props.onUpdate({
+      includeRules: {
+        ...props.group.includeRules,
+        categories: current.length > 0 ? current : undefined,
+      },
+    });
   };
 
   return (
@@ -77,32 +73,29 @@ export const RequiredGroupRow: Component<RequiredGroupRowProps> = (props) => {
 
           <div class="space-y-2">
             <Label class="text-xs">科目区分</Label>
-            <For each={props.group.includeRules}>
-              {(rule, index) => {
-                if (rule.type !== "category") return null;
-                return (
-                  <div class="flex items-start gap-2">
-                    <div class="flex-1">
-                      <CategoryRuleEditor
-                        majorCategory={rule.majorCategory ?? ""}
-                        middleCategory={rule.middleCategory}
-                        minorCategory={rule.minorCategory}
-                        onUpdate={(updates) => handleUpdateRule(index(), updates)}
-                      />
-                    </div>
-                    <Show when={categoryRules().length > 1}>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        class="text-destructive hover:text-destructive hover:bg-destructive/10"
-                        onClick={() => handleRemoveRule(index())}
-                      >
-                        <Trash2 class="size-4" />
-                      </Button>
-                    </Show>
+            <For each={categories()}>
+              {(cat, index) => (
+                <div class="flex items-start gap-2">
+                  <div class="flex-1">
+                    <CategoryRuleEditor
+                      majorCategory={cat.majorCategory ?? ""}
+                      middleCategory={cat.middleCategory}
+                      minorCategory={cat.minorCategory}
+                      onUpdate={(updates) => handleUpdateRule(index(), updates)}
+                    />
                   </div>
-                );
-              }}
+                  <Show when={categories().length > 1}>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      class="text-destructive hover:text-destructive hover:bg-destructive/10"
+                      onClick={() => handleRemoveRule(index())}
+                    >
+                      <Trash2 class="size-4" />
+                    </Button>
+                  </Show>
+                </div>
+              )}
             </For>
 
             <div class="flex justify-between gap-2">

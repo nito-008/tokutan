@@ -1,10 +1,10 @@
-﻿import type {
+import type {
   CategoryStatus,
   Course,
-  ExcludeRule,
+  ExcludeRules,
   GraduationRequirements,
   GroupStatus,
-  IncludeRule,
+  IncludeRules,
   MatchedCourse,
   RequirementGroup,
   RequirementStatus,
@@ -22,23 +22,6 @@ function splitRequiredCourseGroup(value: string): string[] {
     .split(",")
     .map((id) => id.trim())
     .filter((id) => id);
-}
-
-function parseRequiredCourseGroups(groups: RequirementGroup[]): string[][] {
-  const courseGroups: string[][] = [];
-  for (const group of groups) {
-    for (const rule of group.includeRules) {
-      if (rule.type === "courses") {
-        for (const courseName of rule.courseNames) {
-          const parsedGroup = splitRequiredCourseGroup(courseName);
-          if (parsedGroup.length > 0) {
-            courseGroups.push(parsedGroup);
-          }
-        }
-      }
-    }
-  }
-  return courseGroups;
 }
 
 function normalizeCourseName(value: string | undefined): string {
@@ -75,28 +58,27 @@ function buildRequiredCourseExclusionSet(
     for (const subcategory of category.subcategories) {
       if (subcategory.type !== "required") continue;
 
-      // groupsのincludeRulesからtype: "courses"のルールを抽出
+      // groupsのincludeRulesからcourseNamesを抽出
       for (const group of subcategory.groups) {
-        for (const rule of group.includeRules) {
-          if (rule.type !== "courses") continue;
+        const courseNames = group.includeRules.courseNames;
+        if (!courseNames) continue;
 
-          for (const rawCourse of rule.courseNames) {
-            const courseKey = rawCourse?.trim();
-            if (!courseKey) continue;
-            const normalizedCourseName = normalizeCourseName(courseKey);
-            if (normalizedCourseName) {
-              exclusion.courseNames.add(normalizedCourseName);
-            }
+        for (const rawCourse of courseNames) {
+          const courseKey = rawCourse?.trim();
+          if (!courseKey) continue;
+          const normalizedCourseName = normalizeCourseName(courseKey);
+          if (normalizedCourseName) {
+            exclusion.courseNames.add(normalizedCourseName);
+          }
 
-            if (kdbMap.has(courseKey)) {
-              exclusion.courseIds.add(courseKey);
-              continue;
-            }
+          if (kdbMap.has(courseKey)) {
+            exclusion.courseIds.add(courseKey);
+            continue;
+          }
 
-            const mappedId = courseNameToIdMap.get(courseKey);
-            if (mappedId) {
-              exclusion.courseIds.add(mappedId);
-            }
+          const mappedId = courseNameToIdMap.get(courseKey);
+          if (mappedId) {
+            exclusion.courseIds.add(mappedId);
           }
         }
       }
@@ -214,16 +196,14 @@ export async function calculateRequirementStatus(
       if (subcategory.type === "required") {
         // 各グループを処理
         for (const group of subcategory.groups) {
-          // type: "courses" ルールを抽出して処理（未履修表示のため別処理が必要）
-          const courseRules = group.includeRules.filter((r) => r.type === "courses");
-          if (courseRules.length > 0) {
+          // courseNames の処理（未履修表示のため別処理が必要）
+          const courseNames = group.includeRules.courseNames;
+          if (courseNames && courseNames.length > 0) {
             const courseGroups: string[][] = [];
-            for (const rule of courseRules) {
-              for (const courseName of rule.courseNames) {
-                const parsedGroup = splitRequiredCourseGroup(courseName);
-                if (parsedGroup.length > 0) {
-                  courseGroups.push(parsedGroup);
-                }
+            for (const courseName of courseNames) {
+              const parsedGroup = splitRequiredCourseGroup(courseName);
+              if (parsedGroup.length > 0) {
+                courseGroups.push(parsedGroup);
               }
             }
             const requiredMatches = matchRequiredCourseGroups(
@@ -235,25 +215,17 @@ export async function calculateRequirementStatus(
             matchedCourses.push(...requiredMatches);
           }
 
-          // type: "category" ルールを処理（新規追加）
-          const categoryRules = group.includeRules.filter((r) => r.type === "category");
-          if (categoryRules.length > 0) {
-            const tempGroup = { ...group, includeRules: categoryRules };
-            const groupMatches = matchCoursesToGroup(
-              courses,
-              tempGroup,
-              usedCourseIds,
-              requiredCourseExclusion,
-              courseTypeMaster,
-              courseNameToIdMap,
-            );
-            matchedCourses.push(...groupMatches);
-          }
+          // categories / prefixes の処理（courseNamesを除外したルールで実行）
+          const hasCategoriesOrPrefixes =
+            (group.includeRules.categories && group.includeRules.categories.length > 0) ||
+            (group.includeRules.prefixes && group.includeRules.prefixes.length > 0);
 
-          // type: "prefix" ルールを処理（追加サポート）
-          const prefixRules = group.includeRules.filter((r) => r.type === "prefix");
-          if (prefixRules.length > 0) {
-            const tempGroup = { ...group, includeRules: prefixRules };
+          if (hasCategoriesOrPrefixes) {
+            const nonCourseRules: IncludeRules = {
+              prefixes: group.includeRules.prefixes,
+              categories: group.includeRules.categories,
+            };
+            const tempGroup = { ...group, includeRules: nonCourseRules };
             const groupMatches = matchCoursesToGroup(
               courses,
               tempGroup,
@@ -410,24 +382,24 @@ function matchCoursesToGroup(
     if (isCourseExcludedByRequirements(course, excludedCourseIds)) continue;
 
     // Step 1: includeRulesのいずれかにマッチするか
-    let isIncluded = false;
-    for (const rule of group.includeRules) {
-      if (matchCourseToRule(course, rule, courseTypeMaster, courseNameToIdMap)) {
-        isIncluded = true;
-        break;
-      }
-    }
+    const isIncluded = matchCourseToRules(
+      course,
+      group.includeRules,
+      courseTypeMaster,
+      courseNameToIdMap,
+    );
     if (!isIncluded) continue;
 
     // Step 2: excludeRulesのいずれかにマッチするか（除外）
-    let isExcluded = false;
-    for (const rule of group.excludeRules ?? []) {
-      if (matchCourseToRule(course, rule, courseTypeMaster, courseNameToIdMap)) {
-        isExcluded = true;
-        break;
-      }
+    if (group.excludeRules) {
+      const isExcluded = matchCourseToRules(
+        course,
+        group.excludeRules,
+        courseTypeMaster,
+        courseNameToIdMap,
+      );
+      if (isExcluded) continue;
     }
-    if (isExcluded) continue;
 
     // マッチ成功
     usedCourseIds.add(course.id);
@@ -444,49 +416,45 @@ function matchCoursesToGroup(
   return matches;
 }
 
-// 科目が単一ルールにマッチするかチェック
-function matchCourseToRule(
+// 科目がルールオブジェクトにマッチするかチェック
+function matchCourseToRules(
   course: UserCourseRecord,
-  rule: IncludeRule | ExcludeRule,
+  rules: IncludeRules | ExcludeRules,
   courseTypeMaster: CourseTypeMasterNode[],
   courseNameToIdMap: Map<string, string>,
 ): boolean {
-  switch (rule.type) {
-    case "courses": {
-      const normalizedCourseName = normalizeCourseName(course.courseName);
-      for (const rawValue of rule.courseNames) {
-        const specificKey = rawValue?.trim();
-        if (!specificKey) continue;
-        if (course.courseId === specificKey) {
-          return true;
-        }
-        if (course.courseName === specificKey) {
-          return true;
-        }
-        const normalizedSpecificKey = normalizeCourseName(specificKey);
-        if (normalizedSpecificKey && normalizedSpecificKey === normalizedCourseName) {
-          return true;
-        }
-        const mappedId = courseNameToIdMap.get(normalizedSpecificKey);
-        if (mappedId && course.courseId === mappedId) {
-          return true;
-        }
-      }
-      return false;
-    }
-
-    case "prefix":
-      // prefixes配列のいずれかで始まるかチェック
-      return rule.prefixes.some((prefix) => course.courseId.startsWith(prefix));
-
-    case "category": {
-      const categoryCourseIds = getCourseIdsFromCategory(
-        courseTypeMaster,
-        rule.majorCategory,
-        rule.middleCategory,
-        rule.minorCategory,
-      );
-      return categoryCourseIds.some((id) => course.courseId.startsWith(id));
+  // courseNames チェック
+  if (rules.courseNames) {
+    const normalizedCourseName = normalizeCourseName(course.courseName);
+    for (const rawValue of rules.courseNames) {
+      const specificKey = rawValue?.trim();
+      if (!specificKey) continue;
+      if (course.courseId === specificKey) return true;
+      if (course.courseName === specificKey) return true;
+      const normalizedSpecificKey = normalizeCourseName(specificKey);
+      if (normalizedSpecificKey && normalizedSpecificKey === normalizedCourseName) return true;
+      const mappedId = courseNameToIdMap.get(normalizedSpecificKey);
+      if (mappedId && course.courseId === mappedId) return true;
     }
   }
+
+  // prefixes チェック
+  if (rules.prefixes) {
+    if (rules.prefixes.some((prefix) => course.courseId.startsWith(prefix))) return true;
+  }
+
+  // categories チェック
+  if (rules.categories) {
+    for (const cat of rules.categories) {
+      const categoryCourseIds = getCourseIdsFromCategory(
+        courseTypeMaster,
+        cat.majorCategory,
+        cat.middleCategory,
+        cat.minorCategory,
+      );
+      if (categoryCourseIds.some((id) => course.courseId.startsWith(id))) return true;
+    }
+  }
+
+  return false;
 }

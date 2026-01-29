@@ -60,6 +60,10 @@
                             "type": "string",
                             "minLength": 1
                           },
+                          "requiredCredits": {
+                            "type": "number",
+                            "minimum": 0
+                          },
                           "minCredits": {
                             "type": "number",
                             "minimum": 0
@@ -69,59 +73,25 @@
                             "minimum": 0
                           },
                           "includeRules": {
-                            "type": "array",
-                            "items": {
-                              "oneOf": [
-                                {
+                            "type": "object",
+                            "properties": {
+                              "courseNames": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              },
+                              "prefixes": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              },
+                              "categories": {
+                                "type": "array",
+                                "items": {
                                   "type": "object",
                                   "properties": {
-                                    "id": {
-                                      "type": "string",
-                                      "minLength": 1
-                                    },
-                                    "type": {
-                                      "const": "courses"
-                                    },
-                                    "courseNames": {
-                                      "type": "array",
-                                      "items": {
-                                        "type": "string"
-                                      }
-                                    }
-                                  },
-                                  "required": ["id", "type", "courseNames"]
-                                },
-                                {
-                                  "type": "object",
-                                  "properties": {
-                                    "id": {
-                                      "type": "string",
-                                      "minLength": 1
-                                    },
-                                    "type": {
-                                      "const": "prefix"
-                                    },
-                                    "prefixes": {
-                                      "type": "array",
-                                      "items": {
-                                        "type": "string",
-                                        "minLength": 1
-                                      },
-                                      "minItems": 1
-                                    }
-                                  },
-                                  "required": ["id", "type", "prefixes"]
-                                },
-                                {
-                                  "type": "object",
-                                  "properties": {
-                                    "id": {
-                                      "type": "string",
-                                      "minLength": 1
-                                    },
-                                    "type": {
-                                      "const": "category"
-                                    },
                                     "majorCategory": {
                                       "type": "string"
                                     },
@@ -132,65 +102,32 @@
                                       "type": "string"
                                     }
                                   },
-                                  "required": ["id", "type", "majorCategory"]
+                                  "required": ["majorCategory"]
                                 }
-                              ]
-                            }
+                              }
+                            },
+                            "required": []
                           },
                           "excludeRules": {
-                            "type": "array",
-                            "items": {
-                              "oneOf": [
-                                {
+                            "type": "object",
+                            "properties": {
+                              "courseNames": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              },
+                              "prefixes": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              },
+                              "categories": {
+                                "type": "array",
+                                "items": {
                                   "type": "object",
                                   "properties": {
-                                    "id": {
-                                      "type": "string",
-                                      "minLength": 1
-                                    },
-                                    "type": {
-                                      "const": "courses"
-                                    },
-                                    "courseNames": {
-                                      "type": "array",
-                                      "items": {
-                                        "type": "string"
-                                      }
-                                    }
-                                  },
-                                  "required": ["id", "type", "courseNames"]
-                                },
-                                {
-                                  "type": "object",
-                                  "properties": {
-                                    "id": {
-                                      "type": "string",
-                                      "minLength": 1
-                                    },
-                                    "type": {
-                                      "const": "prefix"
-                                    },
-                                    "prefixes": {
-                                      "type": "array",
-                                      "items": {
-                                        "type": "string",
-                                        "minLength": 1
-                                      },
-                                      "minItems": 1
-                                    }
-                                  },
-                                  "required": ["id", "type", "prefixes"]
-                                },
-                                {
-                                  "type": "object",
-                                  "properties": {
-                                    "id": {
-                                      "type": "string",
-                                      "minLength": 1
-                                    },
-                                    "type": {
-                                      "const": "category"
-                                    },
                                     "majorCategory": {
                                       "type": "string"
                                     },
@@ -201,10 +138,11 @@
                                       "type": "string"
                                     }
                                   },
-                                  "required": ["id", "type", "majorCategory"]
+                                  "required": ["majorCategory"]
                                 }
-                              ]
-                            }
+                              }
+                            },
+                            "required": []
                           }
                         },
                         "required": ["id", "includeRules"]
@@ -243,6 +181,10 @@
                             "type": "string",
                             "minLength": 1
                           },
+                          "requiredCredits": {
+                            "type": "number",
+                            "minimum": 0
+                          },
                           "minCredits": {
                             "type": "number",
                             "minimum": 0
@@ -252,59 +194,25 @@
                             "minimum": 0
                           },
                           "includeRules": {
-                            "type": "array",
-                            "items": {
-                              "oneOf": [
-                                {
+                            "type": "object",
+                            "properties": {
+                              "courseNames": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              },
+                              "prefixes": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              },
+                              "categories": {
+                                "type": "array",
+                                "items": {
                                   "type": "object",
                                   "properties": {
-                                    "id": {
-                                      "type": "string",
-                                      "minLength": 1
-                                    },
-                                    "type": {
-                                      "const": "courses"
-                                    },
-                                    "courseNames": {
-                                      "type": "array",
-                                      "items": {
-                                        "type": "string"
-                                      }
-                                    }
-                                  },
-                                  "required": ["id", "type", "courseNames"]
-                                },
-                                {
-                                  "type": "object",
-                                  "properties": {
-                                    "id": {
-                                      "type": "string",
-                                      "minLength": 1
-                                    },
-                                    "type": {
-                                      "const": "prefix"
-                                    },
-                                    "prefixes": {
-                                      "type": "array",
-                                      "items": {
-                                        "type": "string",
-                                        "minLength": 1
-                                      },
-                                      "minItems": 1
-                                    }
-                                  },
-                                  "required": ["id", "type", "prefixes"]
-                                },
-                                {
-                                  "type": "object",
-                                  "properties": {
-                                    "id": {
-                                      "type": "string",
-                                      "minLength": 1
-                                    },
-                                    "type": {
-                                      "const": "category"
-                                    },
                                     "majorCategory": {
                                       "type": "string"
                                     },
@@ -315,65 +223,32 @@
                                       "type": "string"
                                     }
                                   },
-                                  "required": ["id", "type", "majorCategory"]
+                                  "required": ["majorCategory"]
                                 }
-                              ]
-                            }
+                              }
+                            },
+                            "required": []
                           },
                           "excludeRules": {
-                            "type": "array",
-                            "items": {
-                              "oneOf": [
-                                {
+                            "type": "object",
+                            "properties": {
+                              "courseNames": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              },
+                              "prefixes": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              },
+                              "categories": {
+                                "type": "array",
+                                "items": {
                                   "type": "object",
                                   "properties": {
-                                    "id": {
-                                      "type": "string",
-                                      "minLength": 1
-                                    },
-                                    "type": {
-                                      "const": "courses"
-                                    },
-                                    "courseNames": {
-                                      "type": "array",
-                                      "items": {
-                                        "type": "string"
-                                      }
-                                    }
-                                  },
-                                  "required": ["id", "type", "courseNames"]
-                                },
-                                {
-                                  "type": "object",
-                                  "properties": {
-                                    "id": {
-                                      "type": "string",
-                                      "minLength": 1
-                                    },
-                                    "type": {
-                                      "const": "prefix"
-                                    },
-                                    "prefixes": {
-                                      "type": "array",
-                                      "items": {
-                                        "type": "string",
-                                        "minLength": 1
-                                      },
-                                      "minItems": 1
-                                    }
-                                  },
-                                  "required": ["id", "type", "prefixes"]
-                                },
-                                {
-                                  "type": "object",
-                                  "properties": {
-                                    "id": {
-                                      "type": "string",
-                                      "minLength": 1
-                                    },
-                                    "type": {
-                                      "const": "category"
-                                    },
                                     "majorCategory": {
                                       "type": "string"
                                     },
@@ -384,13 +259,14 @@
                                       "type": "string"
                                     }
                                   },
-                                  "required": ["id", "type", "majorCategory"]
+                                  "required": ["majorCategory"]
                                 }
-                              ]
-                            }
+                              }
+                            },
+                            "required": []
                           }
                         },
-                        "required": ["id", "minCredits", "includeRules"]
+                        "required": ["id", "includeRules"]
                       }
                     }
                   },
@@ -426,6 +302,10 @@
                             "type": "string",
                             "minLength": 1
                           },
+                          "requiredCredits": {
+                            "type": "number",
+                            "minimum": 0
+                          },
                           "minCredits": {
                             "type": "number",
                             "minimum": 0
@@ -435,59 +315,25 @@
                             "minimum": 0
                           },
                           "includeRules": {
-                            "type": "array",
-                            "items": {
-                              "oneOf": [
-                                {
+                            "type": "object",
+                            "properties": {
+                              "courseNames": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              },
+                              "prefixes": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              },
+                              "categories": {
+                                "type": "array",
+                                "items": {
                                   "type": "object",
                                   "properties": {
-                                    "id": {
-                                      "type": "string",
-                                      "minLength": 1
-                                    },
-                                    "type": {
-                                      "const": "courses"
-                                    },
-                                    "courseNames": {
-                                      "type": "array",
-                                      "items": {
-                                        "type": "string"
-                                      }
-                                    }
-                                  },
-                                  "required": ["id", "type", "courseNames"]
-                                },
-                                {
-                                  "type": "object",
-                                  "properties": {
-                                    "id": {
-                                      "type": "string",
-                                      "minLength": 1
-                                    },
-                                    "type": {
-                                      "const": "prefix"
-                                    },
-                                    "prefixes": {
-                                      "type": "array",
-                                      "items": {
-                                        "type": "string",
-                                        "minLength": 1
-                                      },
-                                      "minItems": 1
-                                    }
-                                  },
-                                  "required": ["id", "type", "prefixes"]
-                                },
-                                {
-                                  "type": "object",
-                                  "properties": {
-                                    "id": {
-                                      "type": "string",
-                                      "minLength": 1
-                                    },
-                                    "type": {
-                                      "const": "category"
-                                    },
                                     "majorCategory": {
                                       "type": "string"
                                     },
@@ -498,65 +344,32 @@
                                       "type": "string"
                                     }
                                   },
-                                  "required": ["id", "type", "majorCategory"]
+                                  "required": ["majorCategory"]
                                 }
-                              ]
-                            }
+                              }
+                            },
+                            "required": []
                           },
                           "excludeRules": {
-                            "type": "array",
-                            "items": {
-                              "oneOf": [
-                                {
+                            "type": "object",
+                            "properties": {
+                              "courseNames": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              },
+                              "prefixes": {
+                                "type": "array",
+                                "items": {
+                                  "type": "string"
+                                }
+                              },
+                              "categories": {
+                                "type": "array",
+                                "items": {
                                   "type": "object",
                                   "properties": {
-                                    "id": {
-                                      "type": "string",
-                                      "minLength": 1
-                                    },
-                                    "type": {
-                                      "const": "courses"
-                                    },
-                                    "courseNames": {
-                                      "type": "array",
-                                      "items": {
-                                        "type": "string"
-                                      }
-                                    }
-                                  },
-                                  "required": ["id", "type", "courseNames"]
-                                },
-                                {
-                                  "type": "object",
-                                  "properties": {
-                                    "id": {
-                                      "type": "string",
-                                      "minLength": 1
-                                    },
-                                    "type": {
-                                      "const": "prefix"
-                                    },
-                                    "prefixes": {
-                                      "type": "array",
-                                      "items": {
-                                        "type": "string",
-                                        "minLength": 1
-                                      },
-                                      "minItems": 1
-                                    }
-                                  },
-                                  "required": ["id", "type", "prefixes"]
-                                },
-                                {
-                                  "type": "object",
-                                  "properties": {
-                                    "id": {
-                                      "type": "string",
-                                      "minLength": 1
-                                    },
-                                    "type": {
-                                      "const": "category"
-                                    },
                                     "majorCategory": {
                                       "type": "string"
                                     },
@@ -567,13 +380,14 @@
                                       "type": "string"
                                     }
                                   },
-                                  "required": ["id", "type", "majorCategory"]
+                                  "required": ["majorCategory"]
                                 }
-                              ]
-                            }
+                              }
+                            },
+                            "required": []
                           }
                         },
-                        "required": ["id", "minCredits", "includeRules"]
+                        "required": ["id", "includeRules"]
                       }
                     }
                   },
