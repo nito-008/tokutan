@@ -188,7 +188,7 @@ export const GraduationChecker: Component = () => {
                   when={status().isGraduationEligible}
                   fallback={<span>卒業まであと&nbsp;{remaining()}単位!</span>}
                 >
-                  <span>卒業!</span>
+                  <span class="font-keifont">そつぎょう！</span>
                 </Show>
               </CardTitle>
             </CardHeader>
