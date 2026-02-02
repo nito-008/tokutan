@@ -1,0 +1,293 @@
+{
+  "$schema": "https://raw.githubusercontent.com/nito-008/tokutan/refs/heads/main/schema/requirements.json",
+  "id": "coins-2024-software",
+  "year": 2024,
+  "department": "情報科学類",
+  "major": "ソフトウェアサイエンス主専攻",
+  "totalCredits": 125,
+  "version": "1.0.0",
+  "isDefault": false,
+  "createdAt": "2026-02-02T00:00:00.000Z",
+  "updatedAt": "2026-02-02T00:00:00.000Z",
+  "categories": [
+    {
+      "id": "specialized",
+      "name": "専門科目",
+      "subcategories": [
+        {
+          "id": "specialized-required",
+          "type": "required",
+          "groups": [
+            {
+              "id": "required-courses",
+              "includeRules": {
+                "courseNames": [
+                  "ソフトウェアサイエンス実験",
+                  "ソフトウェアサイエンス実験B",
+                  "卒業研究A",
+                  "卒業研究B",
+                  "専門語学A",
+                  "専門語学B"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "specialized-elective",
+          "type": "elective",
+          "minCredits": 34,
+          "groups": [
+            {
+              "id": "gb20-gb30-gb40-group",
+              "minCredits": 16,
+              "includeRules": {
+                "prefixes": ["GB20", "GB30", "GB40"]
+              }
+            },
+            {
+              "id": "gb2-gb3-gb4-ga4-group",
+              "minCredits": 0,
+              "maxCredits": 18,
+              "includeRules": {
+                "prefixes": ["GB2", "GB3", "GB4", "GA4"]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "foundation",
+      "name": "専門基礎科目",
+      "subcategories": [
+        {
+          "id": "foundation-required",
+          "type": "required",
+          "groups": [
+            {
+              "id": "required-courses",
+              "includeRules": {
+                "courseNames": [
+                  "線形代数A",
+                  "線形代数B",
+                  "微分積分A",
+                  "微分積分B",
+                  "確率論",
+                  "統計学",
+                  "数値計算法",
+                  "論理と形式化",
+                  "情報数学A",
+                  "論理システム",
+                  "論理システム演習",
+                  "専門英語基礎",
+                  "プログラミング入門A",
+                  "プログラミング入門B",
+                  "Computer Science in English A",
+                  "Computer Science in English B",
+                  "コンピュータとプログラミング",
+                  "データ構造とアルゴリズム",
+                  "データ構造とアルゴリズム実験",
+                  "論理回路",
+                  "論理回路演習"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "foundation-elective",
+          "type": "elective",
+          "minCredits": 26,
+          "groups": [
+            {
+              "id": "gb1-group",
+              "minCredits": 4,
+              "includeRules": {
+                "prefixes": ["GB1"]
+              },
+              "excludeRules": {
+                "courseNames": [
+                  "情報科学特別演習",
+                  "情報特別演習I",
+                  "情報特別演習II"
+                ]
+              }
+            },
+            {
+              "id": "ga1-group",
+              "minCredits": 8,
+              "includeRules": {
+                "prefixes": ["GA1"]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "common",
+      "name": "共通科目",
+      "subcategories": [
+        {
+          "id": "common-required",
+          "type": "required",
+          "groups": [
+            {
+              "id": "first-year-seminar",
+              "requiredCredits": 2,
+              "includeRules": {
+                "categories": [
+                  {
+                    "majorCategory": "総合科目",
+                    "middleCategory": "ファーストイヤーセミナー"
+                  },
+                  {
+                    "majorCategory": "総合科目",
+                    "middleCategory": "学問への誘い"
+                  }
+                ]
+              }
+            },
+            {
+              "id": "bachelor-foundation",
+              "requiredCredits": 2,
+              "includeRules": {
+                "categories": [
+                  {
+                    "majorCategory": "総合科目",
+                    "middleCategory": "学士基盤科目"
+                  },
+                  {
+                    "majorCategory": "総合科目",
+                    "middleCategory": "学士基盤科目-高年次向け-"
+                  }
+                ]
+              }
+            },
+            {
+              "id": "physical-education",
+              "requiredCredits": 2,
+              "includeRules": {
+                "categories": [
+                  {
+                    "majorCategory": "体育"
+                  }
+                ]
+              }
+            },
+            {
+              "id": "english",
+              "requiredCredits": 4,
+              "includeRules": {
+                "categories": [
+                  {
+                    "majorCategory": "外国語",
+                    "middleCategory": "英語"
+                  }
+                ]
+              }
+            },
+            {
+              "id": "information",
+              "requiredCredits": 4,
+              "includeRules": {
+                "categories": [
+                  {
+                    "majorCategory": "情報"
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": "common-elective",
+          "type": "elective",
+          "minCredits": 1,
+          "maxCredits": 5,
+          "groups": [
+            {
+              "id": "pe-elective",
+              "minCredits": 0,
+              "maxCredits": 4,
+              "includeRules": {
+                "categories": [
+                  {
+                    "majorCategory": "体育"
+                  }
+                ]
+              }
+            },
+            {
+              "id": "foreign-language-elective",
+              "minCredits": 0,
+              "includeRules": {
+                "categories": [
+                  {
+                    "majorCategory": "外国語"
+                  }
+                ]
+              }
+            },
+            {
+              "id": "japanese-elective",
+              "minCredits": 0,
+              "includeRules": {
+                "categories": [
+                  {
+                    "majorCategory": "国語"
+                  }
+                ]
+              }
+            },
+            {
+              "id": "art-elective",
+              "minCredits": 0,
+              "includeRules": {
+                "categories": [
+                  {
+                    "majorCategory": "芸術"
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "related",
+      "name": "関連科目",
+      "subcategories": [
+        {
+          "id": "related-elective",
+          "type": "elective",
+          "minCredits": 6,
+          "maxCredits": 10,
+          "groups": [
+            {
+              "id": "efgh-group",
+              "minCredits": 0,
+              "includeRules": {
+                "prefixes": ["E", "F", "G", "H"]
+              },
+              "excludeRules": {
+                "prefixes": ["GB", "GA"]
+              }
+            },
+            {
+              "id": "efgcgeh-group",
+              "minCredits": 0,
+              "maxCredits": 4,
+              "includeRules": {
+                "prefixes": ["E", "F", "GC", "GE", "H"]
+              }
+            }
+          ],
+          "notes": "E, F, G, Hで始まる科目、共通科目及び教職に関する科目以外の科目"
+        }
+      ]
+    }
+  ]
+}
