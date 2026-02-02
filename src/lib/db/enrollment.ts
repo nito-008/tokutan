@@ -40,13 +40,13 @@ export async function importTwinsData(
     isInProgress: isInProgress(tc.finalGrade),
   }));
 
-  // 既存データを取得
+  // 既存データを取得（IDの引き継ぎのみ）
   const existing = await getEnrollment(profileId);
 
   const enrollment: EnrollmentData = {
     id: existing?.id || `enrollment-${profileId}`,
     profileId,
-    courses: mergeCourses(existing?.courses || [], courses),
+    courses,
     importedAt: now,
     updatedAt: now,
   };
@@ -64,28 +64,6 @@ function determineSemester(tc: TwinsCourse): "spring" | "fall" | "full" {
   if (hasSpring) return "spring";
   if (hasFall) return "fall";
   return "spring"; // デフォルト
-}
-
-// 科目をマージ（重複を更新）
-function mergeCourses(
-  existing: UserCourseRecord[],
-  newCourses: UserCourseRecord[],
-): UserCourseRecord[] {
-  const map = new Map<string, UserCourseRecord>();
-
-  // 既存データをマップに追加
-  for (const course of existing) {
-    const key = `${course.courseId}-${course.year}`;
-    map.set(key, course);
-  }
-
-  // 新しいデータで上書きまたは追加
-  for (const course of newCourses) {
-    const key = `${course.courseId}-${course.year}`;
-    map.set(key, course);
-  }
-
-  return Array.from(map.values());
 }
 
 // 履修データを削除
