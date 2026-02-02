@@ -1,4 +1,12 @@
-import { type Component, createEffect, createMemo, createSignal, onMount, Show } from "solid-js";
+import {
+  type Component,
+  createEffect,
+  createMemo,
+  createSignal,
+  onMount,
+  Show,
+  untrack,
+} from "solid-js";
 import {
   Select,
   SelectContent,
@@ -29,6 +37,9 @@ export const RequirementsSelector: Component = () => {
   const [selectedYear, setSelectedYear] = createSignal<number | undefined>();
   const [selectedDepartment, setSelectedDepartment] = createSignal<string | undefined>();
   const [selectedMajor, setSelectedMajor] = createSignal<string | null | undefined>();
+  const [selectedRequirementId, setSelectedRequirementId] = createSignal<string | undefined>();
+
+  let selectionChangeSeq = 0;
 
   onMount(async () => {
     try {
@@ -41,6 +52,7 @@ export const RequirementsSelector: Component = () => {
         setSelectedYear(currentReq.year);
         setSelectedDepartment(currentReq.department);
         setSelectedMajor(currentReq.major ?? null);
+        setSelectedRequirementId(currentReq.id);
       }
     } catch (error) {
       console.error("Failed to load requirements:", error);
@@ -54,19 +66,17 @@ export const RequirementsSelector: Component = () => {
     if (!currentReq) return;
 
     setRequirements((prev) => {
-      const existingIndex = prev.findIndex((req) => req.id === currentReq.id);
-      if (existingIndex === -1) {
-        return [...prev, currentReq];
-      }
-
-      const next = [...prev];
-      next[existingIndex] = currentReq;
-      return next;
+      const exists = prev.some((req) => req.id === currentReq.id);
+      if (exists) return prev;
+      return [...prev, currentReq];
     });
+
+    if (currentReq.id === untrack(selectedRequirementId)) return;
 
     setSelectedYear(currentReq.year);
     setSelectedDepartment(currentReq.department);
     setSelectedMajor(currentReq.major ?? null);
+    setSelectedRequirementId(currentReq.id);
   });
 
   const yearOptions = createMemo(() => getAvailableYears(requirements()));
@@ -90,6 +100,7 @@ export const RequirementsSelector: Component = () => {
     year: number,
     department: string,
     major: string | null,
+    seq: number,
   ) => {
     const req = findRequirement(requirements(), year, department, major);
     if (!req) return;
@@ -99,43 +110,56 @@ export const RequirementsSelector: Component = () => {
 
     try {
       await updateSelectedRequirements(profile.id, req.id);
-      updateProfile((current) => ({ ...current, selectedRequirementsId: req.id }));
+      if (seq !== selectionChangeSeq) return;
+      setSelectedRequirementId(req.id);
       updateRequirements(req);
+      updateProfile((current) => ({ ...current, selectedRequirementsId: req.id }));
     } catch (error) {
       console.error("Failed to update selected requirements:", error);
     }
   };
 
   const handleYearChange = (option: YearOption | null) => {
+    selectionChangeSeq += 1;
     const year = option?.value;
     setSelectedYear(year);
     setSelectedDepartment(undefined);
     setSelectedMajor(undefined);
+    setSelectedRequirementId(undefined);
   };
 
   const handleDepartmentChange = async (option: DepartmentOption | null) => {
+    selectionChangeSeq += 1;
+    const seq = selectionChangeSeq;
     const dept = option?.value;
+    const year = selectedYear();
     setSelectedDepartment(dept);
     setSelectedMajor(undefined);
+    setSelectedRequirementId(undefined);
 
-    if (!dept || !selectedYear()) return;
+    if (!dept || year === undefined) return;
 
-    const majors = getAvailableMajors(requirements(), selectedYear()!, dept);
+    const majors = getAvailableMajors(requirements(), year, dept);
 
     if (majors.length === 0) {
-      await updateRequirementsSelection(selectedYear()!, dept, null);
+      await updateRequirementsSelection(year, dept, null, seq);
     } else if (majors.length === 1) {
       setSelectedMajor(majors[0].value);
-      await updateRequirementsSelection(selectedYear()!, dept, majors[0].value);
+      await updateRequirementsSelection(year, dept, majors[0].value, seq);
     }
   };
 
   const handleMajorChange = async (option: MajorOption | null) => {
+    selectionChangeSeq += 1;
+    const seq = selectionChangeSeq;
+    const year = selectedYear();
+    const department = selectedDepartment();
     const major = option?.value ?? null;
     setSelectedMajor(major);
+    setSelectedRequirementId(undefined);
 
-    if (selectedYear() && selectedDepartment()) {
-      await updateRequirementsSelection(selectedYear()!, selectedDepartment()!, major);
+    if (year !== undefined && department) {
+      await updateRequirementsSelection(year, department, major, seq);
     }
   };
 
