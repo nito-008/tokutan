@@ -2,6 +2,7 @@ import Plus from "lucide-solid/icons/plus";
 import { type Component, For, Show } from "solid-js";
 import type { SetStoreFunction } from "solid-js/store";
 import { Button } from "~/components/ui/button";
+import { generateGroupId } from "~/lib/id";
 import type { RequirementGroup } from "~/types";
 import { GroupEditor } from "./GroupEditor";
 
@@ -28,7 +29,7 @@ export const GroupsSection: Component<GroupsSectionProps> = (props) => {
 
   const addGroup = () => {
     const newGroup: RequirementGroup = {
-      id: `group-${Date.now()}`,
+      id: generateGroupId(),
       minCredits: 0,
       includeRules: {},
     };

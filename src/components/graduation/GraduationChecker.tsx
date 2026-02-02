@@ -5,6 +5,7 @@ import { Switch, SwitchControl, SwitchLabel } from "~/components/ui/switch";
 import { calculateRequirementStatus } from "~/lib/calculator/requirements";
 import { getCachedKdb } from "~/lib/db/kdb";
 import { saveRequirements } from "~/lib/db/requirements";
+import { generateCategoryId } from "~/lib/id";
 import { useAppState, useAppStateActions } from "~/stores/appState";
 import type {
   GraduationRequirements,
@@ -68,7 +69,7 @@ export const GraduationChecker: Component = () => {
     let updatedCategories: RequirementCategory[];
     if (categoryId === null) {
       const newCategory: RequirementCategory = {
-        id: `cat-${Date.now()}`,
+        id: generateCategoryId(),
         name: updates.name || "新しいカテゴリ",
         subcategories: [],
       };

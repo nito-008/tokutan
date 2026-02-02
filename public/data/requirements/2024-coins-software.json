@@ -1,6 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/nito-008/tokutan/refs/heads/main/schema/requirements.json",
-  "id": "coins-2024-software",
+  "id": "requ_rNjXBwL3xtUo2i7rDH6hh",
   "year": 2024,
   "department": "情報科学類",
   "major": "ソフトウェアサイエンス主専攻",
@@ -11,15 +11,15 @@
   "updatedAt": "2026-02-02T00:00:00.000Z",
   "categories": [
     {
-      "id": "specialized",
+      "id": "ctgy_GdcuRMCPOZf5wQXwa0HI8",
       "name": "専門科目",
       "subcategories": [
         {
-          "id": "specialized-required",
+          "id": "sbct_qUBhCl00Q7H5Y5GjbO5j-",
           "type": "required",
           "groups": [
             {
-              "id": "required-courses",
+              "id": "grup_QcRz1CkM6jxJOaHJLM63A",
               "includeRules": {
                 "courseNames": [
                   "ソフトウェアサイエンス実験",
@@ -34,19 +34,19 @@
           ]
         },
         {
-          "id": "specialized-elective",
+          "id": "sbct_RlIIHBCgGzVPc8qptdpAL",
           "type": "elective",
           "minCredits": 34,
           "groups": [
             {
-              "id": "gb20-gb30-gb40-group",
+              "id": "grup_PwGCmitYNtMSHOG1Ua2u4",
               "minCredits": 16,
               "includeRules": {
                 "prefixes": ["GB20", "GB30", "GB40"]
               }
             },
             {
-              "id": "gb2-gb3-gb4-ga4-group",
+              "id": "grup_hmPLdQ-XkOGCmP0vvLGjg",
               "minCredits": 0,
               "maxCredits": 18,
               "includeRules": {
@@ -58,15 +58,15 @@
       ]
     },
     {
-      "id": "foundation",
+      "id": "ctgy_25gtk8rB3PFCMWq565UwJ",
       "name": "専門基礎科目",
       "subcategories": [
         {
-          "id": "foundation-required",
+          "id": "sbct_qRNRBl3W-Qekd__Sftyev",
           "type": "required",
           "groups": [
             {
-              "id": "required-courses",
+              "id": "grup_-JiOJlefSMIIBbTYwMS15",
               "includeRules": {
                 "courseNames": [
                   "線形代数A",
@@ -96,12 +96,12 @@
           ]
         },
         {
-          "id": "foundation-elective",
+          "id": "sbct_gpZI4sd-eajYMVvYgDLyq",
           "type": "elective",
           "minCredits": 26,
           "groups": [
             {
-              "id": "gb1-group",
+              "id": "grup_HOmlHfcqtcf-LFV6skSbr",
               "minCredits": 4,
               "includeRules": {
                 "prefixes": ["GB1"]
@@ -115,7 +115,7 @@
               }
             },
             {
-              "id": "ga1-group",
+              "id": "grup_cdmRSzch7b1OBgR1GsDLF",
               "minCredits": 8,
               "includeRules": {
                 "prefixes": ["GA1"]
@@ -126,15 +126,15 @@
       ]
     },
     {
-      "id": "common",
+      "id": "ctgy_rRytMqz_fjOnhBTxF2syG",
       "name": "共通科目",
       "subcategories": [
         {
-          "id": "common-required",
+          "id": "sbct_Bx6GZG0qPNI97hkqnarAj",
           "type": "required",
           "groups": [
             {
-              "id": "first-year-seminar",
+              "id": "grup_I55GrBuep9p-J68nW-GHk",
               "requiredCredits": 2,
               "includeRules": {
                 "categories": [
@@ -150,7 +150,7 @@
               }
             },
             {
-              "id": "bachelor-foundation",
+              "id": "grup_pd3oxQ9dXYfeA1yxyjlLV",
               "requiredCredits": 2,
               "includeRules": {
                 "categories": [
@@ -166,7 +166,7 @@
               }
             },
             {
-              "id": "physical-education",
+              "id": "grup_MP-77eWAfrcvnRPsW5fj2",
               "requiredCredits": 2,
               "includeRules": {
                 "categories": [
@@ -177,7 +177,7 @@
               }
             },
             {
-              "id": "english",
+              "id": "grup_5yomHbw3exxEi6xdh6g0L",
               "requiredCredits": 4,
               "includeRules": {
                 "categories": [
@@ -189,7 +189,7 @@
               }
             },
             {
-              "id": "information",
+              "id": "grup_GYUqmo0RU9Ue9zuzd-tgI",
               "requiredCredits": 4,
               "includeRules": {
                 "categories": [
@@ -202,13 +202,13 @@
           ]
         },
         {
-          "id": "common-elective",
+          "id": "sbct_IW6o0PzMiOyXp89AFpbTi",
           "type": "elective",
           "minCredits": 1,
           "maxCredits": 5,
           "groups": [
             {
-              "id": "pe-elective",
+              "id": "grup_irR865Q5X_xHb9L5GFXI7",
               "minCredits": 0,
               "maxCredits": 4,
               "includeRules": {
@@ -220,7 +220,7 @@
               }
             },
             {
-              "id": "foreign-language-elective",
+              "id": "grup_Sp883-rNKpALUD8e4NMWs",
               "minCredits": 0,
               "includeRules": {
                 "categories": [
@@ -231,7 +231,7 @@
               }
             },
             {
-              "id": "japanese-elective",
+              "id": "grup_VSTUlrKmNRRRXcugCw1DQ",
               "minCredits": 0,
               "includeRules": {
                 "categories": [
@@ -242,7 +242,7 @@
               }
             },
             {
-              "id": "art-elective",
+              "id": "grup_ftyP1YIj7M0b_LpTjzgob",
               "minCredits": 0,
               "includeRules": {
                 "categories": [
@@ -257,17 +257,17 @@
       ]
     },
     {
-      "id": "related",
+      "id": "ctgy_J35_Fl22QyrEfeCwSKVED",
       "name": "関連科目",
       "subcategories": [
         {
-          "id": "related-elective",
+          "id": "sbct_H9hhMkmJAGPi-U7JVPEnY",
           "type": "elective",
           "minCredits": 6,
           "maxCredits": 10,
           "groups": [
             {
-              "id": "efgh-group",
+              "id": "grup_JCMGOt9oNcqrSCl1KfZ4I",
               "minCredits": 0,
               "includeRules": {
                 "prefixes": ["E", "F", "G", "H"]
@@ -277,7 +277,7 @@
               }
             },
             {
-              "id": "efgcgeh-group",
+              "id": "grup_OoIilIaclmyNH5W7XRzVx",
               "minCredits": 0,
               "maxCredits": 4,
               "includeRules": {

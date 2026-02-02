@@ -1,4 +1,5 @@
 import type { GraduationRequirements } from "~/types";
+import { generateRequirementId } from "../id";
 import { db } from "./index";
 
 // 全要件を取得
@@ -71,7 +72,7 @@ export async function copyRequirements(id: string): Promise<GraduationRequiremen
   const now = new Date().toISOString();
   const copy: GraduationRequirements = {
     ...original,
-    id: `req-${Date.now()}`,
+    id: generateRequirementId(),
     isDefault: false,
     createdAt: now,
     updatedAt: now,

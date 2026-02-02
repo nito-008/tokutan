@@ -1,6 +1,6 @@
 {
   "$schema": "https://raw.githubusercontent.com/nito-008/tokutan/refs/heads/main/schema/requirements.json",
-  "id": "esys-2024",
+  "id": "requ_LUAwHOTSvb3udYSIIGFzR",
   "year": 2024,
   "department": "工学システム学類",
   "major": "知的・機能工学システム主専攻",
@@ -11,15 +11,15 @@
   "updatedAt": "2026-01-29T14:53:40.837Z",
   "categories": [
     {
-      "id": "specialized",
+      "id": "ctgy_B-0sQctMZhdNZInoXlaOq",
       "name": "専門科目",
       "subcategories": [
         {
-          "id": "specialized-required",
+          "id": "sbct_iP9ce6FJB_t9CmlckK6fM",
           "type": "required",
           "groups": [
             {
-              "id": "required-courses",
+              "id": "grup_Rd2osCaGx9GkmQ4oVC8l8",
               "includeRules": {
                 "courseNames": [
                   "プログラミング序論C",
@@ -39,41 +39,41 @@
           ]
         },
         {
-          "id": "specialized-elective",
+          "id": "sbct_Jk0RKeAxGkz6PcYZUs3j-",
           "type": "elective",
           "minCredits": 40,
           "maxCredits": 49,
           "groups": [
             {
-              "id": "fg-ff-gb-group",
+              "id": "grup_uOU0fcs_ug0E1wk20V2nr",
               "minCredits": 6,
               "includeRules": {
                 "prefixes": ["FG11", "FG21"]
               }
             },
             {
-              "id": "group-1769460882009",
+              "id": "grup_BPHTw_9Ctf29BhNAak2G2",
               "minCredits": 1,
               "includeRules": {
                 "prefixes": ["FG12", "FG22"]
               }
             },
             {
-              "id": "group-1769460901959",
+              "id": "grup_WQBVb-akRjDq8G1SrN8NU",
               "minCredits": 1,
               "includeRules": {
                 "prefixes": ["FG13", "FG23"]
               }
             },
             {
-              "id": "group-1769460916548",
+              "id": "grup_HKiG8O1_GSvgPSAp7D35z",
               "minCredits": 16,
               "includeRules": {
                 "prefixes": ["FG17", "FG24", "FG25"]
               }
             },
             {
-              "id": "group-1769460932698",
+              "id": "grup_AS46AChqf3U9VZahjHCR1",
               "minCredits": 0,
               "includeRules": {
                 "prefixes": ["FG", "FF2", "FF3", "FF4", "FF5", "GB2", "GB3", "GB4", "FA00"]
@@ -84,15 +84,15 @@
       ]
     },
     {
-      "id": "foundation",
+      "id": "ctgy_j0MHu5XuGzG3Ij1srSKqk",
       "name": "専門基礎科目",
       "subcategories": [
         {
-          "id": "foundation-required",
+          "id": "sbct_j6StR1UqtJKZNlhjZmx6D",
           "type": "required",
           "groups": [
             {
-              "id": "required-courses",
+              "id": "grup_SD0lwg4I--IrJMwtvvLYJ",
               "includeRules": {
                 "courseNames": [
                   "数学リテラシー1",
@@ -130,21 +130,21 @@
       ]
     },
     {
-      "id": "common",
+      "id": "ctgy_Y8H0byi38Qf45WU5Dc3Z9",
       "name": "基礎科目共通科目",
       "subcategories": [
         {
-          "id": "subcat-1769461547235",
+          "id": "sbct_HvrDJQz63HKsj1e77pyAg",
           "type": "required",
           "groups": [
             {
-              "id": "required-courses",
+              "id": "grup_u8Lobaal3jlv5hSdVQ9dx",
               "includeRules": {
                 "courseNames": [""]
               }
             },
             {
-              "id": "group-1769690334977",
+              "id": "grup_iobbKRVFbqrhuIJRh2oGL",
               "requiredCredits": 2,
               "includeRules": {
                 "categories": [
@@ -160,7 +160,7 @@
               }
             },
             {
-              "id": "group-1769690391095",
+              "id": "grup_HpVNSrozkVOwrGDPzQfgt",
               "requiredCredits": 3,
               "includeRules": {
                 "categories": [
@@ -196,7 +196,7 @@
               }
             },
             {
-              "id": "group-1769690452574",
+              "id": "grup_-SRUPmF3zzMHI-Wf2s08K",
               "requiredCredits": 4,
               "includeRules": {
                 "categories": [
@@ -208,7 +208,7 @@
               }
             },
             {
-              "id": "group-1769690466434",
+              "id": "grup_jETm0t8zoODDBE-Q2XQxE",
               "requiredCredits": 4,
               "includeRules": {
                 "categories": [
@@ -221,13 +221,13 @@
           ]
         },
         {
-          "id": "subcat-1769461553835",
+          "id": "sbct_Y9nL0S0NwQvjnQwirDSp3",
           "type": "elective",
           "minCredits": 1,
           "maxCredits": 10,
           "groups": [
             {
-              "id": "group-1769490412309",
+              "id": "grup_Hi4uLz2GngKiY2Enwrxtt",
               "minCredits": 1,
               "includeRules": {
                 "categories": [
@@ -244,7 +244,7 @@
               "maxCredits": 3
             },
             {
-              "id": "group-1769490435346",
+              "id": "grup_frvuoGh_cx1wWFk9MDSVz",
               "minCredits": 0,
               "includeRules": {
                 "categories": [
@@ -268,7 +268,7 @@
               }
             },
             {
-              "id": "group-1769490790479",
+              "id": "grup_Xw_oO8O4oHF-T-2Xt8NBc",
               "minCredits": 0,
               "includeRules": {
                 "categories": [
@@ -280,7 +280,7 @@
               "maxCredits": 4
             },
             {
-              "id": "group-1769490807117",
+              "id": "grup_ffz0TL5jiCeCNvNKQ_S97",
               "minCredits": 0,
               "includeRules": {
                 "categories": [
@@ -292,7 +292,7 @@
               "maxCredits": 1
             },
             {
-              "id": "group-1769490833766",
+              "id": "grup_pdxesqmQjgo4ohj2QqnJ_",
               "minCredits": 0,
               "includeRules": {
                 "categories": [
@@ -308,15 +308,15 @@
       ]
     },
     {
-      "id": "basic",
+      "id": "ctgy_Wn5CqOrQwDFF36LGTKlHN",
       "name": "基礎科目関連科目",
       "subcategories": [
         {
-          "id": "subcat-1769461564785",
+          "id": "sbct_kTh48xkUKV3Ujw5HEcZE8",
           "type": "required",
           "groups": [
             {
-              "id": "required-courses",
+              "id": "grup_v1QOzLS5BpsXb064Vu6p3",
               "includeRules": {
                 "courseNames": []
               }
@@ -324,13 +324,13 @@
           ]
         },
         {
-          "id": "subcat-1769461571505",
+          "id": "sbct_jgsLSxetEc4RF88ZnHeyE",
           "type": "elective",
           "minCredits": 6,
           "maxCredits": 15,
           "groups": [
             {
-              "id": "group-1769494514703",
+              "id": "grup_nU9vE0VT7JbtUWycqMLOx",
               "minCredits": 0,
               "excludeRules": {
                 "prefixes": [
@@ -351,7 +351,7 @@
               }
             },
             {
-              "id": "group-1769490983361",
+              "id": "grup_zgQJHYoJ2iF3rWc31kpYT",
               "minCredits": 0,
               "includeRules": {
                 "courseNames": ["工学システム概論"]
@@ -359,7 +359,7 @@
               "maxCredits": 1
             },
             {
-              "id": "group-1769491020908",
+              "id": "grup_rJtm_OLX6TaGDzF-ITcmb",
               "minCredits": 0,
               "includeRules": {
                 "categories": [
@@ -370,7 +370,7 @@
               }
             },
             {
-              "id": "group-1769491030034",
+              "id": "grup_emiyZGU6nEHTDRyfvEukf",
               "minCredits": 0,
               "includeRules": {
                 "categories": [
@@ -381,7 +381,7 @@
               }
             },
             {
-              "id": "group-1769491041512",
+              "id": "grup_bH4xQCI-yuXgoUlzktkuq",
               "minCredits": 0,
               "includeRules": {
                 "categories": [
