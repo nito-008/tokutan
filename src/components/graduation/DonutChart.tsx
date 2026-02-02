@@ -98,7 +98,8 @@ export const DonutChart: Component<DonutChartProps> = (props) => {
     chartInstance?.destroy();
   });
 
-  const percentage = () => Math.round((props.totalEarned / props.totalRequired) * 100);
+  const percentage = () =>
+    props.totalRequired === 0 ? 0 : Math.round((props.totalEarned / props.totalRequired) * 100);
 
   return (
     <div class="relative w-64 h-64 mx-auto">
