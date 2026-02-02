@@ -1,13 +1,13 @@
 import FilePlusCorner from "lucide-solid/icons/file-plus-corner";
 import FolderOpen from "lucide-solid/icons/folder-open";
 import Loader from "lucide-solid/icons/loader";
-import { type Component, Show, createSignal } from "solid-js";
+import { type Component, createSignal, Show } from "solid-js";
 import { Alert, AlertDescription } from "~/components/ui/alert";
 import { importTwinsData } from "~/lib/db/enrollment";
 import { getActiveProfile } from "~/lib/db/profiles";
 import {
-  type ValidationResult,
   parseTwinsCsv,
+  type ValidationResult,
   validateTwinsCourses,
 } from "~/lib/parsers/twins-csv";
 import { useAppStateActions } from "~/stores/appState";
@@ -129,13 +129,7 @@ export const CsvUploadDialog: Component = () => {
             onDragLeave={handleDragLeave}
             onClick={handleClick}
           >
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept=".csv"
-              class="hidden"
-              onChange={handleFileInput}
-            />
+            <input ref={fileInputRef} type="file" class="hidden" onChange={handleFileInput} />
 
             <Show
               when={isLoading()}
