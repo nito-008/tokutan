@@ -10,7 +10,8 @@
     "check": "biome check .",
     "fix": "biome check --write .",
     "typecheck": "tsgo --noEmit",
-    "gen": "tsx scripts/generate-schemas.ts"
+    "gen": "tsx scripts/generate-schemas.ts",
+    "deploy": "wrangler pages deploy .output/public"
   },
   "dependencies": {
     "@kobalte/core": "^0.13.11",
@@ -41,7 +42,8 @@
     "tailwindcss": "^4.0.7",
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
-    "vitest": "^4.0.18"
+    "vitest": "^4.0.18",
+    "wrangler": "^4.61.1"
   },
   "engines": {
     "node": ">=22"
