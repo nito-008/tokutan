@@ -91,6 +91,9 @@
                   "YB",
                   "FJ"
                 ]
+              },
+              "excludeRules": {
+                "courseNames": ["工学システム概論"]
               }
             }
           ]

@@ -77,6 +77,9 @@
               "minCredits": 0,
               "includeRules": {
                 "prefixes": ["FG", "FF2", "FF3", "FF4", "FF5", "GB2", "GB3", "GB4", "FA00"]
+              },
+              "excludeRules": {
+                "courseNames": ["工学システム概論"]
               }
             }
           ]
