@@ -18,12 +18,8 @@ export interface MajorOption {
 /**
  * 全要件から利用可能な年度一覧を抽出（重複なし、降順）
  */
-export function getAvailableYears(
-  requirements: GraduationRequirements[],
-): YearOption[] {
-  const years = [...new Set(requirements.map((r) => r.year))].sort(
-    (a, b) => b - a,
-  );
+export function getAvailableYears(requirements: GraduationRequirements[]): YearOption[] {
+  const years = [...new Set(requirements.map((r) => r.year))].sort((a, b) => b - a);
   return years.map((year) => ({
     value: year,
     label: `${year}年入学`,
@@ -55,9 +51,7 @@ export function getAvailableMajors(
   year: number,
   department: string,
 ): MajorOption[] {
-  const filtered = requirements.filter(
-    (r) => r.year === year && r.department === department,
-  );
+  const filtered = requirements.filter((r) => r.year === year && r.department === department);
 
   const majors = filtered
     .map((r) => r.major)

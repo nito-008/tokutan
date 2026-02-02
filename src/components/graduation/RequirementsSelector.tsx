@@ -1,10 +1,4 @@
-import {
-  type Component,
-  createMemo,
-  createSignal,
-  onMount,
-  Show,
-} from "solid-js";
+import { type Component, createMemo, createSignal, onMount, Show } from "solid-js";
 import {
   Select,
   SelectContent,
@@ -16,12 +10,12 @@ import { updateSelectedRequirements } from "~/lib/db/profiles";
 import { getAllRequirements } from "~/lib/db/requirements";
 import {
   type DepartmentOption,
-  type MajorOption,
-  type YearOption,
   findRequirement,
   getAvailableDepartments,
   getAvailableMajors,
   getAvailableYears,
+  type MajorOption,
+  type YearOption,
 } from "~/lib/requirements/selector-utils";
 import { useAppState, useAppStateActions } from "~/stores/appState";
 import type { GraduationRequirements } from "~/types";

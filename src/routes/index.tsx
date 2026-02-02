@@ -1,5 +1,5 @@
 import Loader from "lucide-solid/icons/loader";
-import { type Component, Show, createSignal, onMount } from "solid-js";
+import { type Component, createSignal, onMount, Show } from "solid-js";
 import { CsvUploadDialog } from "~/components/dialogs/CsvUploadDialog";
 import { SettingsDialog } from "~/components/dialogs/SettingsDialog";
 import { GraduationChecker } from "~/components/graduation/GraduationChecker";

@@ -1,4 +1,4 @@
-﻿import Circle from "lucide-solid/icons/circle";
+import Circle from "lucide-solid/icons/circle";
 import CircleCheck from "lucide-solid/icons/circle-check";
 import Pencil from "lucide-solid/icons/pencil";
 import { type Component, createSignal, For, Show } from "solid-js";
@@ -35,6 +35,7 @@ interface RequirementTreeProps {
     updates: Partial<RequirementSubcategory>,
   ) => void;
   editMode?: boolean;
+  showGrades?: boolean;
 }
 
 const formatCreditDisplay = (earned: number, min: number, max?: number): string => {
@@ -132,6 +133,7 @@ export const RequirementTree: Component<RequirementTreeProps> = (props) => {
                               );
                               if (sub) setEditingSubcategory(sub);
                             }}
+                            showGrades={props.showGrades}
                           />
                         );
                       }}
@@ -156,7 +158,7 @@ export const RequirementTree: Component<RequirementTreeProps> = (props) => {
             <AccordionContent>
               <div class="pl-6 space-y-1">
                 <For each={props.unmatchedCourses}>
-                  {(course) => <CourseItem course={course} />}
+                  {(course) => <CourseItem course={course} showGrades={props.showGrades} />}
                 </For>
                 <Show when={(props.unmatchedCourses ?? []).length === 0}>
                   <p class="text-sm text-muted-foreground">該当しない科目はありません</p>
@@ -193,6 +195,7 @@ interface SubcategoryPanelProps {
   definition?: RequirementSubcategory;
   editable: boolean;
   onEdit: () => void;
+  showGrades?: boolean;
 }
 
 const SubcategoryPanel: Component<SubcategoryPanelProps> = (props) => {
@@ -239,7 +242,7 @@ const SubcategoryPanel: Component<SubcategoryPanelProps> = (props) => {
                   <Separator />
                   <div class="space-y-1">
                     <For each={props.subcategory.matchedCourses}>
-                      {(course) => <CourseItem course={course} />}
+                      {(course) => <CourseItem course={course} showGrades={props.showGrades} />}
                     </For>
                     <Show when={props.subcategory.matchedCourses.length === 0}>
                       <p class="text-sm text-muted-foreground">該当する科目がありません</p>
@@ -259,6 +262,7 @@ const SubcategoryPanel: Component<SubcategoryPanelProps> = (props) => {
                       groupStatus={groupStatus}
                       groupDefinition={groupDefinition}
                       showHeader={showHeader}
+                      showGrades={props.showGrades}
                     />
                   );
                 }}
@@ -274,6 +278,7 @@ const SubcategoryPanel: Component<SubcategoryPanelProps> = (props) => {
                   groupDefinition={groupDefinitions.find(
                     (group) => group.id === groupStatus.groupId,
                   )}
+                  showGrades={props.showGrades}
                 />
               )}
             </For>
@@ -288,6 +293,7 @@ interface ConditionBlockProps {
   groupStatus: GroupStatus;
   groupDefinition?: RequirementGroup;
   showHeader?: boolean;
+  showGrades?: boolean;
 }
 
 const ConditionBlock: Component<ConditionBlockProps> = (props) => {
@@ -310,7 +316,7 @@ const ConditionBlock: Component<ConditionBlockProps> = (props) => {
       </Show>
       <div class="space-y-1">
         <For each={props.groupStatus.matchedCourses}>
-          {(course) => <CourseItem course={course} />}
+          {(course) => <CourseItem course={course} showGrades={props.showGrades} />}
         </For>
         <Show when={props.groupStatus.matchedCourses.length === 0}>
           <p class="text-sm text-muted-foreground">該当する科目がありません</p>
@@ -383,7 +389,7 @@ const formatGroupConditionLabel = (group?: RequirementGroup): string => {
   return parts.length > 0 ? parts.join(" ・ ") : `グループ ${group.id}`;
 };
 
-const CourseItem: Component<{ course: MatchedCourse }> = (props) => {
+const CourseItem: Component<{ course: MatchedCourse; showGrades?: boolean }> = (props) => {
   return (
     <div class="flex items-center gap-2 text-sm py-1">
       <StatusIcon
@@ -396,7 +402,13 @@ const CourseItem: Component<{ course: MatchedCourse }> = (props) => {
       </span>
       <span class="text-xs text-muted-foreground">{props.course.courseId}</span>
       <span class="text-muted-foreground">({props.course.credits}単位)</span>
-      <GradeBadge grade={props.course.grade} />
+      <GradeBadge
+        grade={props.course.grade}
+        showGrades={props.showGrades ?? true}
+        isPassed={props.course.isPassed}
+        isInProgress={props.course.isInProgress}
+        isUnregistered={props.course.isUnregistered}
+      />
     </div>
   );
 };
@@ -419,22 +431,47 @@ const StatusIcon: Component<{
   );
 };
 
-const GradeBadge: Component<{ grade: string }> = (props) => {
+const GradeBadge: Component<{
+  grade: string;
+  showGrades: boolean;
+  isPassed: boolean;
+  isInProgress?: boolean;
+  isUnregistered?: boolean;
+}> = (props) => {
   const variants: Record<string, string> = {
     "A+": "bg-green-500",
     A: "bg-lime-500",
     B: "bg-yellow-500",
     C: "bg-orange-500",
     D: "bg-red-500",
+    F: "bg-red-600",
     P: "bg-purple-500",
     認: "bg-purple-500",
     履修中: "bg-blue-500",
     未履修: "bg-gray-400",
   };
 
+  const isFailedGrade = props.grade === "D" || props.grade === "F";
+  let label = props.grade;
+  let useKeifont = false;
+
+  if (!props.showGrades) {
+    if (isFailedGrade) {
+      label = "らくたん！";
+      useKeifont = true;
+    } else if (props.isPassed) {
+      label = "とくたん！";
+      useKeifont = true;
+    }
+  }
+
   return (
-    <Badge class={`${variants[props.grade] || "bg-gray-500"} text-white text-xs`}>
-      {props.grade}
+    <Badge
+      class={`${variants[props.grade] || "bg-gray-500"} text-white text-xs${
+        useKeifont ? " font-keifont" : ""
+      }`}
+    >
+      {label}
     </Badge>
   );
 };

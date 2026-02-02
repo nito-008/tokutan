@@ -1,5 +1,4 @@
-﻿import { type Component, For, Show, createEffect, createSignal, onCleanup } from "solid-js";
-import { Alert, AlertDescription } from "~/components/ui/alert";
+import { type Component, createEffect, createSignal, For, onCleanup, Show } from "solid-js";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Switch, SwitchControl, SwitchLabel } from "~/components/ui/switch";
 import { calculateRequirementStatus } from "~/lib/calculator/requirements";
@@ -30,6 +29,7 @@ export const GraduationChecker: Component = () => {
     calculatedAt: "",
   });
   const [editMode, setEditMode] = createSignal(false);
+  const [showGrades, setShowGrades] = createSignal(true);
 
   // 要件充足状況を計算
   createEffect(() => {
@@ -111,10 +111,10 @@ export const GraduationChecker: Component = () => {
           groups: RequirementGroup[];
         }>;
         const groups = hasGroups
-          ? (updates as RequiredUpdate).groups ?? []
+          ? ((updates as RequiredUpdate).groups ?? [])
           : existing?.type === "required"
-          ? existing.groups ?? []
-          : [];
+            ? (existing.groups ?? [])
+            : [];
         return {
           id: existing?.id ?? subcategoryId,
           type: "required",
@@ -130,20 +130,20 @@ export const GraduationChecker: Component = () => {
         groups: RequirementGroup[];
       }>;
       const minCredits = hasMinCredits
-        ? (updates as ElectiveUpdate).minCredits ?? 0
+        ? ((updates as ElectiveUpdate).minCredits ?? 0)
         : existing && existing.type !== "required"
-        ? existing.minCredits
-        : 0;
+          ? existing.minCredits
+          : 0;
       const maxCredits = hasMaxCredits
         ? (updates as ElectiveUpdate).maxCredits
         : existing && existing.type !== "required"
-        ? existing.maxCredits
-        : undefined;
+          ? existing.maxCredits
+          : undefined;
       const groups = hasGroups
-        ? (updates as ElectiveUpdate).groups ?? []
+        ? ((updates as ElectiveUpdate).groups ?? [])
         : existing && existing.type !== "required"
-        ? existing.groups
-        : [];
+          ? existing.groups
+          : [];
 
       return {
         id: existing?.id ?? subcategoryId,
@@ -235,10 +235,20 @@ export const GraduationChecker: Component = () => {
 
           <Card class="lg:col-span-2">
             <CardHeader class="flex flex-row items-center justify-between">
-              <Switch checked={editMode()} onChange={setEditMode} class="flex items-center gap-2">
-                <SwitchLabel>編集モード</SwitchLabel>
-                <SwitchControl />
-              </Switch>
+              <div class="flex items-center gap-4">
+                <Switch checked={editMode()} onChange={setEditMode} class="flex items-center gap-2">
+                  <SwitchLabel>編集モード</SwitchLabel>
+                  <SwitchControl />
+                </Switch>
+                <Switch
+                  checked={showGrades()}
+                  onChange={setShowGrades}
+                  class="flex items-center gap-2"
+                >
+                  <SwitchLabel>成績評価を表示</SwitchLabel>
+                  <SwitchControl />
+                </Switch>
+              </div>
             </CardHeader>
             <CardContent>
               <RequirementTree
@@ -248,6 +258,7 @@ export const GraduationChecker: Component = () => {
                 onCategoryUpdate={handleCategoryUpdate}
                 onSubcategoryUpdate={handleSubcategoryUpdate}
                 editMode={editMode()}
+                showGrades={showGrades()}
               />
             </CardContent>
           </Card>

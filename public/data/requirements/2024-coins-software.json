@@ -107,11 +107,7 @@
                 "prefixes": ["GB1"]
               },
               "excludeRules": {
-                "courseNames": [
-                  "情報科学特別演習",
-                  "情報特別演習I",
-                  "情報特別演習II"
-                ]
+                "courseNames": ["情報科学特別演習", "情報特別演習I", "情報特別演習II"]
               }
             },
             {
