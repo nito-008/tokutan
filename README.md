@@ -1,32 +1,15 @@
-# SolidStart
+# とくたん！ - 筑波大学卒業要件チェッカー
 
-Everything you need to build a Solid project, powered by [`solid-start`](https://start.solidjs.com);
+このツールでは卒業要件を満たしているかどうかをTwinsの成績データを用いてチェックすることができます。
 
-## Creating a project
+現在は以下の入学年・学類・専攻に対応しています
 
-```bash
-# create a new project in the current directory
-npm init solid@latest
+- 2024年度入学
+  - 情報科学類
+    - ソフトウェアサイエンス主専攻
+  - 工学システム学類
+    - エネルギー・メカニクス主専攻
+    - 知的工学システム主専攻
 
-# create a new project in my-app
-npm init solid@latest my-app
-```
-
-## Developing
-
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
-
-```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-Solid apps are built with _presets_, which optimise your project for deployment to different environments.
-
-By default, `npm run build` will generate a Node app that you can run with `npm start`. To use a different preset, add it to the `devDependencies` in `package.json` and specify in your `app.config.js`.
-
-## This project was created with the [Solid CLI](https://github.com/solidjs-community/solid-cli)
+> **Warning**
+> 判定結果が正しいかどうかは必ず最新の履修要覧や支援室などで確認するようにしましょう。このツールを利用したことにより卒業に失敗したとしても、開発者は責任を負いません。
