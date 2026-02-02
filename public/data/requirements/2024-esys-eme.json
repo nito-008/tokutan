@@ -76,21 +76,7 @@
               "id": "grup_cN9ZbtpN8jpiE1TF-N0xd",
               "minCredits": 0,
               "includeRules": {
-                "prefixes": [
-                  "FG",
-                  "FF2",
-                  "FF3",
-                  "FF4",
-                  "FF5",
-                  "GB2",
-                  "GB3",
-                  "GB4",
-                  "FA00",
-                  "FH",
-                  "YA",
-                  "YB",
-                  "FJ"
-                ]
+                "prefixes": ["FG", "FF2", "FF3", "FF4", "FF5", "GB2", "GB3", "GB4", "FA00", "FJ"]
               },
               "excludeRules": {
                 "courseNames": ["工学システム概論"]
