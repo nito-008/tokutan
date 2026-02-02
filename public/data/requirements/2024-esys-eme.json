@@ -152,9 +152,6 @@
           "type": "required",
           "groups": [
             {
-              "id": "grup_3ayglFE_tnV50FpfX0J9s"
-            },
-            {
               "id": "grup_iobbKRVFbqrhuIJRh2oGL",
               "requiredCredits": 2,
               "includeRules": {
