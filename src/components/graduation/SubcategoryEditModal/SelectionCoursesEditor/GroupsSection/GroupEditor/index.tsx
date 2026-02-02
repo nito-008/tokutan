@@ -399,13 +399,22 @@ export const GroupEditor: Component<GroupEditorProps> = (props) => {
                   条件を追加
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
-                  <DropdownMenuItem onSelect={() => addField("courseNames")}>
+                  <DropdownMenuItem
+                    onSelect={() => addField("courseNames")}
+                    disabled={!!props.group.includeRules?.courseNames}
+                  >
                     特定科目
                   </DropdownMenuItem>
-                  <DropdownMenuItem onSelect={() => addField("prefixes")}>
+                  <DropdownMenuItem
+                    onSelect={() => addField("prefixes")}
+                    disabled={!!props.group.includeRules?.prefixes}
+                  >
                     ～で始まる科目
                   </DropdownMenuItem>
-                  <DropdownMenuItem onSelect={() => addField("categories")}>
+                  <DropdownMenuItem
+                    onSelect={() => addField("categories")}
+                    disabled={!!props.group.includeRules?.categories}
+                  >
                     科目区分
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -422,13 +431,22 @@ export const GroupEditor: Component<GroupEditorProps> = (props) => {
                   除外条件を追加
                 </DropdownMenuTrigger>
                 <DropdownMenuContent>
-                  <DropdownMenuItem onSelect={() => addField("courseNames-exclude")}>
+                  <DropdownMenuItem
+                    onSelect={() => addField("courseNames-exclude")}
+                    disabled={!!props.group.excludeRules?.courseNames}
+                  >
                     特定科目
                   </DropdownMenuItem>
-                  <DropdownMenuItem onSelect={() => addField("prefixes-exclude")}>
+                  <DropdownMenuItem
+                    onSelect={() => addField("prefixes-exclude")}
+                    disabled={!!props.group.excludeRules?.prefixes}
+                  >
                     ～で始まる科目
                   </DropdownMenuItem>
-                  <DropdownMenuItem onSelect={() => addField("categories-exclude")}>
+                  <DropdownMenuItem
+                    onSelect={() => addField("categories-exclude")}
+                    disabled={!!props.group.excludeRules?.categories}
+                  >
                     科目区分
                   </DropdownMenuItem>
                 </DropdownMenuContent>
