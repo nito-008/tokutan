@@ -414,18 +414,7 @@ export async function calculateRequirementStatus(
         { status: GroupStatus; keptCourses: MatchedCourse[] }
       >();
 
-      console.log(
-        `[DEBUG] Processing subcategory ${subcategory.id}, maxCredits: ${subcategory.maxCredits}`,
-      );
-      console.log(
-        `[DEBUG] Processing order:`,
-        processingOrder.map((p) => `${p.index}:${p.group.id}`),
-      );
-
       for (const { group, index } of processingOrder) {
-        console.log(
-          `[DEBUG] Processing group ${group.id} (index: ${index}), remainingMaxCredits: ${remainingMaxCredits}`,
-        );
         const groupMatches = matchCoursesToGroup(
           courses,
           group,
@@ -438,14 +427,6 @@ export async function calculateRequirementStatus(
         );
 
         const limitedMatches = limitMatchedCoursesByMaxCredits(groupMatches, remainingMaxCredits);
-
-        for (const dropped of limitedMatches.dropped) {
-          if (dropped.courseId.startsWith("AD")) {
-            console.log(
-              `[DEBUG] ${dropped.courseId} (${dropped.courseName}): DROPPED by limitMatchedCoursesByMaxCredits, group: ${group.id}, remainingMaxCredits: ${remainingMaxCredits}`,
-            );
-          }
-        }
 
         remainingMaxCredits = limitedMatches.remainingCredits;
         invalidCourses.push(...limitedMatches.dropped);
@@ -570,21 +551,12 @@ function matchCoursesToGroup(
 
   for (const course of courses) {
     const normalizedCourseName = normalizeCourseName(course.courseName);
-    const isDebugCourse = course.courseId.startsWith("AD");
 
     // 既に使用済みの科目はスキップ
     if (usedCourseIds.has(course.id)) {
-      if (isDebugCourse)
-        console.log(
-          `[DEBUG] ${course.courseId} (${course.courseName}): skipped - already used, group: ${group.id}`,
-        );
       continue;
     }
     if (isCourseExcludedByRequirements(course, excludedCourseIds)) {
-      if (isDebugCourse)
-        console.log(
-          `[DEBUG] ${course.courseId} (${course.courseName}): skipped - excluded by requirements, group: ${group.id}`,
-        );
       continue;
     }
 
@@ -597,10 +569,6 @@ function matchCoursesToGroup(
           (name) => normalizeCourseName(name) === normalizedCourseName,
         );
         if (!isExplicitlyIncluded) {
-          if (isDebugCourse)
-            console.log(
-              `[DEBUG] ${course.courseId} (${course.courseName}): skipped - Step 0 subcategory excluded, group: ${group.id}`,
-            );
           continue;
         }
       }
@@ -615,10 +583,6 @@ function matchCoursesToGroup(
           (name) => normalizeCourseName(name) === normalizedCourseName,
         );
         if (!isIncludedInThisGroup) {
-          if (isDebugCourse)
-            console.log(
-              `[DEBUG] ${course.courseId} (${course.courseName}): skipped - Step 0.5 not in this group's courseNames, group: ${group.id}`,
-            );
           continue;
         }
       }
@@ -634,10 +598,6 @@ function matchCoursesToGroup(
         courseNameToIdMap,
       );
       if (!isIncluded) {
-        if (isDebugCourse)
-          console.log(
-            `[DEBUG] ${course.courseId} (${course.courseName}): skipped - Step 1 includeRules not matched, group: ${group.id}`,
-          );
         continue;
       }
     }
@@ -651,19 +611,11 @@ function matchCoursesToGroup(
         courseNameToIdMap,
       );
       if (isExcluded) {
-        if (isDebugCourse)
-          console.log(
-            `[DEBUG] ${course.courseId} (${course.courseName}): skipped - Step 2 excludeRules matched, group: ${group.id}`,
-          );
         continue;
       }
     }
 
     // マッチ成功
-    if (isDebugCourse)
-      console.log(
-        `[DEBUG] ${course.courseId} (${course.courseName}): MATCHED in group: ${group.id}`,
-      );
     usedCourseIds.add(course.id);
     matches.push({
       courseId: course.courseId,

@@ -48,7 +48,6 @@ export async function refreshKdbCache(): Promise<void> {
     });
 
     await setSetting(SettingKeys.KDB_CACHED_AT, now);
-    console.log(`kdb cache updated: ${courses.length} courses`);
   } catch (error) {
     console.error("Failed to refresh kdb cache:", error);
     throw error;

@@ -81,7 +81,7 @@ export const SettingsDialog: Component<SettingsDialogProps> = (props) => {
   };
 
   const handleDeleteRequirements = async () => {
-    const confirmed = window.confirm("卒業要件データを削除します。よろしいですか？");
+    const confirmed = window.confirm("卒業要件データを再取得します。よろしいですか？");
     if (!confirmed) return;
 
     setIsDeletingRequirements(true);
@@ -170,13 +170,17 @@ export const SettingsDialog: Component<SettingsDialogProps> = (props) => {
           </div>
 
           <div class="border rounded-lg p-4">
-            <h4 class="font-medium mb-2">卒業要件データを削除</h4>
+            <h4 class="font-medium mb-2">卒業要件データを再取得</h4>
+            <p class="text-sm text-muted-foreground mb-3">
+              卒業要件データをサーバーから再取得します。ローカルの編集データは削除されます。
+            </p>
+
             <Button
               variant="destructive"
               onClick={handleDeleteRequirements}
               disabled={isDeletingRequirements()}
             >
-              {isDeletingRequirements() ? "削除中..." : "卒業要件データを削除"}
+              {isDeletingRequirements() ? "再取得中..." : "卒業要件データを再取得"}
             </Button>
           </div>
 
