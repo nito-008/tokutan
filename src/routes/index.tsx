@@ -4,6 +4,7 @@ import { CsvUploadDialog } from "~/components/dialogs/CsvUploadDialog";
 import { SettingsDialog } from "~/components/dialogs/SettingsDialog";
 import { GraduationChecker } from "~/components/graduation/GraduationChecker";
 import { RequirementsSelector } from "~/components/graduation/RequirementsSelector";
+import { Footer } from "~/components/layout/Footer";
 import { Header } from "~/components/layout/Header";
 import { Alert, AlertDescription } from "~/components/ui/alert";
 import { type AppState, initializeApp } from "~/lib/init";
@@ -64,6 +65,8 @@ const Home: Component = () => {
             </Show>
           </Show>
         </main>
+
+        <Footer />
 
         <SettingsDialog
           open={showSettingsDialog()}
