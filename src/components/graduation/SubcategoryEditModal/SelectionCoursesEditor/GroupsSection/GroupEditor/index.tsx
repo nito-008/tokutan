@@ -45,7 +45,7 @@ export const GroupEditor: Component<GroupEditorProps> = (props) => {
 
     if (baseField === "courseNames") {
       if (isExclude) {
-        updateExcludeField("courseNames", [...(props.group.excludeRules?.courseNames ?? [])]);
+        updateExcludeField("courseNames", [...(props.group.excludeRules?.courseNames ?? []), ""]);
       } else {
         updateIncludeField("courseNames", [...(props.group.includeRules?.courseNames ?? [])]);
       }

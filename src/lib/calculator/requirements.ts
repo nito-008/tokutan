@@ -26,6 +26,44 @@ function isRulesEmpty(rules: IncludeRules | ExcludeRules | undefined): boolean {
   return !hasNames && !hasPrefixes && !hasCategories;
 }
 
+// サブカテゴリ内の全グループのexcludeRules.courseNamesを収集
+// これにより、後のグループで除外指定された科目が、前のグループでマッチするのを防ぐ
+function collectSubcategoryExcludedCourseNames(groups: RequirementGroup[]): Set<string> {
+  const excludedNames = new Set<string>();
+  for (const group of groups) {
+    if (group.excludeRules?.courseNames) {
+      for (const name of group.excludeRules.courseNames) {
+        const normalized = normalizeCourseName(name);
+        if (normalized) {
+          excludedNames.add(normalized);
+        }
+      }
+    }
+  }
+  return excludedNames;
+}
+
+// 全要件からincludeRules.courseNamesで明示的に指定された科目名を収集
+// これらの科目はprefix/categoriesでのマッチでは使用せず、courseNamesでの明示的なマッチでのみ使用可能
+function collectExplicitlyIncludedCourseNames(requirements: GraduationRequirements): Set<string> {
+  const explicitNames = new Set<string>();
+  for (const category of requirements.categories) {
+    for (const subcategory of category.subcategories) {
+      for (const group of subcategory.groups) {
+        if (group.includeRules?.courseNames) {
+          for (const name of group.includeRules.courseNames) {
+            const normalized = normalizeCourseName(name);
+            if (normalized) {
+              explicitNames.add(normalized);
+            }
+          }
+        }
+      }
+    }
+  }
+  return explicitNames;
+}
+
 function splitRequiredCourseGroup(value: string): string[] {
   return value
     .split(",")
@@ -233,6 +271,10 @@ export async function calculateRequirementStatus(
     courseNameToIdMap,
   );
 
+  // 全要件から明示的にcourseNamesで指定された科目名を収集
+  // これらの科目はprefix/categoriesでのマッチでは使用せず、courseNamesでの明示的なマッチでのみ使用
+  const explicitlyIncludedCourseNames = collectExplicitlyIncludedCourseNames(requirements);
+
   const categoryStatuses: CategoryStatus[] = requirements.categories.map((category) => {
     const subcategoryStatuses: SubcategoryStatus[] = category.subcategories.map((subcategory) => {
       const groupStatuses: GroupStatus[] = [];
@@ -279,6 +321,8 @@ export async function calculateRequirementStatus(
               requiredCourseExclusion,
               courseTypeMaster,
               courseNameToIdMap,
+              undefined,
+              explicitlyIncludedCourseNames,
             );
             groupMatches.push(...groupCourseMatches);
           }
@@ -345,7 +389,30 @@ export async function calculateRequirementStatus(
 
       let remainingMaxCredits = subcategory.maxCredits;
 
-      for (const group of subcategory.groups) {
+      // サブカテゴリ内の全グループのexcludeRules.courseNamesを事前収集
+      // これにより、後のグループで除外指定された科目が、前のグループでマッチするのを防ぐ
+      const subcategoryExcludedCourseNames = collectSubcategoryExcludedCourseNames(
+        subcategory.groups,
+      );
+
+      // includeRulesが設定されたグループを先に処理し、キャッチオール（includeRules未設定）は後に回す
+      // これにより、明示的に指定された科目がサブカテゴリの単位上限の予算を優先的に使える
+      const processingOrder = subcategory.groups
+        .map((group, index) => ({ group, index }))
+        .sort((a, b) => {
+          const aIsCatchAll = isRulesEmpty(a.group.includeRules);
+          const bIsCatchAll = isRulesEmpty(b.group.includeRules);
+          if (aIsCatchAll && !bIsCatchAll) return 1;
+          if (!aIsCatchAll && bIsCatchAll) return -1;
+          return 0;
+        });
+
+      const groupResultMap = new Map<
+        number,
+        { status: GroupStatus; keptCourses: MatchedCourse[] }
+      >();
+
+      for (const { group, index } of processingOrder) {
         const groupMatches = matchCoursesToGroup(
           courses,
           group,
@@ -353,9 +420,12 @@ export async function calculateRequirementStatus(
           requiredCourseExclusion,
           courseTypeMaster,
           courseNameToIdMap,
+          subcategoryExcludedCourseNames,
+          explicitlyIncludedCourseNames,
         );
 
         const limitedMatches = limitMatchedCoursesByMaxCredits(groupMatches, remainingMaxCredits);
+
         remainingMaxCredits = limitedMatches.remainingCredits;
         invalidCourses.push(...limitedMatches.dropped);
 
@@ -372,17 +442,27 @@ export async function calculateRequirementStatus(
           earnedCredits >= minCredits &&
           (group.maxCredits === undefined || earnedCredits <= group.maxCredits);
 
-        groupStatuses.push({
-          groupId: group.id,
-          isSatisfied,
-          earnedCredits,
-          inProgressCredits,
-          requiredCredits: minCredits,
-          maxCredits: group.maxCredits,
-          matchedCourses: limitedMatches.kept,
+        groupResultMap.set(index, {
+          status: {
+            groupId: group.id,
+            isSatisfied,
+            earnedCredits,
+            inProgressCredits,
+            requiredCredits: minCredits,
+            maxCredits: group.maxCredits,
+            matchedCourses: limitedMatches.kept,
+          },
+          keptCourses: limitedMatches.kept,
         });
+      }
 
-        matchedCourses.push(...limitedMatches.kept);
+      // 元のグループ順序で結果を再構成（UI表示用）
+      for (let i = 0; i < subcategory.groups.length; i++) {
+        const result = groupResultMap.get(i);
+        if (result) {
+          groupStatuses.push(result.status);
+          matchedCourses.push(...result.keptCourses);
+        }
       }
 
       const earnedCredits = matchedCourses
@@ -462,13 +542,49 @@ function matchCoursesToGroup(
   excludedCourseIds: RequiredCourseExclusion,
   courseTypeMaster: CourseTypeMasterNode[],
   courseNameToIdMap: Map<string, string>,
+  subcategoryExcludedCourseNames?: Set<string>,
+  explicitlyIncludedCourseNames?: Set<string>,
 ): MatchedCourse[] {
   const matches: MatchedCourse[] = [];
 
   for (const course of courses) {
+    const normalizedCourseName = normalizeCourseName(course.courseName);
+
     // 既に使用済みの科目はスキップ
-    if (usedCourseIds.has(course.id)) continue;
-    if (isCourseExcludedByRequirements(course, excludedCourseIds)) continue;
+    if (usedCourseIds.has(course.id)) {
+      continue;
+    }
+    if (isCourseExcludedByRequirements(course, excludedCourseIds)) {
+      continue;
+    }
+
+    // Step 0: サブカテゴリ全体で除外指定された科目名をチェック
+    // ただし、このグループのincludeRules.courseNamesで明示的に指定されている場合は除外しない
+    if (subcategoryExcludedCourseNames && subcategoryExcludedCourseNames.size > 0) {
+      if (subcategoryExcludedCourseNames.has(normalizedCourseName)) {
+        // このグループのincludeRules.courseNamesに含まれていれば除外しない
+        const isExplicitlyIncluded = group.includeRules?.courseNames?.some(
+          (name) => normalizeCourseName(name) === normalizedCourseName,
+        );
+        if (!isExplicitlyIncluded) {
+          continue;
+        }
+      }
+    }
+
+    // Step 0.5: 全要件のどこかでcourseNamesで明示的に指定されている科目は、
+    // このグループのcourseNamesで指定されていない限りスキップ
+    // これにより、prefix/categoriesでのマッチを防ぎ、明示的に指定されたグループでのみ使用される
+    if (explicitlyIncludedCourseNames && explicitlyIncludedCourseNames.size > 0) {
+      if (explicitlyIncludedCourseNames.has(normalizedCourseName)) {
+        const isIncludedInThisGroup = group.includeRules?.courseNames?.some(
+          (name) => normalizeCourseName(name) === normalizedCourseName,
+        );
+        if (!isIncludedInThisGroup) {
+          continue;
+        }
+      }
+    }
 
     // Step 1: includeRulesが設定されている場合はホワイトリスト方式でチェック
     // 未設定または空の場合は全科目を対象（ブラックリスト方式）
@@ -479,7 +595,9 @@ function matchCoursesToGroup(
         courseTypeMaster,
         courseNameToIdMap,
       );
-      if (!isIncluded) continue;
+      if (!isIncluded) {
+        continue;
+      }
     }
 
     // Step 2: excludeRulesのいずれかにマッチするか（除外）
@@ -490,7 +608,9 @@ function matchCoursesToGroup(
         courseTypeMaster,
         courseNameToIdMap,
       );
-      if (isExcluded) continue;
+      if (isExcluded) {
+        continue;
+      }
     }
 
     // マッチ成功
