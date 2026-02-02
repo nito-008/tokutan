@@ -22,7 +22,7 @@ export function getAvailableYears(requirements: GraduationRequirements[]): YearO
   const years = [...new Set(requirements.map((r) => r.year))].sort((a, b) => b - a);
   return years.map((year) => ({
     value: year,
-    label: `${year}年入学`,
+    label: `${year}年度入学`,
   }));
 }
 

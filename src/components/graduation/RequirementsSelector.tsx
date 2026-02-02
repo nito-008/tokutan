@@ -185,14 +185,14 @@ export const RequirementsSelector: Component = () => {
           onChange={handleYearChange}
           options={yearOptions()}
           optionValue="value"
-          placeholder="入学年度"
+          placeholder="入学年度を選択"
           itemComponent={(selectProps) => (
             <SelectItem item={selectProps.item}>{selectProps.item.rawValue.label}</SelectItem>
           )}
         >
           <SelectTrigger class="w-32">
             <SelectValue<YearOption>>
-              {(state) => state.selectedOption()?.label || "入学年度"}
+              {(state) => state.selectedOption()?.label || "入学年度を選択"}
             </SelectValue>
           </SelectTrigger>
           <SelectContent />
@@ -204,14 +204,14 @@ export const RequirementsSelector: Component = () => {
             onChange={handleDepartmentChange}
             options={departmentOptions()}
             optionValue="value"
-            placeholder="学類"
+            placeholder="学類を選択"
             itemComponent={(selectProps) => (
               <SelectItem item={selectProps.item}>{selectProps.item.rawValue.label}</SelectItem>
             )}
           >
             <SelectTrigger class="w-40">
               <SelectValue<DepartmentOption>>
-                {(state) => state.selectedOption()?.label || "学類"}
+                {(state) => state.selectedOption()?.label || "学類を選択"}
               </SelectValue>
             </SelectTrigger>
             <SelectContent />
@@ -224,14 +224,14 @@ export const RequirementsSelector: Component = () => {
             onChange={handleMajorChange}
             options={majorOptions()}
             optionValue="value"
-            placeholder="専攻"
+            placeholder="専攻を選択"
             itemComponent={(selectProps) => (
               <SelectItem item={selectProps.item}>{selectProps.item.rawValue.label}</SelectItem>
             )}
           >
             <SelectTrigger class="w-64">
               <SelectValue<MajorOption>>
-                {(state) => state.selectedOption()?.label || "専攻"}
+                {(state) => state.selectedOption()?.label || "専攻を選択"}
               </SelectValue>
             </SelectTrigger>
             <SelectContent />
