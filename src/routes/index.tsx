@@ -1,10 +1,11 @@
 import Loader from "lucide-solid/icons/loader";
-import { type Component, createSignal, onMount, Show } from "solid-js";
+import { type Component, Show, createSignal, onMount } from "solid-js";
 import { CsvUploadDialog } from "~/components/dialogs/CsvUploadDialog";
 import { SettingsDialog } from "~/components/dialogs/SettingsDialog";
 import { GraduationChecker } from "~/components/graduation/GraduationChecker";
 import { RequirementsSelector } from "~/components/graduation/RequirementsSelector";
 import { Header } from "~/components/layout/Header";
+import { Alert, AlertDescription } from "~/components/ui/alert";
 import { type AppState, initializeApp } from "~/lib/init";
 import { AppStateProvider } from "~/stores/appState";
 
@@ -35,7 +36,12 @@ const Home: Component = () => {
       <div class="min-h-screen bg-background">
         <Header onSettings={() => setShowSettingsDialog(true)} />
 
-        <main class="container mx-auto px-4 py-6">
+        <main class="container mx-auto px-4 py-6 space-y-6">
+          <Alert variant="destructive" class="text-sm leading-relaxed bg-destructive-foreground">
+            <AlertDescription>
+              判定結果が正しいかどうかは必ず最新の履修要覧や支援室などで確認するようにしましょう。このツールを利用したことにより卒業に失敗したとしても、開発者は責任を負いません。
+            </AlertDescription>
+          </Alert>
           <Show
             when={!isLoading()}
             fallback={

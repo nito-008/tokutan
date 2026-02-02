@@ -1,4 +1,4 @@
-﻿import { type Component, createEffect, createSignal, For, onCleanup, Show } from "solid-js";
+﻿import { type Component, For, Show, createEffect, createSignal, onCleanup } from "solid-js";
 import { Alert, AlertDescription } from "~/components/ui/alert";
 import { Card, CardContent, CardHeader, CardTitle } from "~/components/ui/card";
 import { Switch, SwitchControl, SwitchLabel } from "~/components/ui/switch";
@@ -110,10 +110,10 @@ export const GraduationChecker: Component = () => {
           groups: RequirementGroup[];
         }>;
         const groups = hasGroups
-          ? ((updates as RequiredUpdate).groups ?? [])
+          ? (updates as RequiredUpdate).groups ?? []
           : existing?.type === "required"
-            ? (existing.groups ?? [])
-            : [];
+          ? existing.groups ?? []
+          : [];
         return {
           id: existing?.id ?? subcategoryId,
           type: "required",
@@ -129,20 +129,20 @@ export const GraduationChecker: Component = () => {
         groups: RequirementGroup[];
       }>;
       const minCredits = hasMinCredits
-        ? ((updates as ElectiveUpdate).minCredits ?? 0)
+        ? (updates as ElectiveUpdate).minCredits ?? 0
         : existing && existing.type !== "required"
-          ? existing.minCredits
-          : 0;
+        ? existing.minCredits
+        : 0;
       const maxCredits = hasMaxCredits
         ? (updates as ElectiveUpdate).maxCredits
         : existing && existing.type !== "required"
-          ? existing.maxCredits
-          : undefined;
+        ? existing.maxCredits
+        : undefined;
       const groups = hasGroups
-        ? ((updates as ElectiveUpdate).groups ?? [])
+        ? (updates as ElectiveUpdate).groups ?? []
         : existing && existing.type !== "required"
-          ? existing.groups
-          : [];
+        ? existing.groups
+        : [];
 
       return {
         id: existing?.id ?? subcategoryId,
@@ -178,7 +178,7 @@ export const GraduationChecker: Component = () => {
 
   return (
     <div class="space-y-6">
-      <Show when={appState()?.requirements}>
+      <Show when={appState()?.enrollment}>
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
           <Card class="lg:col-span-1">
             <CardHeader>
@@ -251,11 +251,6 @@ export const GraduationChecker: Component = () => {
             </CardContent>
           </Card>
         </div>
-        <Alert variant="destructive" class="mt-4 text-sm leading-relaxed bg-destructive-foreground">
-          <AlertDescription>
-            判定結果が正しいかどうかは必ず最新の履修要覧や支援室などで確認するようにしましょう。このツールを利用したことにより卒業に失敗したとしても、開発者は責任を負いません。
-          </AlertDescription>
-        </Alert>
       </Show>
     </div>
   );

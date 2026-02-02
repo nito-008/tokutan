@@ -1,13 +1,13 @@
 import FilePlusCorner from "lucide-solid/icons/file-plus-corner";
 import FolderOpen from "lucide-solid/icons/folder-open";
 import Loader from "lucide-solid/icons/loader";
-import { type Component, createSignal, Show } from "solid-js";
+import { type Component, Show, createSignal } from "solid-js";
 import { Alert, AlertDescription } from "~/components/ui/alert";
 import { importTwinsData } from "~/lib/db/enrollment";
 import { getActiveProfile } from "~/lib/db/profiles";
 import {
-  parseTwinsCsv,
   type ValidationResult,
+  parseTwinsCsv,
   validateTwinsCourses,
 } from "~/lib/parsers/twins-csv";
 import { useAppState, useAppStateActions } from "~/stores/appState";
@@ -79,7 +79,7 @@ export const CsvUploadDialog: Component = () => {
     if (file) handleFile(file);
   };
 
-  const [isUploaderOpen, setIsUploaderOpen] = createSignal(!appState()?.enrollment);
+  const [isUploaderOpen, setIsUploaderOpen] = createSignal(false);
 
   const onDataLoaded = async (courses: TwinsCourse[], _validation: ValidationResult) => {
     const profile = await getActiveProfile();
@@ -113,7 +113,8 @@ export const CsvUploadDialog: Component = () => {
           <DialogHeader>
             <DialogTitle>成績データを選択</DialogTitle>
             <DialogDescription>
-              TWINSからダウンロードしたCSVファイルをアップロードしてください
+              <p>TWINSからダウンロードしたCSVファイルをアップロードしてください</p>
+              <p>※成績データはサーバーには送信されません。処理は全てローカルで行われます。</p>
             </DialogDescription>
           </DialogHeader>
 
@@ -122,7 +123,11 @@ export const CsvUploadDialog: Component = () => {
             class={`
             border-2 border-dashed rounded-lg p-8 text-center cursor-pointer
             transition-colors w-full
-            ${isDragging() ? "border-primary bg-primary/5" : "border-muted-foreground/25 hover:border-primary/50"}
+            ${
+              isDragging()
+                ? "border-primary bg-primary/5"
+                : "border-muted-foreground/25 hover:border-primary/50"
+            }
           `}
             onDrop={handleDrop}
             onDragOver={handleDragOver}
