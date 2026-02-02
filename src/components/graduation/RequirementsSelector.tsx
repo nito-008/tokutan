@@ -1,6 +1,5 @@
 import {
   type Component,
-  createEffect,
   createMemo,
   createSignal,
   onMount,
@@ -41,19 +40,18 @@ export const RequirementsSelector: Component = () => {
     try {
       const allReqs = await getAllRequirements();
       setRequirements(allReqs);
+
+      // 初期値を設定（1回のみ）
+      const currentReq = appState()?.requirements;
+      if (currentReq) {
+        setSelectedYear(currentReq.year);
+        setSelectedDepartment(currentReq.department);
+        setSelectedMajor(currentReq.major ?? null);
+      }
     } catch (error) {
       console.error("Failed to load requirements:", error);
     } finally {
       setIsLoading(false);
-    }
-  });
-
-  createEffect(() => {
-    const currentReq = appState()?.requirements;
-    if (currentReq && requirements().length > 0) {
-      setSelectedYear(currentReq.year);
-      setSelectedDepartment(currentReq.department);
-      setSelectedMajor(currentReq.major ?? null);
     }
   });
 
