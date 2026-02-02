@@ -76,6 +76,24 @@ function normalizeCourseName(value: string | undefined): string {
 }
 
 /**
+ * 単位上限を超過したときに、優先的に除外する科目かどうかを判定する
+ * @param match 判定対象の科目
+ * @returns 履修中・不合格（未修得）ならtrue
+ */
+function isLowPriorityCourseForMaxCreditLimit(match: MatchedCourse): boolean {
+  return match.isInProgress || !match.isPassed;
+}
+
+/**
+ * 単位として計上できない不合格・未修得科目かどうかを判定する
+ * @param match 判定対象の科目
+ * @returns 不合格・未修得ならtrue
+ */
+function isFailedOrUnearnedCourse(match: MatchedCourse): boolean {
+  return !match.isPassed && !match.isInProgress;
+}
+
+/**
  * サブカテゴリの最大単位数に合わせてマッチ結果を上限内に絞り込む
  * @param matches マッチした科目一覧
  * @param maxCredits サブカテゴリの最大単位数
@@ -92,8 +110,25 @@ function limitMatchedCoursesByMaxCredits(
   const kept: MatchedCourse[] = [];
   const dropped: MatchedCourse[] = [];
   let remainingCredits = maxCredits;
+  const candidateMatches = matches.filter((match) => {
+    if (isFailedOrUnearnedCourse(match)) {
+      dropped.push(match);
+      return false;
+    }
+    return true;
+  });
+  const passedCredits = candidateMatches
+    .filter((match) => match.isPassed)
+    .reduce((sum, match) => sum + match.credits, 0);
+  const hasPassedCreditOverflow = passedCredits > maxCredits;
 
-  for (const match of matches) {
+  for (const match of candidateMatches) {
+    // 上限超過時は、履修中・不合格（未修得）を先に除外して合格科目を優先して残す
+    if (hasPassedCreditOverflow && isLowPriorityCourseForMaxCreditLimit(match)) {
+      dropped.push(match);
+      continue;
+    }
+
     const countableCredits = match.isPassed ? match.credits : 0;
     if (countableCredits > 0 && remainingCredits <= 0) {
       dropped.push(match);
