@@ -1,7 +1,7 @@
 import Circle from "lucide-solid/icons/circle";
 import CircleCheck from "lucide-solid/icons/circle-check";
 import Pencil from "lucide-solid/icons/pencil";
-import { type Component, createSignal, For, Show } from "solid-js";
+import { type Component, createMemo, createSignal, For, Show } from "solid-js";
 import {
   Accordion,
   AccordionContent,
@@ -451,27 +451,38 @@ const GradeBadge: Component<{
     未履修: "bg-gray-400",
   };
 
-  const isFailedGrade = props.grade === "D" || props.grade === "F";
-  let label = props.grade;
-  let useKeifont = false;
+  const badgeInfo = createMemo(() => {
+    const isFailedGrade = props.grade === "D" || props.grade === "F";
+    let label = props.grade;
+    let useKeifont = false;
+    let colorClass = variants[props.grade] || "bg-gray-500";
 
-  if (!props.showGrades) {
-    if (isFailedGrade) {
-      label = "らくたん！";
-      useKeifont = true;
-    } else if (props.isPassed) {
-      label = "とくたん！";
-      useKeifont = true;
+    if (!props.showGrades) {
+      if (isFailedGrade) {
+        label = "らくたん！";
+        useKeifont = true;
+        colorClass = "bg-red-500";
+      } else if (props.isInProgress) {
+        label = "りしゅうちゅう！";
+        useKeifont = true;
+        colorClass = "bg-blue-500";
+      } else if (props.isPassed) {
+        label = "とくたん！";
+        useKeifont = true;
+        colorClass = "bg-green-500";
+      }
     }
-  }
+
+    return { label, useKeifont, colorClass };
+  });
 
   return (
     <Badge
-      class={`${variants[props.grade] || "bg-gray-500"} text-white text-xs${
-        useKeifont ? " font-keifont" : ""
+      class={`${badgeInfo().colorClass} text-white text-xs${
+        badgeInfo().useKeifont ? " font-keifont" : ""
       }`}
     >
-      {label}
+      {badgeInfo().label}
     </Badge>
   );
 };

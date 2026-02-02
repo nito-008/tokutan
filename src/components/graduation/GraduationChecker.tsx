@@ -29,7 +29,7 @@ export const GraduationChecker: Component = () => {
     calculatedAt: "",
   });
   const [editMode, setEditMode] = createSignal(false);
-  const [showGrades, setShowGrades] = createSignal(true);
+  const [showGrades, setShowGrades] = createSignal(false);
 
   // 要件充足状況を計算
   createEffect(() => {
@@ -241,11 +241,11 @@ export const GraduationChecker: Component = () => {
                   <SwitchControl />
                 </Switch>
                 <Switch
-                  checked={showGrades()}
-                  onChange={setShowGrades}
+                  checked={!showGrades()}
+                  onChange={(v) => setShowGrades(!v)}
                   class="flex items-center gap-2"
                 >
-                  <SwitchLabel>成績評価を表示</SwitchLabel>
+                  <SwitchLabel>とくたん！/らくたん！</SwitchLabel>
                   <SwitchControl />
                 </Switch>
               </div>
