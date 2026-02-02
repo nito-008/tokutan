@@ -10,13 +10,12 @@ import {
   parseTwinsCsv,
   validateTwinsCourses,
 } from "~/lib/parsers/twins-csv";
-import { useAppState, useAppStateActions } from "~/stores/appState";
+import { useAppStateActions } from "~/stores/appState";
 import type { TwinsCourse } from "~/types";
 import { Button } from "../ui/button";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog";
 
 export const CsvUploadDialog: Component = () => {
-  const appState = useAppState();
   const { updateEnrollment } = useAppStateActions();
 
   const [isDragging, setIsDragging] = createSignal(false);
@@ -95,10 +94,6 @@ export const CsvUploadDialog: Component = () => {
   };
 
   const handleUploaderOpenChange = (open: boolean) => {
-    if (!open && !appState()?.enrollment) {
-      return;
-    }
-
     setIsUploaderOpen(open);
   };
 
