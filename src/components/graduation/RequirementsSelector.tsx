@@ -1,4 +1,4 @@
-import { type Component, createMemo, createSignal, onMount, Show } from "solid-js";
+import { type Component, createEffect, createMemo, createSignal, onMount, Show } from "solid-js";
 import {
   Select,
   SelectContent,
@@ -47,6 +47,26 @@ export const RequirementsSelector: Component = () => {
     } finally {
       setIsLoading(false);
     }
+  });
+
+  createEffect(() => {
+    const currentReq = appState()?.requirements;
+    if (!currentReq) return;
+
+    setRequirements((prev) => {
+      const existingIndex = prev.findIndex((req) => req.id === currentReq.id);
+      if (existingIndex === -1) {
+        return [...prev, currentReq];
+      }
+
+      const next = [...prev];
+      next[existingIndex] = currentReq;
+      return next;
+    });
+
+    setSelectedYear(currentReq.year);
+    setSelectedDepartment(currentReq.department);
+    setSelectedMajor(currentReq.major ?? null);
   });
 
   const yearOptions = createMemo(() => getAvailableYears(requirements()));

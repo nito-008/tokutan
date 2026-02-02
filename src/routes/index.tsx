@@ -1,5 +1,6 @@
 import Loader from "lucide-solid/icons/loader";
 import { type Component, createSignal, onMount, Show } from "solid-js";
+import { CreateRequirementsDialog } from "~/components/dialogs/CreateRequirementsDialog";
 import { CsvUploadDialog } from "~/components/dialogs/CsvUploadDialog";
 import { SettingsDialog } from "~/components/dialogs/SettingsDialog";
 import { GraduationChecker } from "~/components/graduation/GraduationChecker";
@@ -60,6 +61,7 @@ const Home: Component = () => {
               <div class="flex justify-center items-center gap-4 mb-6">
                 <RequirementsSelector />
                 <CsvUploadDialog />
+                <CreateRequirementsDialog />
               </div>
               <GraduationChecker />
             </Show>
