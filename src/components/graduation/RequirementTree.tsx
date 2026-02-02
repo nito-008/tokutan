@@ -462,6 +462,10 @@ const GradeBadge: Component<{
         label = "らくたん！";
         useKeifont = true;
         colorClass = "bg-red-500";
+      } else if (props.isUnregistered) {
+        label = "みりしゅう！";
+        useKeifont = true;
+        colorClass = "bg-gray-400";
       } else if (props.isInProgress) {
         label = "りしゅうちゅう！";
         useKeifont = true;
