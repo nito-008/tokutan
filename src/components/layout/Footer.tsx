@@ -16,6 +16,26 @@ export const Footer: Component = () => {
           </a>
         </p>
         <p>
+          Thanks to{" "}
+          <a
+            href="https://github.com/Make-IT-TSUKUBA/alternative-tsukuba-kdb"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="underline hover:text-foreground"
+          >
+            alternative-tsukuba-kdb
+          </a>
+          {" / "}
+          <a
+            href="https://github.com/s7tya/kdb-crawler"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="underline hover:text-foreground"
+          >
+            kdb-crawler
+          </a>
+        </p>
+        <p>
           Developed by{" "}
           <a
             href="https://github.com/nito-008"
