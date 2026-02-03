@@ -22,7 +22,7 @@
               "id": "grup_KuHvk-5doPMfCwcNhw8eL",
               "includeRules": {
                 "courseNames": [
-                  "情報システム実験",
+                  "情報システム実験A",
                   "情報システム実験B",
                   "卒業研究A",
                   "卒業研究B",
@@ -52,6 +52,9 @@
               "includeRules": {
                 "prefixes": ["GB2", "GB3", "GB4", "GA4"],
                 "courseNames": ["情報科学特別演習", "情報特別演習I", "情報特別演習II"]
+              },
+              "excludeRules": {
+                "prefixes": ["GB20", "GB30", "GB40"]
               }
             }
           ]
