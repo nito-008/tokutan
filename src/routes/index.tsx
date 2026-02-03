@@ -63,11 +63,11 @@ const Home: Component = () => {
                   <RequirementsSelector />
                   <CsvUploadDialog />
                 </div>
-                <div class="flex justify-center items-center gap-4 mb-6">
-                  <CreateRequirementsDialog />
-                </div>
               </div>
               <GraduationChecker />
+              <div class="flex justify-start items-center gap-4 mb-6">
+                <CreateRequirementsDialog />
+              </div>
             </Show>
           </Show>
         </main>
