@@ -4,6 +4,7 @@
   "year": 2024,
   "department": "情報科学類",
   "major": "知能情報メディア主専攻",
+  "prefixes": ["GA", "GB"],
   "totalCredits": 125,
   "version": "1.0.0",
   "isDefault": false,

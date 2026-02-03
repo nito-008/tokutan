@@ -11,6 +11,7 @@ export const GraduationRequirementsSchema = v.object({
   year: YearSchema,
   department: v.pipe(v.string(), v.minLength(1)),
   major: v.optional(v.string()),
+  prefixes: v.optional(v.array(v.pipe(v.string(), v.minLength(1)))),
   totalCredits: v.pipe(v.number(), v.minValue(0)),
   categories: v.array(RequirementCategorySchema),
   version: VersionSchema,

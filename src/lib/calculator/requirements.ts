@@ -152,11 +152,24 @@ type RequiredCourseExclusion = {
   courseNames: Set<string>;
 };
 
-function buildCourseNameToIdMap(kdbMap: Map<string, Course>): Map<string, string> {
+function buildCourseNameToIdMap(
+  kdbMap: Map<string, Course>,
+  preferredPrefixes?: string[],
+): Map<string, string> {
   const courseNameToIdMap = new Map<string, string>();
   for (const [courseId, course] of kdbMap.entries()) {
     const normalizedName = normalizeCourseName(course.name);
-    if (normalizedName) {
+    if (!normalizedName) continue;
+
+    const existing = courseNameToIdMap.get(normalizedName);
+    if (!existing) {
+      courseNameToIdMap.set(normalizedName, courseId);
+    } else if (
+      preferredPrefixes &&
+      preferredPrefixes.length > 0 &&
+      preferredPrefixes.some((p) => courseId.startsWith(p)) &&
+      !preferredPrefixes.some((p) => existing.startsWith(p))
+    ) {
       courseNameToIdMap.set(normalizedName, courseId);
     }
   }
@@ -349,7 +362,7 @@ export async function calculateRequirementStatus(
   for (const course of kdbCourses) {
     kdbMap.set(course.id, course);
   }
-  const courseNameToIdMap = buildCourseNameToIdMap(kdbMap);
+  const courseNameToIdMap = buildCourseNameToIdMap(kdbMap, requirements.prefixes);
   const invalidCourses: MatchedCourse[] = [];
   // 全必修科目番号（および科目名）を収集
   const requiredCourseExclusion = buildRequiredCourseExclusionSet(

@@ -4,6 +4,7 @@
   "year": 2024,
   "department": "工学システム学類",
   "major": "知的・機能工学システム主専攻",
+  "prefixes": ["FA", "FG"],
   "totalCredits": 125,
   "version": "1.0.0",
   "isDefault": true,

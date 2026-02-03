@@ -17,6 +17,13 @@
     "major": {
       "type": "string"
     },
+    "prefixes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
     "totalCredits": {
       "type": "number",
       "minimum": 0
