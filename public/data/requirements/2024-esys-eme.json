@@ -171,6 +171,22 @@
                   },
                   {
                     "majorCategory": "体育",
+                    "middleCategory": "生物、地球、数学、物理、化学、創成、医学、看護、医療、芸術、総学3,4組（春学期1年次）"
+                  },
+                  {
+                    "majorCategory": "体育",
+                    "middleCategory": "生物、地球、数学、物理、化学、創成、医学、看護、医療、芸術、総学3,4組（秋学期1年次）"
+                  },
+                  {
+                    "majorCategory": "体育",
+                    "middleCategory": "社会、国際、教育、心理、障害、資源、情報、知識、総学5,6組（春学期1年次）"
+                  },
+                  {
+                    "majorCategory": "体育",
+                    "middleCategory": "社会、国際、教育、心理、障害、資源、情報、知識、総学5,6組（秋学期1年次）"
+                  },
+                  {
+                    "majorCategory": "体育",
                     "middleCategory": "国際、生物、地球、応理、工シス、看護（春学期2年次）"
                   },
                   {
@@ -246,12 +262,22 @@
               "includeRules": {
                 "categories": [
                   {
-                    "majorCategory": "体育",
-                    "middleCategory": "全学年対象自由科目（講義）"
+                    "majorCategory": "体育"
+                  }
+                ],
+                "courseNames": [],
+                "prefixes": [""]
+              },
+              "maxCredits": 1,
+              "excludeRules": {
+                "prefixes": [""],
+                "courseNames": [],
+                "categories": [
+                  {
+                    "majorCategory": ""
                   }
                 ]
-              },
-              "maxCredits": 1
+              }
             },
             {
               "id": "grup_Xw_oO8O4oHF-T-2Xt8NBc",
