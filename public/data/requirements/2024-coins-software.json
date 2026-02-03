@@ -50,7 +50,8 @@
               "minCredits": 0,
               "maxCredits": 18,
               "includeRules": {
-                "prefixes": ["GB2", "GB3", "GB4", "GA4"]
+                "prefixes": ["GB2", "GB3", "GB4", "GA4"],
+                "courseNames": ["情報科学特別演習", "情報特別演習I", "情報特別演習II"]
               }
             }
           ]
@@ -73,18 +74,9 @@
                   "線形代数B",
                   "微分積分A",
                   "微分積分B",
-                  "確率論",
-                  "統計学",
-                  "数値計算法",
-                  "論理と形式化",
-                  "情報数学A",
-                  "論理システム",
-                  "論理システム演習",
                   "専門英語基礎",
                   "プログラミング入門A",
                   "プログラミング入門B",
-                  "Computer Science in English A",
-                  "Computer Science in English B",
                   "コンピュータとプログラミング",
                   "データ構造とアルゴリズム",
                   "データ構造とアルゴリズム実験",
@@ -100,6 +92,28 @@
           "type": "elective",
           "minCredits": 26,
           "groups": [
+            {
+              "id": "grup_Xk9mZvT2pLqR8wYnJfKaB",
+              "minCredits": 8,
+              "includeRules": {
+                "courseNames": [
+                  "確率論",
+                  "統計学",
+                  "数値計算法",
+                  "論理と形式化",
+                  "情報数学A",
+                  "論理システム",
+                  "論理システム演習"
+                ]
+              }
+            },
+            {
+              "id": "grup_Nh7cWsE4vPxQ3uFmDgLtC",
+              "minCredits": 2,
+              "includeRules": {
+                "courseNames": ["Computer Science in English A", "Computer Science in English B"]
+              }
+            },
             {
               "id": "grup_HOmlHfcqtcf-LFV6skSbr",
               "minCredits": 4,
@@ -123,7 +137,7 @@
     },
     {
       "id": "ctgy_rRytMqz_fjOnhBTxF2syG",
-      "name": "共通科目",
+      "name": "基礎科目共通科目",
       "subcategories": [
         {
           "id": "sbct_Bx6GZG0qPNI97hkqnarAj",
@@ -141,22 +155,6 @@
                   {
                     "majorCategory": "総合科目",
                     "middleCategory": "学問への誘い"
-                  }
-                ]
-              }
-            },
-            {
-              "id": "grup_pd3oxQ9dXYfeA1yxyjlLV",
-              "requiredCredits": 2,
-              "includeRules": {
-                "categories": [
-                  {
-                    "majorCategory": "総合科目",
-                    "middleCategory": "学士基盤科目"
-                  },
-                  {
-                    "majorCategory": "総合科目",
-                    "middleCategory": "学士基盤科目-高年次向け-"
                   }
                 ]
               }
@@ -204,6 +202,22 @@
           "maxCredits": 5,
           "groups": [
             {
+              "id": "grup_pd3oxQ9dXYfeA1yxyjlLV",
+              "requiredCredits": 1,
+              "includeRules": {
+                "categories": [
+                  {
+                    "majorCategory": "総合科目",
+                    "middleCategory": "学士基盤科目"
+                  },
+                  {
+                    "majorCategory": "総合科目",
+                    "middleCategory": "学士基盤科目-高年次向け-"
+                  }
+                ]
+              }
+            },
+            {
               "id": "grup_irR865Q5X_xHb9L5GFXI7",
               "minCredits": 0,
               "maxCredits": 4,
@@ -211,37 +225,13 @@
                 "categories": [
                   {
                     "majorCategory": "体育"
-                  }
-                ]
-              }
-            },
-            {
-              "id": "grup_Sp883-rNKpALUD8e4NMWs",
-              "minCredits": 0,
-              "includeRules": {
-                "categories": [
+                  },
                   {
                     "majorCategory": "外国語"
-                  }
-                ]
-              }
-            },
-            {
-              "id": "grup_VSTUlrKmNRRRXcugCw1DQ",
-              "minCredits": 0,
-              "includeRules": {
-                "categories": [
+                  },
                   {
                     "majorCategory": "国語"
-                  }
-                ]
-              }
-            },
-            {
-              "id": "grup_ftyP1YIj7M0b_LpTjzgob",
-              "minCredits": 0,
-              "includeRules": {
-                "categories": [
+                  },
                   {
                     "majorCategory": "芸術"
                   }
@@ -254,7 +244,7 @@
     },
     {
       "id": "ctgy_J35_Fl22QyrEfeCwSKVED",
-      "name": "関連科目",
+      "name": "基礎科目関連科目",
       "subcategories": [
         {
           "id": "sbct_H9hhMkmJAGPi-U7JVPEnY",
@@ -264,12 +254,14 @@
           "groups": [
             {
               "id": "grup_JCMGOt9oNcqrSCl1KfZ4I",
-              "minCredits": 0,
-              "includeRules": {
-                "prefixes": ["E", "F", "G", "H"]
-              },
+              "minCredits": 6,
               "excludeRules": {
-                "prefixes": ["GB", "GA"]
+                "prefixes": ["E", "F", "G", "H"],
+                "categories": [
+                  {
+                    "majorCategory": "教職"
+                  }
+                ]
               }
             },
             {
@@ -280,8 +272,7 @@
                 "prefixes": ["E", "F", "GC", "GE", "H"]
               }
             }
-          ],
-          "notes": "E, F, G, Hで始まる科目、共通科目及び教職に関する科目以外の科目"
+          ]
         }
       ]
     }
