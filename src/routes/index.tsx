@@ -58,10 +58,14 @@ const Home: Component = () => {
             }
           >
             <Show when={appState()}>
-              <div class="flex justify-center items-center gap-4 mb-6">
-                <RequirementsSelector />
-                <CsvUploadDialog />
-                <CreateRequirementsDialog />
+              <div class="space-y-4">
+                <div class="flex justify-center items-center gap-4 mb-6">
+                  <RequirementsSelector />
+                  <CsvUploadDialog />
+                </div>
+                <div class="flex justify-center items-center gap-4 mb-6">
+                  <CreateRequirementsDialog />
+                </div>
               </div>
               <GraduationChecker />
             </Show>

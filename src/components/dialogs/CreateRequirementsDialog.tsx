@@ -146,7 +146,7 @@ export const CreateRequirementsDialog: Component = () => {
     <>
       <Button variant="outline" onClick={() => setOpen(true)}>
         <Plus />
-        <span>卒業要件を作成</span>
+        <span>新しく卒業要件を作成</span>
       </Button>
       <Dialog open={open()} onOpenChange={handleOpenChange}>
         <DialogContent>
