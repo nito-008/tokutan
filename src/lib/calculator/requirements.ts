@@ -75,6 +75,8 @@ function normalizeCourseName(value: string | undefined): string {
   return (value ?? "").trim().toLowerCase();
 }
 
+const DEFAULT_UNREGISTERED_CREDITS = 0;
+
 /**
  * 単位上限を超過したときに、優先的に除外する科目かどうかを判定する
  * @param match 判定対象の科目
@@ -161,6 +163,54 @@ function buildCourseNameToIdMap(kdbMap: Map<string, Course>): Map<string, string
   return courseNameToIdMap;
 }
 
+/**
+ * 必修科目グループ(同一扱い候補)から、KDB上の科目メタ情報を解決する
+ * @param group 同一扱いとして定義された科目名/科目番号の配列
+ * @param kdbMap 科目番号をキーにしたKDBマップ
+ * @param courseNameToIdMap 正規化済み科目名 -> 科目番号マップ
+ * @returns 表示用の科目情報(見つからない場合は先頭候補名と0単位)
+ */
+function resolveRequiredGroupCourseMeta(
+  group: string[],
+  kdbMap: Map<string, Course>,
+  courseNameToIdMap: Map<string, string>,
+): { courseId: string; courseName: string; credits: number } {
+  const fallbackCourseName = group.find((name) => name.trim() !== "")?.trim() ?? "";
+
+  for (const rawKey of group) {
+    const key = rawKey.trim();
+    if (!key) continue;
+
+    const byId = kdbMap.get(key);
+    if (byId) {
+      return {
+        courseId: byId.id,
+        courseName: byId.name,
+        credits: byId.credits,
+      };
+    }
+
+    const normalized = normalizeCourseName(key);
+    if (!normalized) continue;
+    const mappedId = courseNameToIdMap.get(normalized);
+    if (!mappedId) continue;
+    const byName = kdbMap.get(mappedId);
+    if (!byName) continue;
+
+    return {
+      courseId: byName.id,
+      courseName: byName.name,
+      credits: byName.credits,
+    };
+  }
+
+  return {
+    courseId: "",
+    courseName: fallbackCourseName,
+    credits: DEFAULT_UNREGISTERED_CREDITS,
+  };
+}
+
 function buildRequiredCourseExclusionSet(
   requirements: GraduationRequirements,
   kdbMap: Map<string, Course>,
@@ -193,7 +243,7 @@ function buildRequiredCourseExclusionSet(
             continue;
           }
 
-          const mappedId = courseNameToIdMap.get(courseKey);
+          const mappedId = courseNameToIdMap.get(normalizedCourseName);
           if (mappedId) {
             exclusion.courseIds.add(mappedId);
           }
@@ -219,7 +269,8 @@ function matchRequiredCourseGroups(
   courseGroups: string[][],
   courses: UserCourseRecord[],
   usedCourseIds: Set<string>,
-  _kdbMap: Map<string, Course>,
+  kdbMap: Map<string, Course>,
+  courseNameToIdMap: Map<string, string>,
 ): MatchedCourse[] {
   const matches: MatchedCourse[] = [];
   const coursesByName = new Map<string, UserCourseRecord[]>();
@@ -262,10 +313,11 @@ function matchRequiredCourseGroups(
     }
 
     // 未履修の場合、科目名を表示（courseIdは空文字）
+    const unresolved = resolveRequiredGroupCourseMeta(group, kdbMap, courseNameToIdMap);
     matches.push({
-      courseId: "",
-      courseName: primaryCourseName,
-      credits: 2, // デフォルト単位数
+      courseId: unresolved.courseId,
+      courseName: unresolved.courseName || primaryCourseName,
+      credits: unresolved.credits,
       grade: "未履修",
       isPassed: false,
       isInProgress: false,
@@ -334,6 +386,7 @@ export async function calculateRequirementStatus(
               courses,
               usedCourseIds,
               kdbMap,
+              courseNameToIdMap,
             );
             groupMatches.push(...requiredMatches);
           }
